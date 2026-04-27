@@ -1,0 +1,17 @@
+// React 애플리케이션 진입점: Router + 전역 Provider 결합
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { BrowserRouter } from "react-router-dom";
+import App from "./App";
+import AppProviders from "./providers/AppProviders";
+import "../styles.css";
+
+ReactDOM.createRoot(document.getElementById("root")).render(
+  <React.StrictMode>
+    <BrowserRouter>
+      <AppProviders>
+        <App />
+      </AppProviders>
+    </BrowserRouter>
+  </React.StrictMode>
+);
