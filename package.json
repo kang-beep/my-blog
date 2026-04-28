@@ -16,7 +16,9 @@
     "zustand": "^5.0.12"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.2.4",
     "@vitejs/plugin-react": "^5.2.0",
+    "tailwindcss": "^4.2.4",
     "vite": "^7.3.2"
   }
 }

@@ -6,20 +6,22 @@ import { formatDate } from "../../../shared/utils/date";
 
 export default function PostCard({ post, onTagClick }) {
   return (
-    <article style={{ border: "1px solid #e5e7eb", borderRadius: "8px", padding: "12px" }}>
-      <h3>
-        <Link to={getPostDetailPath(post?.id)}>{post?.title ?? "제목 없음"}</Link>
+    <article className="card space-y-2">
+      <h3 className="leading-snug">
+        <Link className="font-semibold" to={getPostDetailPath(post?.id)}>
+          {post?.title ?? "제목 없음"}
+        </Link>
       </h3>
-      <p>{post?.category ?? "미분류"}</p>
-      <p>{formatDate(post?.created_at)}</p>
+      <p className="text-sm text-slate-600">{post?.category ?? "미분류"}</p>
+      <p className="text-xs text-slate-500">{formatDate(post?.created_at)}</p>
       {post?.image_url ? (
         <img
           src={post.image_url}
           alt={post.title ?? "post"}
-          style={{ maxWidth: "100%", borderRadius: "6px" }}
+          className="max-h-64 w-full rounded-lg object-cover"
         />
       ) : null}
-      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap" }}>
+      <div className="flex flex-wrap gap-2">
         {(post?.tags ?? []).map((tag) => (
           <TagBadge key={`${post?.id}-${tag}`} tag={tag} onClick={onTagClick} />
         ))}

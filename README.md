@@ -59,3 +59,11 @@ Supabase 무료 플랜의 자동 일시정지 방지를 위해 주기적으로 R
 - `SUPABASE_PUBLISHABLE_KEY` (publishable key)
 
 워크플로우 파일: `.github/workflows/supabase-ping.yml`
+
+## 문서
+
+- `docs/01_project_overview.md`: 프로젝트 개요
+- `docs/02_frontend_features.md`: 프론트 기능 명세
+- `docs/03_db_schemas.md`: DB 스키마 명세
+- `docs/04_ops_pipeline.md`: 운영 파이프라인
+- `docs/05_deploy_and_seed_guide.md`: 배포/환경변수/초기 데이터 입력 가이드

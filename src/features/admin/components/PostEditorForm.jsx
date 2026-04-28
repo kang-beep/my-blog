@@ -37,11 +37,12 @@ export default function PostEditorForm({ initialPost, onSubmit, isSubmitting }) 
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="card space-y-3">
       <h2>{initialPost ? "글 수정" : "새 글 작성"}</h2>
       <div>
-        <label htmlFor="title">제목</label>
+        <label className="label" htmlFor="title">제목</label>
         <input
+          className="input"
           id="title"
           value={title}
           onChange={(event) => setTitle(event.target.value)}
@@ -49,8 +50,9 @@ export default function PostEditorForm({ initialPost, onSubmit, isSubmitting }) 
         />
       </div>
       <div>
-        <label htmlFor="content">본문</label>
+        <label className="label" htmlFor="content">본문</label>
         <textarea
+          className="input min-h-52"
           id="content"
           rows={10}
           value={content}
@@ -59,8 +61,9 @@ export default function PostEditorForm({ initialPost, onSubmit, isSubmitting }) 
         />
       </div>
       <div>
-        <label htmlFor="category">카테고리</label>
+        <label className="label" htmlFor="category">카테고리</label>
         <input
+          className="input"
           id="category"
           value={category}
           onChange={(event) => setCategory(event.target.value)}
@@ -68,8 +71,9 @@ export default function PostEditorForm({ initialPost, onSubmit, isSubmitting }) 
         />
       </div>
       <div>
-        <label htmlFor="tags">태그(쉼표 구분)</label>
+        <label className="label" htmlFor="tags">태그(쉼표 구분)</label>
         <input
+          className="input"
           id="tags"
           value={tagsInput}
           onChange={(event) => setTagsInput(event.target.value)}
@@ -77,15 +81,16 @@ export default function PostEditorForm({ initialPost, onSubmit, isSubmitting }) 
         />
       </div>
       <div>
-        <label htmlFor="image">이미지</label>
+        <label className="label" htmlFor="image">이미지</label>
         <input
+          className="input"
           id="image"
           type="file"
           accept="image/*"
           onChange={(event) => setImageFile(event.target.files?.[0] ?? null)}
         />
       </div>
-      <button type="submit" disabled={isSubmitting}>
+      <button className="btn btn-primary" type="submit" disabled={isSubmitting}>
         {isSubmitting ? "저장 중..." : initialPost ? "수정 저장" : "글 등록"}
       </button>
     </form>

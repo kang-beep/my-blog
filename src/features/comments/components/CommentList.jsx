@@ -3,17 +3,19 @@ import { formatDate } from "../../../shared/utils/date";
 
 export default function CommentList({ comments = [], canDelete = false, onDelete }) {
   if (comments.length === 0) {
-    return <p>첫 댓글을 남겨보세요.</p>;
+    return <p className="rounded-lg bg-slate-100 px-3 py-2 text-sm text-slate-600">첫 댓글을 남겨보세요.</p>;
   }
 
   return (
-    <ul>
+    <ul className="space-y-2">
       {comments.map((comment) => (
-        <li key={comment.id}>
-          <strong>{comment.nickname}</strong>: {comment.content}
-          <p>{formatDate(comment.created_at)}</p>
+        <li key={comment.id} className="rounded-lg border border-slate-200 bg-white p-3">
+          <p className="mb-1 text-sm">
+            <strong>{comment.nickname}</strong>: {comment.content}
+          </p>
+          <p className="text-xs text-slate-500">{formatDate(comment.created_at)}</p>
           {canDelete ? (
-            <button type="button" onClick={() => onDelete?.(comment.id)}>
+            <button className="btn mt-2" type="button" onClick={() => onDelete?.(comment.id)}>
               삭제
             </button>
           ) : null}

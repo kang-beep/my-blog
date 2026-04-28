@@ -92,12 +92,14 @@ export default function Admin() {
   };
 
   return (
-    <section>
-      <h1>관리자 대시보드</h1>
-      <button type="button" onClick={handleSignOut}>
-        로그아웃
-      </button>
-      {error ? <p>{error}</p> : null}
+    <section className="space-y-4">
+      <div className="flex items-center justify-between gap-3">
+        <h1>관리자 대시보드</h1>
+        <button className="btn" type="button" onClick={handleSignOut}>
+          로그아웃
+        </button>
+      </div>
+      {error ? <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</p> : null}
 
       <PostEditorForm
         initialPost={editingPost}
@@ -106,17 +108,19 @@ export default function Admin() {
       />
 
       <h2>내 글 목록</h2>
-      {isLoading ? <p>글 목록을 불러오는 중입니다...</p> : null}
-      {!isLoading && posts.length === 0 ? <p>등록된 글이 없습니다.</p> : null}
-      <ul>
+      {isLoading ? <p className="text-sm text-slate-500">글 목록을 불러오는 중입니다...</p> : null}
+      {!isLoading && posts.length === 0 ? (
+        <p className="rounded-lg bg-slate-100 px-3 py-2 text-sm text-slate-600">등록된 글이 없습니다.</p>
+      ) : null}
+      <ul className="space-y-2">
         {posts.map((post) => (
-          <li key={post.id}>
+          <li key={post.id} className="card">
             <strong>{post.title}</strong> ({post.category}) - {formatDate(post.created_at)}
-            <div style={{ display: "flex", gap: "8px", marginTop: "4px" }}>
-              <button type="button" onClick={() => setEditingPost(post)}>
+            <div className="mt-2 flex gap-2">
+              <button className="btn" type="button" onClick={() => setEditingPost(post)}>
                 수정
               </button>
-              <button type="button" onClick={() => handleDelete(post.id)}>
+              <button className="btn" type="button" onClick={() => handleDelete(post.id)}>
                 삭제
               </button>
             </div>

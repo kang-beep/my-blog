@@ -7,18 +7,18 @@ export default function Sidebar() {
   const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
 
   return (
-    <aside>
-      <h2>Portfolio</h2>
-      <p>개인 포트폴리오 미니 블로그</p>
-      <nav>
-        <ul>
-          <li>
+    <aside className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+      <h2 className="mb-2 text-2xl font-bold">Portfolio</h2>
+      <p className="mb-4 text-sm text-slate-600">blog by kangsan</p>
+      <nav className="space-y-2">
+        <ul className="space-y-2">
+          <li className="rounded-lg px-2 py-1 hover:bg-slate-100">
             <Link to={ROUTES.HOME}>홈</Link>
           </li>
-          <li>
+          <li className="rounded-lg px-2 py-1 hover:bg-slate-100">
             <Link to={ROUTES.POSTS}>글 목록</Link>
           </li>
-          <li>
+          <li className="rounded-lg px-2 py-1 hover:bg-slate-100">
             <Link to={isAuthenticated ? ROUTES.ADMIN : ROUTES.LOGIN}>
               {isAuthenticated ? "관리자" : "로그인"}
             </Link>

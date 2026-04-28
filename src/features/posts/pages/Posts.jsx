@@ -44,14 +44,15 @@ export default function Posts() {
   };
 
   return (
-    <section>
+    <section className="space-y-4">
       <h1>글 목록</h1>
-      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "12px" }}>
-        <button type="button" onClick={() => updateFilter("category", "")}>
+      <div className="flex flex-wrap gap-2">
+        <button className="btn" type="button" onClick={() => updateFilter("category", "")}>
           전체 카테고리
         </button>
         {categories.map((item) => (
           <button
+            className="btn"
             type="button"
             key={item}
             onClick={() => updateFilter("category", item)}
@@ -61,13 +62,14 @@ export default function Posts() {
           </button>
         ))}
       </div>
-      {categoryError ? <p>{categoryError}</p> : null}
-      <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginBottom: "12px" }}>
-        <button type="button" onClick={() => updateFilter("tag", "")}>
+      {categoryError ? <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{categoryError}</p> : null}
+      <div className="flex flex-wrap gap-2">
+        <button className="btn" type="button" onClick={() => updateFilter("tag", "")}>
           전체 태그
         </button>
         {uniqueTags.map((item) => (
           <button
+            className="btn"
             type="button"
             key={item}
             onClick={() => updateFilter("tag", item)}
@@ -77,8 +79,8 @@ export default function Posts() {
           </button>
         ))}
       </div>
-      {isLoading ? <p>글 목록을 불러오는 중입니다...</p> : null}
-      {error ? <p>{error}</p> : null}
+      {isLoading ? <p className="text-sm text-slate-500">글 목록을 불러오는 중입니다...</p> : null}
+      {error ? <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</p> : null}
       {!isLoading && !error ? (
         <PostList posts={posts} onTagClick={(clickedTag) => updateFilter("tag", clickedTag)} />
       ) : null}

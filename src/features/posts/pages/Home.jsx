@@ -34,16 +34,16 @@ export default function Home() {
   };
 
   return (
-    <section>
+    <section className="space-y-6">
       <h1>홈</h1>
-      {isLoading ? <p>글 섹션을 불러오는 중입니다...</p> : null}
-      {error ? <p>{error}</p> : null}
+      {isLoading ? <p className="text-sm text-slate-500">글 섹션을 불러오는 중입니다...</p> : null}
+      {error ? <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</p> : null}
       {!isLoading && !error && sections.length === 0 ? (
-        <p>아직 등록된 글이 없습니다.</p>
+        <p className="rounded-lg bg-slate-100 px-3 py-2 text-sm text-slate-600">아직 등록된 글이 없습니다.</p>
       ) : null}
       {sections.map((section) => (
-        <section key={section.category} style={{ marginBottom: "24px" }}>
-          <h2>{section.category}</h2>
+        <section key={section.category} className="space-y-3">
+          <h2 className="border-b border-slate-200 pb-2">{section.category}</h2>
           <PostList posts={section.posts} onTagClick={handleTagClick} />
         </section>
       ))}

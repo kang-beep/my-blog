@@ -34,12 +34,13 @@ export default function Login() {
   };
 
   return (
-    <section>
-      <h1>관리자 로그인</h1>
-      <form onSubmit={handleSubmit}>
+    <section className="mx-auto max-w-md">
+      <h1 className="mb-4">관리자 로그인</h1>
+      <form onSubmit={handleSubmit} className="card space-y-4">
         <div>
-          <label htmlFor="email">이메일</label>
+          <label className="label" htmlFor="email">이메일</label>
           <input
+            className="input"
             id="email"
             type="email"
             value={email}
@@ -48,8 +49,9 @@ export default function Login() {
           />
         </div>
         <div>
-          <label htmlFor="password">비밀번호</label>
+          <label className="label" htmlFor="password">비밀번호</label>
           <input
+            className="input"
             id="password"
             type="password"
             value={password}
@@ -57,8 +59,8 @@ export default function Login() {
             required
           />
         </div>
-        {error ? <p>{error}</p> : null}
-        <button type="submit" disabled={isSubmitting}>
+        {error ? <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</p> : null}
+        <button className="btn btn-primary w-full" type="submit" disabled={isSubmitting}>
           {isSubmitting ? "로그인 중..." : "로그인"}
         </button>
       </form>

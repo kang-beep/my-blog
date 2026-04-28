@@ -28,8 +28,9 @@ export default function CommentForm({ onSubmit }) {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form onSubmit={handleSubmit} className="space-y-2">
       <input
+        className="input"
         type="text"
         placeholder="닉네임"
         value={nickname}
@@ -37,13 +38,14 @@ export default function CommentForm({ onSubmit }) {
         required
       />
       <textarea
+        className="input min-h-24"
         placeholder="댓글 내용"
         value={content}
         onChange={(event) => setContent(event.target.value)}
         required
       />
-      {error ? <p>{error}</p> : null}
-      <button type="submit" disabled={isSubmitting}>
+      {error ? <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</p> : null}
+      <button className="btn btn-primary" type="submit" disabled={isSubmitting}>
         {isSubmitting ? "등록 중..." : "댓글 등록"}
       </button>
     </form>

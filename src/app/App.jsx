@@ -4,9 +4,9 @@ import Sidebar from "../shared/layout/Sidebar";
 
 export default function App() {
   return (
-    <div style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: "16px" }}>
+    <div className="mx-auto grid min-h-screen w-full max-w-7xl grid-cols-1 gap-4 p-4 lg:grid-cols-[280px_1fr]">
       <Sidebar />
-      <main>
+      <main className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
         <AppRouter />
       </main>
     </div>
