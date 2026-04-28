@@ -7,7 +7,7 @@ React + Vite + Supabase 기반의 포트폴리오 미니 블로그입니다.
 - React (Vite)
 - Supabase (Database, Auth, Storage)
 - Zustand
-- React Router
+- React Router 
 
 ## 로컬 실행
 
