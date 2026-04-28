@@ -8,7 +8,7 @@ export default function Sidebar() {
 
   return (
     <aside className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-      <h2 className="mb-2 text-2xl font-bold">Portfolio</h2>
+      <h2 className="mb-2 text-2xl font-bold">kang-beep tech</h2>
       <p className="mb-4 text-sm text-slate-600">blog by kangsan</p>
       <nav className="space-y-2">
         <ul className="space-y-2">

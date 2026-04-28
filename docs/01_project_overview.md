@@ -1,6 +1,6 @@
 # 01. Project Overview
 
-> 포트폴리오 미니 홈페이지
+> my-tech-blog (UI 표시명: kang-beep tech)
 
 ---
 

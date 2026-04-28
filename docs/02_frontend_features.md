@@ -1,6 +1,6 @@
 # 02. Frontend Features
 
-> 포트폴리오 미니 홈페이지 — 페이지별 기능 명세서
+> my-tech-blog (UI 표시명: kang-beep tech) — 페이지별 기능 명세서
 
 ---
 

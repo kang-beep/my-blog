@@ -1,6 +1,6 @@
-# my_portfolio_blog
+# my-tech-blog
 
-React + Vite + Supabase 기반의 포트폴리오 미니 블로그입니다.
+React + Vite + Supabase 기반의 `kang-beep tech` 블로그입니다.
 
 ## 기술 스택
 
