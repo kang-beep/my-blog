@@ -2,11 +2,13 @@
 import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const supabasePublishableKey =
+  import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY ||
+  import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabasePublishableKey) {
   throw new Error(
-    "Supabase 환경변수가 누락되었습니다. .env.local의 VITE_SUPABASE_URL, VITE_SUPABASE_PUBLISHABLE_KEY를 확인하세요."
+    "Supabase 환경변수가 누락되었습니다. 로컬은 .env.local, 배포는 Vercel Environment Variables의 VITE_SUPABASE_URL 및 VITE_SUPABASE_PUBLISHABLE_KEY(또는 VITE_SUPABASE_ANON_KEY)를 확인하세요."
   );
 }
 
