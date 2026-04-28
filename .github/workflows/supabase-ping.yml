@@ -21,7 +21,6 @@ jobs:
 
           curl --fail --silent --show-error \
             "${SUPABASE_URL}/rest/v1/posts?select=id&limit=1" \
-            -H "apikey: ${SUPABASE_PUBLISHABLE_KEY}" \
-            -H "Authorization: Bearer ${SUPABASE_PUBLISHABLE_KEY}"
+            -H "apikey: ${SUPABASE_PUBLISHABLE_KEY}"
 
           echo "Supabase ping completed successfully."
