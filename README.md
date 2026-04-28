@@ -56,8 +56,7 @@ Supabase 무료 플랜의 자동 일시정지 방지를 위해 주기적으로 R
 필요한 GitHub Secrets:
 
 - `SUPABASE_URL` (예: `https://<project-id>.supabase.co`)
-- `SUPABASE_SECRET_KEY` (권장, 서버 전용)
-- `SUPABASE_PUBLISHABLE_KEY` (fallback 용도)
+- `SUPABASE_SECRET_KEY` (서버 전용)
 
 워크플로우 파일: `.github/workflows/supabase-ping.yml`
 

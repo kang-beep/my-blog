@@ -63,7 +63,7 @@ GitHub 레포지토리 → Settings → Secrets and variables → Actions
 | Secret 키 | 값 |
 |---|---|
 | `SUPABASE_URL` | Supabase 프로젝트 URL |
-| `SUPABASE_PUBLISHABLE_KEY` | Supabase Publishable API Key |
+| `SUPABASE_SECRET_KEY` | Supabase Secret API Key (서버 전용) |
 
 ---
 

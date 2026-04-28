@@ -12,15 +12,15 @@ jobs:
       - name: Ping Supabase REST API
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_PUBLISHABLE_KEY: ${{ secrets.SUPABASE_PUBLISHABLE_KEY }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
         run: |
-          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_PUBLISHABLE_KEY" ]; then
-            echo "Missing required secrets: SUPABASE_URL or SUPABASE_PUBLISHABLE_KEY"
+          if [ -z "$SUPABASE_URL" ] || [ -z "$SUPABASE_SECRET_KEY" ]; then
+            echo "Missing required secrets: SUPABASE_URL or SUPABASE_SECRET_KEY"
             exit 1
           fi
 
           curl --fail --silent --show-error \
             "${SUPABASE_URL}/rest/v1/posts?select=id&limit=1" \
-            -H "apikey: ${SUPABASE_PUBLISHABLE_KEY}"
+            -H "apikey: ${SUPABASE_SECRET_KEY}"
 
           echo "Supabase ping completed successfully."

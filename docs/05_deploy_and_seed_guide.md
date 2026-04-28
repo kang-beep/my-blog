@@ -30,8 +30,7 @@ VITE_SUPABASE_PUBLISHABLE_KEY=sb_publishable_xxx
 ### GitHub Actions (Secrets)
 
 - `SUPABASE_URL`
-- `SUPABASE_SECRET_KEY` (권장)
-- `SUPABASE_PUBLISHABLE_KEY` (fallback)
+- `SUPABASE_SECRET_KEY`
 
 > 주의: `sb_secret_*` 키는 서버 전용이며 프론트엔드/VITE 환경변수로 사용 금지.
 
