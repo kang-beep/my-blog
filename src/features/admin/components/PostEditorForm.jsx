@@ -8,10 +8,18 @@ function parseTags(tagsInput) {
     .filter(Boolean);
 }
 
-export default function PostEditorForm({ initialPost, onSubmit, isSubmitting }) {
+export default function PostEditorForm({
+  initialPost,
+  onSubmit,
+  isSubmitting,
+  categories = [],
+  onAddCategory,
+}) {
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("");
+  const [categoryId, setCategoryId] = useState("");
+  const [newCategoryName, setNewCategoryName] = useState("");
   const [tagsInput, setTagsInput] = useState("");
   const [imageFile, setImageFile] = useState(null);
 
@@ -19,6 +27,7 @@ export default function PostEditorForm({ initialPost, onSubmit, isSubmitting }) 
     setTitle(initialPost?.title ?? "");
     setContent(initialPost?.content ?? "");
     setCategory(initialPost?.category ?? "");
+    setCategoryId(initialPost?.category_id ?? "");
     setTagsInput((initialPost?.tags ?? []).join(", "));
     setImageFile(null);
   }, [initialPost]);
@@ -30,10 +39,24 @@ export default function PostEditorForm({ initialPost, onSubmit, isSubmitting }) 
       title: title.trim(),
       content: content.trim(),
       category: category.trim(),
+      category_id: categoryId || null,
       tags: parseTags(tagsInput),
       imageFile,
       image_url: initialPost?.image_url ?? null,
     });
+  };
+
+  const handleQuickAddCategory = async () => {
+    const nextName = newCategoryName.trim();
+    if (!nextName || !onAddCategory) {
+      return;
+    }
+    const added = await onAddCategory(nextName);
+    setCategory(nextName);
+    if (added?.id) {
+      setCategoryId(added.id);
+    }
+    setNewCategoryName("");
   };
 
   return (
@@ -62,6 +85,26 @@ export default function PostEditorForm({ initialPost, onSubmit, isSubmitting }) 
       </div>
       <div>
         <label className="label" htmlFor="category">카테고리</label>
+        <select
+          id="category-select"
+          className="input mb-2"
+          value={categoryId}
+          onChange={(event) => {
+            const nextId = event.target.value;
+            setCategoryId(nextId);
+            const selected = categories.find((item) => item.id === nextId);
+            if (selected?.name) {
+              setCategory(selected.name);
+            }
+          }}
+        >
+          <option value="">카테고리 선택</option>
+          {categories.map((item) => (
+            <option key={item.id} value={item.id}>
+              {item.name}
+            </option>
+          ))}
+        </select>
         <input
           className="input"
           id="category"
@@ -69,6 +112,17 @@ export default function PostEditorForm({ initialPost, onSubmit, isSubmitting }) 
           onChange={(event) => setCategory(event.target.value)}
           required
         />
+        <div className="mt-2 flex gap-2">
+          <input
+            className="input"
+            value={newCategoryName}
+            onChange={(event) => setNewCategoryName(event.target.value)}
+            placeholder="새 카테고리 빠른 추가"
+          />
+          <button className="btn" type="button" onClick={handleQuickAddCategory}>
+            추가
+          </button>
+        </div>
       </div>
       <div>
         <label className="label" htmlFor="tags">태그(쉼표 구분)</label>

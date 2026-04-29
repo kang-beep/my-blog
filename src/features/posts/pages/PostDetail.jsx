@@ -2,7 +2,7 @@
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { fetchAdjacentPosts, fetchPostById } from "../api/postApi";
-import { getPostDetailPath, ROUTES } from "../../../shared/constants/routes";
+import { getEditPostPath, getPostDetailPath, ROUTES } from "../../../shared/constants/routes";
 import { formatDate } from "../../../shared/utils/date";
 import CommentList from "../../comments/components/CommentList";
 import CommentForm from "../../comments/components/CommentForm";
@@ -51,6 +51,13 @@ export default function PostDetail() {
       {!isLoading && post ? (
         <>
           <h1>{post.title}</h1>
+          {isAuthenticated ? (
+            <div>
+              <Link className="btn" to={getEditPostPath(post.id)}>
+                이 글 수정
+              </Link>
+            </div>
+          ) : null}
           <p className="text-sm text-slate-600">
             {post.category} | {formatDate(post.created_at)}
           </p>

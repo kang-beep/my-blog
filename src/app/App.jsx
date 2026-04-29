@@ -4,7 +4,7 @@ import Sidebar from "../shared/layout/Sidebar";
 
 export default function App() {
   return (
-    <div className="mx-auto grid min-h-screen w-full max-w-7xl grid-cols-1 gap-4 p-4 lg:grid-cols-[280px_1fr]">
+    <div className="mx-auto grid min-h-screen w-full max-w-[1180px] grid-cols-1 gap-4 p-4 lg:grid-cols-[280px_minmax(0,760px)] lg:justify-center">
       <Sidebar />
       <main className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
         <AppRouter />

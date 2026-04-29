@@ -15,7 +15,7 @@ export default function Login() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (isAuthenticated) {
-    const redirectPath = location.state?.from?.pathname ?? ROUTES.ADMIN;
+    const redirectPath = location.state?.from?.pathname ?? ROUTES.MANAGE;
     return <Navigate to={redirectPath} replace />;
   }
 

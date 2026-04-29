@@ -62,8 +62,7 @@ Supabase 무료 플랜의 자동 일시정지 방지를 위해 주기적으로 R
 
 ## 문서
 
-- `docs/01_project_overview.md`: 프로젝트 개요
-- `docs/02_frontend_features.md`: 프론트 기능 명세
-- `docs/03_db_schemas.md`: DB 스키마 명세
-- `docs/04_ops_pipeline.md`: 운영 파이프라인
-- `docs/05_deploy_and_seed_guide.md`: 배포/환경변수/초기 데이터 입력 가이드
+- `docs/01_project_overview.md` — 개요·스택·아키텍처
+- `docs/02_frontend.md` — 프론트 구조·라우트·Vercel
+- `docs/03_db.md` — Supabase 스키마·SQL·RLS/GRANT·Storage
+- `docs/04_ops.md` — 파이프라인·Actions·운영 점검

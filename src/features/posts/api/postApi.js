@@ -11,7 +11,9 @@ function mapPost(record) {
 export async function fetchPosts({ category, tag } = {}) {
   let query = supabase
     .from("posts")
-    .select("id, title, content, category, tags, image_url, created_at, updated_at")
+    .select(
+      "id, title, slug, excerpt, status, published_at, content, category, category_id, tags, image_url, created_at, updated_at"
+    )
     .order("created_at", { ascending: false });
 
   if (category) {
@@ -31,7 +33,9 @@ export async function fetchPosts({ category, tag } = {}) {
 export async function fetchPostById(postId) {
   const { data, error } = await supabase
     .from("posts")
-    .select("id, title, content, category, tags, image_url, created_at, updated_at")
+    .select(
+      "id, title, slug, excerpt, status, published_at, content, category, category_id, tags, image_url, created_at, updated_at"
+    )
     .eq("id", postId)
     .single();
   if (error) {
@@ -41,11 +45,19 @@ export async function fetchPostById(postId) {
 }
 
 export async function fetchCategories() {
-  const { data, error } = await supabase.from("posts").select("category");
-  if (error) {
-    throw new Error(error.message);
+  const managed = await supabase
+    .from("categories")
+    .select("id, name")
+    .eq("is_visible", true)
+    .order("sort_order", { ascending: true });
+  if (!managed.error && managed.data && managed.data.length > 0) {
+    return managed.data.map((item) => item.name);
   }
-  const unique = new Set((data ?? []).map((item) => item.category).filter(Boolean));
+  const fallback = await supabase.from("posts").select("category");
+  if (fallback.error) {
+    throw new Error(fallback.error.message);
+  }
+  const unique = new Set((fallback.data ?? []).map((item) => item.category).filter(Boolean));
   return [...unique];
 }
 

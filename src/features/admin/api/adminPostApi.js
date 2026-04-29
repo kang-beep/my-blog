@@ -36,7 +36,7 @@ export async function deletePost(postId) {
 export async function fetchAdminPosts() {
   const { data, error } = await supabase
     .from("posts")
-    .select("id, title, content, category, tags, image_url, created_at")
+    .select("id, title, content, category, category_id, tags, image_url, created_at")
     .order("created_at", { ascending: false });
   if (error) {
     throw new Error(error.message);
