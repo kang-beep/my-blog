@@ -1,10 +1,7 @@
 // 앱 시작 시 인증 세션 복원/구독을 처리하는 전역 Provider 래퍼
 import { useEffect } from "react";
-import {
-  getSession,
-  subscribeAuthState,
-} from "../../features/auth/api/authApi";
-import { useAuthStore } from "../../features/auth/store/authStore";
+import { getSession, subscribeAuthState } from "@/features/auth/api/authApi";
+import { useAuthStore } from "@/features/auth/store/authStore";
 
 export default function AppProviders({ children }) {
   const setSession = useAuthStore((state) => state.setSession);

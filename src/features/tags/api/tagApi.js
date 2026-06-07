@@ -1,5 +1,5 @@
 // 태그 집계/관계 데이터 조회 함수 모음
-import { supabase } from "../../../shared/lib/supabaseClient";
+import { supabase } from "@/shared/lib/supabaseClient";
 
 export async function fetchTagCounts() {
   const { data, error } = await supabase.from("posts").select("tags");

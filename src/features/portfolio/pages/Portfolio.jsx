@@ -1,6 +1,6 @@
 // 포트폴리오 페이지: 프로젝트 목록 렌더링
 import { useEffect, useMemo, useState } from "react";
-import { fetchPortfolioProjects } from "../api/portfolioApi";
+import { fetchPortfolioProjects } from "@/features/portfolio/api/portfolioApi";
 
 export default function Portfolio() {
   const [projects, setProjects] = useState([]);

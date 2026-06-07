@@ -4,7 +4,7 @@ import {
   createComment,
   deleteComment,
   fetchCommentsByPostId,
-} from "../api/commentApi";
+} from "@/features/comments/api/commentApi";
 
 export function useComments(postId) {
   const [comments, setComments] = useState([]);

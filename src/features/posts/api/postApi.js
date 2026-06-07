@@ -1,5 +1,5 @@
 // posts 도메인 Supabase 접근 함수 모음
-import { supabase } from "../../../shared/lib/supabaseClient";
+import { supabase } from "@/shared/lib/supabaseClient";
 
 function mapPost(record) {
   return {

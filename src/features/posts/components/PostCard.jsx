@@ -1,8 +1,8 @@
 // 글 카드 컴포넌트: 목록/홈/관리자 화면에서 공통 재사용
 import { Link } from "react-router-dom";
-import { getPostDetailPath } from "../../../shared/constants/routes";
-import TagBadge from "../../../shared/ui/TagBadge";
-import { formatDate } from "../../../shared/utils/date";
+import { getPostDetailPath } from "@/shared/constants/routes";
+import TagBadge from "@/shared/ui/TagBadge";
+import { formatDate } from "@/shared/utils/date";
 
 export default function PostCard({ post, onTagClick }) {
   return (

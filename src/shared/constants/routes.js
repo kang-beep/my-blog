@@ -3,17 +3,20 @@ export const ROUTES = {
   HOME: "/",
   POSTS: "/posts",
   POST_DETAIL: "/posts/:id",
-  WRITE: "/write",
-  EDIT: "/edit/:id",
   PORTFOLIO: "/portfolio",
-  LOGIN: "/login",
-  MANAGE: "/manage-kang-beep",
+  ADMIN_LOGIN: "/admin-login",
+  ADMIN: "/admin",
+  ADMIN_PROFILE: "/admin/profile",
+  ADMIN_POSTS: "/admin/posts",
+  ADMIN_POSTS_NEW: "/admin/posts/new",
+  ADMIN_POSTS_EDIT: "/admin/posts/:id/edit",
+  ADMIN_PORTFOLIO: "/admin/portfolio",
 };
 
 export function getPostDetailPath(postId) {
   return `/posts/${postId}`;
 }
 
-export function getEditPostPath(postId) {
-  return `/edit/${postId}`;
+export function getAdminPostEditPath(postId) {
+  return `/admin/posts/${postId}/edit`;
 }

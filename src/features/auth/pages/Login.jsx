@@ -1,9 +1,9 @@
 // 관리자 로그인 페이지: 이메일/비밀번호 인증 처리
 import { useState } from "react";
 import { Navigate, useLocation } from "react-router-dom";
-import { signInWithEmail } from "../api/authApi";
-import { useAuthStore } from "../store/authStore";
-import { ROUTES } from "../../../shared/constants/routes";
+import { signInWithEmail } from "@/features/auth/api/authApi";
+import { useAuthStore } from "@/features/auth/store/authStore";
+import { ROUTES } from "@/shared/constants/routes";
 
 export default function Login() {
   const location = useLocation();
@@ -15,7 +15,7 @@ export default function Login() {
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   if (isAuthenticated) {
-    const redirectPath = location.state?.from?.pathname ?? ROUTES.MANAGE;
+    const redirectPath = location.state?.from?.pathname ?? ROUTES.ADMIN_PROFILE;
     return <Navigate to={redirectPath} replace />;
   }
 

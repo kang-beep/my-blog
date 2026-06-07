@@ -1,5 +1,5 @@
 // 카테고리 관리 API
-import { supabase } from "../../../shared/lib/supabaseClient";
+import { supabase } from "@/shared/lib/supabaseClient";
 
 function toSlug(name) {
   return name

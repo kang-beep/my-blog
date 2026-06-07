@@ -1,14 +1,18 @@
-// 앱 루트 컴포넌트: 공통 레이아웃과 라우터를 조합
-import AppRouter from "./router";
-import Sidebar from "../shared/layout/Sidebar";
+// 앱 루트 컴포넌트: 고정 헤더·왼쪽 프로필 레일 + 스크롤 가능 본문
+import AppRouter from "@/app/router";
+import Header from "@/shared/layout/Header";
+import ProfileSidebar from "@/shared/layout/ProfileSidebar";
 
 export default function App() {
   return (
-    <div className="mx-auto grid min-h-screen w-full max-w-[1180px] grid-cols-1 gap-4 p-4 lg:grid-cols-[280px_minmax(0,760px)] lg:justify-center">
-      <Sidebar />
-      <main className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-        <AppRouter />
-      </main>
+    <div className="flex h-dvh flex-col overflow-hidden bg-slate-50">
+      <Header />
+      <div className="flex min-h-0 flex-1 flex-col lg:flex-row">
+        <ProfileSidebar />
+        <main className="min-h-0 flex-1 overflow-y-auto bg-white px-4 py-5 lg:px-8 lg:py-6">
+          <AppRouter />
+        </main>
+      </div>
     </div>
   );
 }

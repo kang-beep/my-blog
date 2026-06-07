@@ -1,5 +1,5 @@
 // 포트폴리오 프로젝트 조회/관리 API
-import { supabase } from "../../../shared/lib/supabaseClient";
+import { supabase } from "@/shared/lib/supabaseClient";
 
 export async function fetchPortfolioProjects() {
   const { data, error } = await supabase

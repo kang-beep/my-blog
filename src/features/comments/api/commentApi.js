@@ -1,5 +1,5 @@
 // comments 도메인 Supabase 접근 함수 모음
-import { supabase } from "../../../shared/lib/supabaseClient";
+import { supabase } from "@/shared/lib/supabaseClient";
 
 export async function fetchCommentsByPostId(postId) {
   const { data, error } = await supabase

@@ -1,6 +1,6 @@
 // posts 도메인 조회 상태를 관리하는 커스텀 훅
 import { useEffect, useState } from "react";
-import { fetchPosts } from "../api/postApi";
+import { fetchPosts } from "@/features/posts/api/postApi";
 
 export function usePosts(filters = {}) {
   const [posts, setPosts] = useState([]);

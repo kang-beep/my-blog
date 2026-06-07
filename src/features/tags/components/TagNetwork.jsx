@@ -1,7 +1,7 @@
 // 태그 네트워크 1차 렌더: 태그 빈도와 관계 데이터를 클릭 가능한 목록으로 표시
 import { useNavigate } from "react-router-dom";
-import { ROUTES } from "../../../shared/constants/routes";
-import { useTags } from "../hooks/useTags";
+import { ROUTES } from "@/shared/constants/routes";
+import { useTags } from "@/features/tags/hooks/useTags";
 
 export default function TagNetwork() {
   const navigate = useNavigate();

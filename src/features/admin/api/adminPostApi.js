@@ -1,5 +1,11 @@
 // 관리자 글 등록/수정/삭제 전용 API 함수 모음
-import { supabase } from "../../../shared/lib/supabaseClient";
+import { supabase } from "@/shared/lib/supabaseClient";
+import { STORAGE_BUCKETS } from "@/shared/constants/storage";
+import {
+  formatStorageError,
+  getImageExtension,
+  resolveImageContentType,
+} from "@/shared/lib/storageUpload";
 
 export async function createPost(payload) {
   const { data, error } = await supabase
@@ -47,22 +53,27 @@ export async function fetchAdminPosts() {
   }));
 }
 
-export async function uploadPostImage(file) {
-  const extension = file.name.includes(".")
-    ? file.name.split(".").pop().toLowerCase()
-    : "jpg";
+export async function uploadPostImage(file, postId) {
+  if (!postId) {
+    throw new Error("이미지 업로드에는 글 ID가 필요합니다.");
+  }
+
+  const extension = getImageExtension(file.name);
+  const contentType = resolveImageContentType(file, extension);
   const fileName = `${crypto.randomUUID()}.${extension}`;
-  const filePath = `post-images/${fileName}`;
+  const filePath = `${postId}/${fileName}`;
+
   const { error: uploadError } = await supabase.storage
-    .from("post-images")
+    .from(STORAGE_BUCKETS.POSTS)
     .upload(filePath, file, {
       upsert: false,
+      contentType,
     });
 
   if (uploadError) {
-    throw new Error(uploadError.message);
+    throw new Error(formatStorageError(uploadError));
   }
 
-  const { data } = supabase.storage.from("post-images").getPublicUrl(filePath);
+  const { data } = supabase.storage.from(STORAGE_BUCKETS.POSTS).getPublicUrl(filePath);
   return data.publicUrl;
 }

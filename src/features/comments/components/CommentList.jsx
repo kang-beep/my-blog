@@ -1,5 +1,5 @@
 // 댓글 목록 표시 컴포넌트: 관리자 로그인 시 삭제 버튼 노출
-import { formatDate } from "../../../shared/utils/date";
+import { formatDate } from "@/shared/utils/date";
 
 export default function CommentList({ comments = [], canDelete = false, onDelete }) {
   if (comments.length === 0) {

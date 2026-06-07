@@ -1,0 +1,70 @@
+// 상단 헤더: 사이트 브랜드 + 탐색/관리 네비게이션 + 로그아웃
+import { useState } from "react";
+import { NavLink } from "react-router-dom";
+import { signOut } from "@/features/auth/api/authApi";
+import { useAuthStore } from "@/features/auth/store/authStore";
+import { ADMIN_NAV, PUBLIC_NAV, SITE_NAME } from "@/shared/constants/navigation";
+import { ROUTES } from "@/shared/constants/routes";
+import HeaderNavLink from "@/shared/ui/HeaderNavLink";
+
+export default function Header() {
+  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const clearSession = useAuthStore((state) => state.clearSession);
+  const [signOutError, setSignOutError] = useState("");
+
+  const handleSignOut = async () => {
+    setSignOutError("");
+    try {
+      await signOut();
+      clearSession();
+    } catch (requestError) {
+      setSignOutError(requestError.message || "로그아웃에 실패했습니다.");
+    }
+  };
+
+  return (
+    <header className="shrink-0 border-b border-slate-200 bg-white shadow-sm">
+      <div className="flex w-full flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 lg:pl-4">
+        <NavLink
+          to={ROUTES.HOME}
+          end
+          className="shrink-0 text-lg font-bold text-slate-900 no-underline hover:text-indigo-700"
+        >
+          {SITE_NAME}
+        </NavLink>
+
+        <nav className="flex flex-wrap items-center gap-1">
+          {PUBLIC_NAV.map((item) => (
+            <HeaderNavLink key={item.to} {...item} />
+          ))}
+
+          {isAuthenticated ? (
+            <>
+              <span className="mx-1 h-4 w-px bg-slate-200" aria-hidden />
+              <span className="px-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
+                관리
+              </span>
+              {ADMIN_NAV.map((item) => (
+                <HeaderNavLink key={item.to} {...item} />
+              ))}
+            </>
+          ) : null}
+        </nav>
+
+        {isAuthenticated ? (
+          <button
+            className="btn ml-auto shrink-0"
+            type="button"
+            onClick={handleSignOut}
+          >
+            로그아웃
+          </button>
+        ) : null}
+      </div>
+
+      {signOutError ? (
+        <p className="px-4 pb-2 text-sm text-rose-600">{signOutError}</p>
+      ) : null}
+    </header>
+  );
+}

@@ -1,13 +1,14 @@
 // 글 상세 페이지: 본문, 인접 글 네비게이션, 댓글 영역 제공
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { fetchAdjacentPosts, fetchPostById } from "../api/postApi";
-import { getEditPostPath, getPostDetailPath, ROUTES } from "../../../shared/constants/routes";
-import { formatDate } from "../../../shared/utils/date";
-import CommentList from "../../comments/components/CommentList";
-import CommentForm from "../../comments/components/CommentForm";
-import { useComments } from "../../comments/hooks/useComments";
-import { useAuthStore } from "../../auth/store/authStore";
+import { fetchAdjacentPosts, fetchPostById } from "@/features/posts/api/postApi";
+import { getPostDetailPath, ROUTES } from "@/shared/constants/routes";
+import { formatDate } from "@/shared/utils/date";
+import CommentList from "@/features/comments/components/CommentList";
+import CommentForm from "@/features/comments/components/CommentForm";
+import { useComments } from "@/features/comments/hooks/useComments";
+import { useAuthStore } from "@/features/auth/store/authStore";
+import { isHtmlContent, sanitizePostHtml } from "@/shared/lib/sanitizeHtml";
 
 export default function PostDetail() {
   const { id } = useParams();
@@ -51,22 +52,22 @@ export default function PostDetail() {
       {!isLoading && post ? (
         <>
           <h1>{post.title}</h1>
-          {isAuthenticated ? (
-            <div>
-              <Link className="btn" to={getEditPostPath(post.id)}>
-                이 글 수정
-              </Link>
-            </div>
-          ) : null}
           <p className="text-sm text-slate-600">
             {post.category} | {formatDate(post.created_at)}
           </p>
           {post.image_url ? (
             <img src={post.image_url} alt={post.title} className="max-h-[28rem] w-full rounded-xl object-cover" />
           ) : null}
-          <article className="whitespace-pre-wrap rounded-xl border border-slate-200 bg-slate-50 p-4">
-            {post.content}
-          </article>
+          {isHtmlContent(post.content) ? (
+            <article
+              className="post-content rounded-xl border border-slate-200 bg-slate-50 p-4"
+              dangerouslySetInnerHTML={{ __html: sanitizePostHtml(post.content) }}
+            />
+          ) : (
+            <article className="whitespace-pre-wrap rounded-xl border border-slate-200 bg-slate-50 p-4">
+              {post.content}
+            </article>
+          )}
 
           <nav className="flex flex-wrap gap-4 rounded-xl border border-slate-200 bg-white p-3">
             {adjacent.previousPost ? (
