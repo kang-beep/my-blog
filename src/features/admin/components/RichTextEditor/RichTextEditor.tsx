@@ -68,6 +68,13 @@ export default function RichTextEditor({
       Image.configure({
         inline: false,
         allowBase64: false,
+        resize: {
+          enabled: true,
+          directions: ["bottom-right", "bottom-left", "top-right", "top-left"],
+          minWidth: 80,
+          minHeight: 60,
+          alwaysPreserveAspectRatio: true,
+        },
       }),
       Placeholder.configure({ placeholder }),
     ],

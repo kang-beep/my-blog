@@ -1,19 +1,24 @@
 // posts 도메인 Supabase 접근 함수 모음
 import { supabase } from "@/shared/lib/supabaseClient";
 
+const POST_LIST_FIELDS =
+  "id, title, slug, excerpt, status, published_at, content, category, category_id, tags, image_url, like_count, created_at, updated_at";
+
+const POST_CARD_FIELDS =
+  "id, title, category, tags, image_url, like_count, created_at";
+
 function mapPost(record) {
   return {
     ...record,
     tags: Array.isArray(record.tags) ? record.tags : [],
+    like_count: record.like_count ?? 0,
   };
 }
 
 export async function fetchPosts({ category, tag } = {}) {
   let query = supabase
     .from("posts")
-    .select(
-      "id, title, slug, excerpt, status, published_at, content, category, category_id, tags, image_url, created_at, updated_at"
-    )
+    .select(POST_LIST_FIELDS)
     .order("created_at", { ascending: false });
 
   if (category) {
@@ -33,9 +38,7 @@ export async function fetchPosts({ category, tag } = {}) {
 export async function fetchPostById(postId) {
   const { data, error } = await supabase
     .from("posts")
-    .select(
-      "id, title, slug, excerpt, status, published_at, content, category, category_id, tags, image_url, created_at, updated_at"
-    )
+    .select(POST_LIST_FIELDS)
     .eq("id", postId)
     .single();
   if (error) {
@@ -67,7 +70,7 @@ export async function fetchCategorySections(limitPerCategory = 3) {
     categories.map(async (category) => {
       const { data, error } = await supabase
         .from("posts")
-        .select("id, title, category, tags, image_url, created_at")
+        .select(POST_CARD_FIELDS)
         .eq("category", category)
         .order("created_at", { ascending: false })
         .limit(limitPerCategory);

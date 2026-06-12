@@ -1,5 +1,5 @@
 import { useRef, type ChangeEvent, type ReactNode } from "react";
-import type { Editor } from "@tiptap/react";
+import { useEditorState, type Editor } from "@tiptap/react";
 import {
   Bold,
   Heading2,
@@ -21,6 +21,11 @@ interface EditorToolbarProps {
 export default function EditorToolbar({ editor, onInsertImage, isUploading }: EditorToolbarProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const isImageActive = useEditorState({
+    editor,
+    selector: ({ editor: currentEditor }) => currentEditor?.isActive("image") ?? false,
+  });
+
   if (!editor) {
     return null;
   }
@@ -39,6 +44,10 @@ export default function EditorToolbar({ editor, onInsertImage, isUploading }: Ed
     }
 
     editor.chain().focus().extendMarkRange("link").setLink({ href: url.trim() }).run();
+  };
+
+  const setImageWidth = (width: string | null) => {
+    editor.chain().focus().updateAttributes("image", { width, height: null }).run();
   };
 
   const handleImagePick = async (event: ChangeEvent<HTMLInputElement>) => {
@@ -112,6 +121,24 @@ export default function EditorToolbar({ editor, onInsertImage, isUploading }: Ed
       >
         <ImagePlus size={16} aria-hidden />
       </ToolbarButton>
+      {isImageActive ? (
+        <>
+          <span className="mx-1 hidden h-6 w-px bg-slate-200 sm:inline" aria-hidden />
+          <span className="self-center px-1 text-xs text-slate-500">이미지 크기</span>
+          <ToolbarTextButton label="이미지 너비 50%" onClick={() => setImageWidth("50%")}>
+            50%
+          </ToolbarTextButton>
+          <ToolbarTextButton label="이미지 너비 75%" onClick={() => setImageWidth("75%")}>
+            75%
+          </ToolbarTextButton>
+          <ToolbarTextButton label="이미지 너비 100%" onClick={() => setImageWidth("100%")}>
+            100%
+          </ToolbarTextButton>
+          <ToolbarTextButton label="이미지 원본 크기" onClick={() => setImageWidth(null)}>
+            원본
+          </ToolbarTextButton>
+        </>
+      ) : null}
       <input
         ref={fileInputRef}
         type="file"
@@ -141,6 +168,26 @@ function ToolbarButton({ label, isActive, onClick, disabled, children }: Toolbar
       aria-label={label}
       title={label}
       disabled={disabled}
+      onClick={onClick}
+    >
+      {children}
+    </button>
+  );
+}
+
+interface ToolbarTextButtonProps {
+  label: string;
+  onClick: () => void;
+  children: ReactNode;
+}
+
+function ToolbarTextButton({ label, onClick, children }: ToolbarTextButtonProps) {
+  return (
+    <button
+      type="button"
+      className="inline-flex h-8 items-center rounded-md border border-transparent px-2 text-xs font-medium text-slate-700 hover:border-slate-200 hover:bg-white"
+      aria-label={label}
+      title={label}
       onClick={onClick}
     >
       {children}

@@ -13,7 +13,10 @@ export default function PostCard({ post, onTagClick }) {
         </Link>
       </h3>
       <p className="text-sm text-slate-600">{post?.category ?? "미분류"}</p>
-      <p className="text-xs text-slate-500">{formatDate(post?.created_at)}</p>
+      <p className="text-xs text-slate-500">
+        {formatDate(post?.created_at)}
+        {typeof post?.like_count === "number" ? ` · 좋아요 ${post.like_count}` : null}
+      </p>
       {post?.image_url ? (
         <img
           src={post.image_url}

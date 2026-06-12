@@ -20,7 +20,7 @@ const POST_CONTENT_ALLOWED_TAGS = [
   "pre",
 ];
 
-const POST_CONTENT_ALLOWED_ATTR = ["href", "target", "rel", "src", "alt", "class"];
+const POST_CONTENT_ALLOWED_ATTR = ["href", "target", "rel", "src", "alt", "class", "width", "height"];
 
 export function sanitizePostHtml(html: string): string {
   return DOMPurify.sanitize(html, {

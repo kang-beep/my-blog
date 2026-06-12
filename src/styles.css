@@ -22,7 +22,15 @@
   }
 
   a {
-    @apply text-indigo-600 hover:text-indigo-500;
+    @apply cursor-pointer text-indigo-600 hover:text-indigo-500;
+  }
+
+  button:not(:disabled) {
+    @apply cursor-pointer;
+  }
+
+  button:disabled {
+    @apply cursor-not-allowed;
   }
 }
 
@@ -48,7 +56,7 @@
   }
 
   .nav-link {
-    @apply block rounded-lg px-3 py-2 text-sm font-medium text-slate-700 no-underline hover:bg-slate-100;
+    @apply block cursor-pointer rounded-lg px-3 py-2 text-sm font-medium text-slate-700 no-underline hover:bg-slate-100;
   }
 
   .nav-link-active {
@@ -60,7 +68,7 @@
   }
 
   .header-nav-link {
-    @apply inline-flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-700 no-underline hover:bg-slate-100;
+    @apply inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-700 no-underline hover:bg-slate-100;
   }
 
   .header-nav-link-active {

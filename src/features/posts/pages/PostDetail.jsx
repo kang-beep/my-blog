@@ -1,29 +1,21 @@
-// 글 상세 페이지: 본문, 인접 글 네비게이션, 댓글 영역 제공
+// 글 상세 페이지: 인스타 스타일 카드 + Giscus 댓글
 import { useEffect, useState } from "react";
-import { Link, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { fetchAdjacentPosts, fetchPostById } from "@/features/posts/api/postApi";
 import { getPostDetailPath, ROUTES } from "@/shared/constants/routes";
-import { formatDate } from "@/shared/utils/date";
-import CommentList from "@/features/comments/components/CommentList";
-import CommentForm from "@/features/comments/components/CommentForm";
-import { useComments } from "@/features/comments/hooks/useComments";
-import { useAuthStore } from "@/features/auth/store/authStore";
+import PostCommentsSection from "@/features/comments/components/PostCommentsSection";
+import PostLikeButton from "@/features/posts/components/PostLikeButton";
+import PostMetaDates from "@/features/posts/components/PostMetaDates";
+import TagBadge from "@/shared/ui/TagBadge";
 import { isHtmlContent, sanitizePostHtml } from "@/shared/lib/sanitizeHtml";
 
 export default function PostDetail() {
   const { id } = useParams();
-  const isAuthenticated = useAuthStore((state) => state.isAuthenticated);
+  const navigate = useNavigate();
   const [post, setPost] = useState(null);
   const [adjacent, setAdjacent] = useState({ previousPost: null, nextPost: null });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
-  const {
-    comments,
-    isLoading: isCommentsLoading,
-    error: commentsError,
-    submitComment,
-    removeComment,
-  } = useComments(id);
 
   useEffect(() => {
     const loadPostDetail = async () => {
@@ -45,60 +37,90 @@ export default function PostDetail() {
     }
   }, [id]);
 
+  const goToCategory = (category) => {
+    navigate(`${ROUTES.POSTS}?category=${encodeURIComponent(category)}`);
+  };
+
+  const goToTag = (tag) => {
+    navigate(`${ROUTES.POSTS}?tag=${encodeURIComponent(tag)}`);
+  };
+
+  const hasHeroImage = Boolean(post?.image_url);
+
   return (
-    <section className="space-y-4">
+    <section className="mx-auto w-full max-w-xl space-y-4 lg:max-w-5xl xl:max-w-6xl">
       {isLoading ? <p className="text-sm text-slate-500">글을 불러오는 중입니다...</p> : null}
       {error ? <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</p> : null}
       {!isLoading && post ? (
         <>
-          <h1>{post.title}</h1>
-          <p className="text-sm text-slate-600">
-            {post.category} | {formatDate(post.created_at)}
-          </p>
-          {post.image_url ? (
-            <img src={post.image_url} alt={post.title} className="max-h-[28rem] w-full rounded-xl object-cover" />
-          ) : null}
-          {isHtmlContent(post.content) ? (
-            <article
-              className="post-content rounded-xl border border-slate-200 bg-slate-50 p-4"
-              dangerouslySetInnerHTML={{ __html: sanitizePostHtml(post.content) }}
-            />
-          ) : (
-            <article className="whitespace-pre-wrap rounded-xl border border-slate-200 bg-slate-50 p-4">
-              {post.content}
-            </article>
-          )}
+          <article className="overflow-hidden border border-slate-200 bg-white shadow-sm">
+            <div className={hasHeroImage ? "lg:flex lg:items-stretch" : undefined}>
+              {hasHeroImage ? (
+                <div className="lg:w-[min(46%,32rem)] lg:shrink-0 lg:border-r lg:border-slate-100">
+                  <img
+                    src={post.image_url}
+                    alt={post.title}
+                    className="aspect-[4/3] w-full object-cover lg:aspect-auto lg:h-full lg:min-h-[20rem] lg:max-h-[44rem]"
+                  />
+                </div>
+              ) : null}
 
-          <nav className="flex flex-wrap gap-4 rounded-xl border border-slate-200 bg-white p-3">
+              <div className="min-w-0 flex-1 space-y-4 p-4 sm:p-5 lg:p-6 lg:py-7">
+                <header className="space-y-2 border-b border-slate-100 pb-4">
+                  <h1 className="text-2xl font-bold leading-snug tracking-tight text-slate-900 sm:text-[1.65rem] lg:text-3xl">
+                    {post.title}
+                  </h1>
+                  <PostMetaDates createdAt={post.created_at} updatedAt={post.updated_at} />
+                </header>
+
+                {isHtmlContent(post.content) ? (
+                  <div
+                    className="post-content text-[0.95rem] leading-relaxed text-slate-800 lg:text-base"
+                    dangerouslySetInnerHTML={{ __html: sanitizePostHtml(post.content) }}
+                  />
+                ) : (
+                  <div className="whitespace-pre-wrap text-[0.95rem] leading-relaxed text-slate-800 lg:text-base">
+                    {post.content}
+                  </div>
+                )}
+
+                <PostCommentsSection
+                  postId={post.id}
+                  leading={
+                    <PostLikeButton
+                      postId={post.id}
+                      initialLikeCount={post.like_count}
+                      variant="compact"
+                    />
+                  }
+                >
+                  {post.category?.trim() ? (
+                    <TagBadge tag={post.category.trim()} onClick={goToCategory} />
+                  ) : null}
+                  {(post.tags ?? []).map((tag) => (
+                    <TagBadge key={`${post.id}-${tag}`} tag={tag} onClick={goToTag} />
+                  ))}
+                </PostCommentsSection>
+              </div>
+            </div>
+          </article>
+
+          <nav className="flex flex-col gap-2 border border-slate-200 bg-white px-4 py-3 text-sm shadow-sm">
             {adjacent.previousPost ? (
-              <Link className="font-medium" to={getPostDetailPath(adjacent.previousPost.id)}>
-                이전글: {adjacent.previousPost.title}
+              <Link className="truncate font-medium text-slate-700 hover:text-indigo-600" to={getPostDetailPath(adjacent.previousPost.id)}>
+                ← 이전글 · {adjacent.previousPost.title}
               </Link>
             ) : (
-              <span className="text-sm text-slate-500">이전글 없음</span>
+              <span className="text-slate-400">이전글 없음</span>
             )}
             {adjacent.nextPost ? (
-              <Link className="font-medium" to={getPostDetailPath(adjacent.nextPost.id)}>
-                다음글: {adjacent.nextPost.title}
+              <Link className="truncate font-medium text-slate-700 hover:text-indigo-600" to={getPostDetailPath(adjacent.nextPost.id)}>
+                다음글 · {adjacent.nextPost.title} →
               </Link>
             ) : (
-              <span className="text-sm text-slate-500">다음글 없음</span>
+              <span className="text-slate-400">다음글 없음</span>
             )}
           </nav>
-
-          <section className="space-y-3 rounded-xl border border-slate-200 bg-white p-4">
-            <h2>댓글</h2>
-            {isCommentsLoading ? <p className="text-sm text-slate-500">댓글을 불러오는 중입니다...</p> : null}
-            {commentsError ? <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{commentsError}</p> : null}
-            <CommentList
-              comments={comments}
-              canDelete={isAuthenticated}
-              onDelete={removeComment}
-            />
-            <CommentForm
-              onSubmit={(payload) => submitComment({ ...payload, post_id: id })}
-            />
-          </section>
         </>
       ) : null}
       {!isLoading && !post && !error ? (
