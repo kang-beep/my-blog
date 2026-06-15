@@ -1,3 +1,7 @@
-export const TAG_GRAPH_MIN_HEIGHT = 360;
-export const TAG_GRAPH_ASPECT_RATIO = 0.5;
+export const TAG_GRAPH_MIN_HEIGHT = 240;
+export const TAG_GRAPH_MAX_HEIGHT = 360;
+export const TAG_GRAPH_ASPECT_RATIO = 0.55;
 export const TAG_GRAPH_MAX_NODES = 40;
+export const TAG_GRAPH_NODE_RADIUS_SCALE = 3;
+export const TAG_GRAPH_ZOOM_PADDING = 18;
+export const TAG_GRAPH_FULLSCREEN_ZOOM_PADDING = 32;

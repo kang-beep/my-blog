@@ -1,6 +1,9 @@
 # 05. Home External Feeds
 
-홈(`/`) 상단에 **Hugging Face Daily Papers**와 **GitHub Trending Repos** 카드를 2열 그리드로 표시한다.
+홈(`/`)은 **Latest Trends**(외부)와 **Mine**(내 콘텐츠) 두 섹션으로 구성된다.
+
+- **Latest Trends**: Hugging Face Daily Papers + GitHub Trending Repos (`External` 배지)
+- **Mine**: 최신 글 목록 + Tag Network (확대 시 창형 모달)
 
 ## 데이터 흐름
 
@@ -111,8 +114,30 @@ src/features/github/trending-repos/
 
 ## Home 레이아웃
 
-- `.home-cards-grid`: 2열 (lg+) / 1열 (모바일)
-- 그 아래 TagNetwork (태그 + 최신 글)
+### Latest Trends
+
+- `.home-cards-grid`: HF + GitHub 2열 (lg+) / 1열 (모바일)
+- 카드 헤더 `External` 배지, UI 라벨 영문
+
+### Mine
+
+- `.home-tag-posts-grid`: Posts + Tag Network — lg+ **`6fr : 4fr`**
+- Posts: 최대 10건 (`HOME_LATEST_POST_LIMIT`)
+- Tag Network: `TagNetworkPanel` + `TagForceGraph`
+  - 우상단 확대 → `TagNetworkFullscreenModal` (배경 딤, PC **정사각형** 창, 모바일 여백 유지)
+  - Esc / X / 배경 클릭으로 닫기
+
+### 관련 컴포넌트
+
+```
+src/features/posts/components/HomeSection.jsx
+src/features/posts/components/HomeLatestPosts.jsx
+src/features/tags/components/TagNetwork.jsx
+src/features/tags/components/TagNetworkPanel.jsx
+src/features/tags/components/TagNetworkFullscreenModal.jsx
+src/shared/ui/HomeFeedBadge.jsx
+src/shared/hooks/useProfileSidebarOpen.js
+```
 
 ## 제거된 것
 
@@ -122,7 +147,6 @@ src/features/github/trending-repos/
 ## 추후 (범위 외)
 
 - Hugging Face weekly/monthly (`?date=` 누적)
-- GitHub Trending UI 한글 탭 라벨
 
 ## 관련 문서
 

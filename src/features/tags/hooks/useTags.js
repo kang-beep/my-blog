@@ -17,7 +17,7 @@ export function useTags() {
         setNodes(network.nodes);
         setEdges(network.edges);
       } catch (requestError) {
-        setError(requestError.message || "태그 데이터를 불러오지 못했습니다.");
+        setError(requestError.message || "Failed to load tags.");
       } finally {
         setIsLoading(false);
       }

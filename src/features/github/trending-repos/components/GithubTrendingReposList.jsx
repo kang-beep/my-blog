@@ -9,6 +9,8 @@ import {
   GITHUB_TRENDING_PERIOD_LABELS,
   GITHUB_TRENDING_PERIODS,
 } from "@/features/github/trending-repos/constants/githubTrendingRepos";
+import { HOME_FEED_BADGE_EXTERNAL } from "@/features/posts/constants/home";
+import HomeFeedBadge from "@/shared/ui/HomeFeedBadge";
 
 export default function GithubTrendingReposList() {
   const [selectedPeriod, setSelectedPeriod] = useState("daily");
@@ -25,7 +27,7 @@ export default function GithubTrendingReposList() {
         const items = await fetchGithubTrendingRepos(selectedPeriod);
         setRepos(items);
       } catch (requestError) {
-        setError(requestError.message || "GitHub Trending을 불러오지 못했습니다.");
+        setError(requestError.message || "Failed to load GitHub Trending.");
       } finally {
         setIsLoading(false);
       }
@@ -38,11 +40,14 @@ export default function GithubTrendingReposList() {
     <section className="home-feed-card flex flex-col border border-slate-200 bg-white shadow-sm">
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 px-4 py-4 sm:px-6">
         <div>
-          <h1 className="flex items-center gap-2 text-xl font-semibold text-slate-900">
-            <GithubMarkIcon size={20} className="shrink-0 text-slate-800" />
-            <span>GitHub Trending</span>
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">인기 레포 · RSS 순서</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="flex items-center gap-2 text-xl font-semibold text-slate-900">
+              <GithubMarkIcon size={20} className="shrink-0 text-slate-800" />
+              <span>GitHub Trending</span>
+            </h3>
+            <HomeFeedBadge>{HOME_FEED_BADGE_EXTERNAL}</HomeFeedBadge>
+          </div>
+          <p className="mt-1 text-sm text-slate-500">Top repos · RSS order</p>
         </div>
         <a
           className="btn inline-flex shrink-0 items-center gap-1.5 no-underline"
@@ -83,7 +88,7 @@ export default function GithubTrendingReposList() {
       <div className="home-feed-card-body" aria-busy={isLoading} aria-live="polite">
         {isLoading ? (
           <>
-            <p className="sr-only">GitHub Trending을 불러오는 중입니다.</p>
+            <p className="sr-only">Loading GitHub Trending.</p>
             <GithubTrendingReposSkeleton />
           </>
         ) : null}
@@ -94,7 +99,7 @@ export default function GithubTrendingReposList() {
 
         {!isLoading && !error && repos.length === 0 ? (
           <p className="rounded-lg bg-slate-50 px-3 py-8 text-center text-sm text-slate-500">
-            표시할 레포가 없습니다. GitHub Actions 동기화 후 다시 확인하세요.
+            No repos to show. Run the GitHub Actions sync and check again.
           </p>
         ) : null}
 

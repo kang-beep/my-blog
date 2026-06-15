@@ -6,6 +6,8 @@ import HuggingFaceDailyPapersSkeleton from "@/features/huggingface/daily-papers/
 import {
   HUGGINGFACE_DAILY_PAPERS_PAGE_URL,
 } from "@/features/huggingface/daily-papers/constants/huggingfaceDailyPapers";
+import { HOME_FEED_BADGE_EXTERNAL } from "@/features/posts/constants/home";
+import HomeFeedBadge from "@/shared/ui/HomeFeedBadge";
 
 export default function HuggingFaceDailyPapersList() {
   const [papers, setPapers] = useState([]);
@@ -21,7 +23,7 @@ export default function HuggingFaceDailyPapersList() {
         const items = await fetchHuggingFaceDailyPapers();
         setPapers(items);
       } catch (requestError) {
-        setError(requestError.message || "Hugging Face 인기 논문을 불러오지 못했습니다.");
+        setError(requestError.message || "Failed to load Hugging Face daily papers.");
       } finally {
         setIsLoading(false);
       }
@@ -34,11 +36,14 @@ export default function HuggingFaceDailyPapersList() {
     <section className="home-feed-card flex flex-col border border-slate-200 bg-white shadow-sm">
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 px-4 py-4 sm:px-6">
         <div>
-          <h1 className="flex items-center gap-2 text-xl font-semibold text-slate-900">
-            <span aria-hidden>🤗</span>
-            <span>Hugging Face Daily Papers</span>
-          </h1>
-          <p className="mt-1 text-sm text-slate-500">오늘의 인기 논문 · 업보트 순</p>
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="flex items-center gap-2 text-xl font-semibold text-slate-900">
+              <span aria-hidden>🤗</span>
+              <span>Hugging Face Daily Papers</span>
+            </h3>
+            <HomeFeedBadge>{HOME_FEED_BADGE_EXTERNAL}</HomeFeedBadge>
+          </div>
+          <p className="mt-1 text-sm text-slate-500">Today&apos;s top papers · by upvotes</p>
         </div>
         <a
           className="btn inline-flex shrink-0 items-center gap-1.5 no-underline"
@@ -54,7 +59,7 @@ export default function HuggingFaceDailyPapersList() {
       <div className="home-feed-card-body" aria-busy={isLoading} aria-live="polite">
         {isLoading ? (
           <>
-            <p className="sr-only">Hugging Face 인기 논문을 불러오는 중입니다.</p>
+            <p className="sr-only">Loading Hugging Face daily papers.</p>
             <HuggingFaceDailyPapersSkeleton />
           </>
         ) : null}
@@ -65,7 +70,7 @@ export default function HuggingFaceDailyPapersList() {
 
         {!isLoading && !error && papers.length === 0 ? (
           <p className="rounded-lg bg-slate-50 px-3 py-8 text-center text-sm text-slate-500">
-            표시할 논문이 없습니다. GitHub Actions 동기화 후 다시 확인하세요.
+            No papers to show. Run the GitHub Actions sync and check again.
           </p>
         ) : null}
 

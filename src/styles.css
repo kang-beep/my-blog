@@ -79,11 +79,100 @@
     @apply grid grid-cols-1 gap-6 lg:grid-cols-2;
   }
 
+  .home-feed-badge {
+    @apply inline-flex shrink-0 rounded-full px-2 py-0.5 text-xs font-medium;
+  }
+
+  .home-feed-badge-external {
+    @apply bg-slate-100 text-slate-600;
+  }
+
+  .home-feed-badge-mine {
+    @apply bg-indigo-50 text-indigo-700;
+  }
+
   .home-feed-card {
     @apply flex min-h-0 flex-col;
   }
 
   .home-feed-card-body {
     @apply max-h-[32rem] min-h-0 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5;
+  }
+
+  .home-tag-posts-grid {
+    @apply grid min-h-0 grid-cols-1 lg:grid-cols-[minmax(0,6fr)_minmax(0,4fr)] lg:divide-x lg:divide-slate-100;
+  }
+
+  .home-tag-posts-panel {
+    @apply flex min-h-0 flex-col;
+  }
+
+  .home-tag-posts-panel-header {
+    @apply shrink-0 border-b border-slate-100 px-4 py-3 sm:px-5;
+  }
+
+  .home-tag-posts-panel-body {
+    @apply flex min-h-0 flex-col px-4 py-3 sm:px-5 lg:h-96 lg:overflow-hidden;
+  }
+
+  .home-tag-posts-panel-body-scroll {
+    @apply lg:overflow-y-auto;
+  }
+
+  .app-body {
+    @apply min-h-0;
+  }
+
+  .app-body-sidebar-open {
+    @apply lg:grid-cols-[minmax(0,2fr)_minmax(0,8fr)];
+  }
+
+  .app-body-sidebar-closed {
+    @apply lg:grid-cols-[auto_minmax(0,1fr)];
+  }
+
+  .profile-sidebar-shell {
+    @apply flex w-full min-w-0 flex-col bg-white lg:h-full lg:max-w-full;
+  }
+
+  .profile-sidebar-shell-open {
+    @apply lg:border-r lg:border-slate-200;
+  }
+
+  .profile-sidebar-shell-closed {
+    @apply border-b border-slate-200 lg:border-b-0 lg:border-r lg:border-slate-200;
+  }
+
+  .profile-sidebar-closed-inner {
+    @apply hidden min-h-0 lg:flex lg:justify-end lg:px-2 lg:pt-2;
+  }
+
+  .profile-sidebar-panel {
+    @apply min-h-0 min-w-0;
+  }
+
+  .profile-sidebar-toggle {
+    @apply inline-flex w-full shrink-0 cursor-pointer items-center justify-center gap-1.5 border-slate-200 bg-white text-slate-600 hover:bg-slate-50;
+  }
+
+  .profile-sidebar-toggle-expand {
+    @apply border-b py-2.5;
+  }
+
+  .profile-sidebar-toggle-collapse {
+    @apply border-b py-2;
+  }
+
+  .tag-network-modal-backdrop {
+    @apply bg-slate-900/45 backdrop-blur-[2px];
+  }
+
+  .tag-network-modal-window {
+    @apply max-h-[min(88dvh,820px)] max-w-5xl overflow-hidden rounded-xl border border-slate-200 bg-white shadow-xl;
+    @apply lg:h-[min(72dvh,640px)] lg:w-[min(72dvh,640px)] lg:max-h-none lg:max-w-none;
+  }
+
+  .tag-network-modal-body {
+    @apply min-h-[min(52dvh,480px)] sm:min-h-[min(60dvh,560px)] lg:min-h-0;
   }
 }

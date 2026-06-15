@@ -1,4 +1,4 @@
-// 상단 헤더: 사이트 브랜드 + 탐색/관리 네비게이션 + 로그아웃
+// Top header: brand, navigation, sign out
 import { useState } from "react";
 import { NavLink } from "react-router-dom";
 import { signOut } from "@/features/auth/api/authApi";
@@ -18,7 +18,7 @@ export default function Header() {
       await signOut();
       clearSession();
     } catch (requestError) {
-      setSignOutError(requestError.message || "로그아웃에 실패했습니다.");
+      setSignOutError(requestError.message || "Failed to sign out.");
     }
   };
 
@@ -42,7 +42,7 @@ export default function Header() {
             <>
               <span className="mx-1 h-4 w-px bg-slate-200" aria-hidden />
               <span className="px-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
-                관리
+                Admin
               </span>
               {ADMIN_NAV.map((item) => (
                 <HeaderNavLink key={item.to} {...item} />
@@ -52,19 +52,13 @@ export default function Header() {
         </nav>
 
         {isAuthenticated ? (
-          <button
-            className="btn ml-auto shrink-0"
-            type="button"
-            onClick={handleSignOut}
-          >
-            로그아웃
+          <button className="btn ml-auto shrink-0" type="button" onClick={handleSignOut}>
+            Sign out
           </button>
         ) : null}
       </div>
 
-      {signOutError ? (
-        <p className="px-4 pb-2 text-sm text-rose-600">{signOutError}</p>
-      ) : null}
+      {signOutError ? <p className="px-4 pb-2 text-sm text-rose-600">{signOutError}</p> : null}
     </header>
   );
 }

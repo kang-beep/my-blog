@@ -48,7 +48,7 @@ export default function HuggingFaceDailyPapersListItem({ paper }) {
   return (
     <li className="space-y-2 py-5 first:pt-0 last:pb-0">
       <h3 className="text-base font-semibold leading-snug text-slate-900">
-        {paper.title ?? "제목 없음"}
+        {paper.title ?? "Untitled"}
       </h3>
       {paper.ai_summary ? (
         <p className="text-sm leading-relaxed text-slate-600">{paper.ai_summary}</p>
@@ -56,7 +56,7 @@ export default function HuggingFaceDailyPapersListItem({ paper }) {
       <PaperKeywords keywords={paper.ai_keywords} />
       <div className="flex flex-wrap items-center gap-2 pt-1">
         <span className="text-sm font-medium text-slate-700">▲ {upvotes}</span>
-        <ExternalActionButton href={paperUrl}>논문 보기</ExternalActionButton>
+        <ExternalActionButton href={paperUrl}>View paper</ExternalActionButton>
         {paper.github_repo ? (
           <ExternalActionButton href={paper.github_repo}>GitHub</ExternalActionButton>
         ) : null}
