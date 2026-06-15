@@ -1,17 +1,16 @@
 import { XMLParser } from "fast-xml-parser";
-import { parseGithubTrendingRssItem } from "./parseGithubTrendingRss.mjs";
 import {
-  clearRowsForDate,
+  assertPlainTextDescriptions,
+  parseGithubTrendingRssItem,
+} from "./lib/githubTrendingRss.mjs";
+import {
   createServiceSupabaseClient,
-  deleteRowsBeforeDate,
   getUtcDateString,
-  insertRows,
-  shouldSkipDelete,
-} from "./_supabase.mjs";
+  replaceRowsForDate,
+} from "./lib/supabase.mjs";
 
 const TABLE_NAME = "github_trending_repos";
 
-// GitHubTrendingRSS — XML RSS feeds (not GitHub HTML pages)
 const RSS_FEEDS = {
   daily: "https://mshibanami.github.io/GitHubTrendingRSS/daily/all.xml",
   weekly: "https://mshibanami.github.io/GitHubTrendingRSS/weekly/all.xml",
@@ -70,17 +69,20 @@ async function syncPeriod(supabase, period, fetchedDate) {
     .map((item) => mapTrendingRow(item, period, fetchedDate))
     .filter(Boolean);
 
+  if (rows[0]?.description) {
+    console.log(`Sample description: ${rows[0].description.slice(0, 120)}`);
+  }
+
+  assertPlainTextDescriptions(rows, period);
+
   console.log(`RSS ${period}: parsed ${rows.length} rows → inserting all (no limit).`);
 
-  await clearRowsForDate(supabase, TABLE_NAME, {
-    fetched_date: fetchedDate,
-    period,
-  });
-  await insertRows(supabase, TABLE_NAME, rows);
-
-  if (!shouldSkipDelete()) {
-    await deleteRowsBeforeDate(supabase, TABLE_NAME, fetchedDate, { period });
-  }
+  await replaceRowsForDate(
+    supabase,
+    TABLE_NAME,
+    { fetched_date: fetchedDate, period },
+    rows,
+  );
 
   console.log(`Synced ${rows.length} GitHub trending repos (${period}) for ${fetchedDate}.`);
 }

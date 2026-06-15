@@ -1,11 +1,8 @@
 import {
-  clearRowsForDate,
   createServiceSupabaseClient,
-  deleteRowsBeforeDate,
   getUtcDateString,
-  insertRows,
-  shouldSkipDelete,
-} from "./_supabase.mjs";
+  replaceRowsForDate,
+} from "./lib/supabase.mjs";
 
 const HUGGINGFACE_DAILY_PAPERS_URL = "https://huggingface.co/api/daily_papers";
 const TABLE_NAME = "huggingface_daily_papers";
@@ -67,12 +64,7 @@ async function main() {
 
   console.log(`API returned ${entries.length} entries → inserting ${rows.length} rows (no limit).`);
 
-  await clearRowsForDate(supabase, TABLE_NAME, { fetched_date: fetchedDate });
-  await insertRows(supabase, TABLE_NAME, rows);
-
-  if (!shouldSkipDelete()) {
-    await deleteRowsBeforeDate(supabase, TABLE_NAME, fetchedDate);
-  }
+  await replaceRowsForDate(supabase, TABLE_NAME, { fetched_date: fetchedDate }, rows);
 
   console.log(`Synced ${rows.length} Hugging Face papers for ${fetchedDate}.`);
 }

@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ExternalLink } from "lucide-react";
+import GithubMarkIcon from "@/shared/ui/GithubMarkIcon";
 import { fetchGithubTrendingRepos } from "@/features/github/trending-repos/api/githubTrendingReposApi";
 import GithubTrendingRepoListItem from "@/features/github/trending-repos/components/GithubTrendingRepoListItem";
 import GithubTrendingReposSkeleton from "@/features/github/trending-repos/components/GithubTrendingReposSkeleton";
@@ -38,7 +39,7 @@ export default function GithubTrendingReposList() {
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 px-4 py-4 sm:px-6">
         <div>
           <h1 className="flex items-center gap-2 text-xl font-semibold text-slate-900">
-            <span aria-hidden>⭐</span>
+            <GithubMarkIcon size={20} className="shrink-0 text-slate-800" />
             <span>GitHub Trending</span>
           </h1>
           <p className="mt-1 text-sm text-slate-500">인기 레포 · RSS 순서</p>

@@ -32,6 +32,25 @@ jobs:
 
       - run: npm ci
 
+      - name: Verify RSS parser is present
+        run: test -f scripts/sync/lib/githubTrendingRss.mjs
+
+      - name: Verify RSS parser output
+        run: |
+          node --input-type=module -e "
+          import { parseGithubTrendingRssItem } from './scripts/sync/lib/githubTrendingRss.mjs';
+          const sample = {
+            title: 'iptv-org/iptv',
+            link: 'https://github.com/iptv-org/iptv',
+            description: '<p>Collection of publicly available IPTV channels from all over the world</p><hr><h1>IPTV</h1>',
+          };
+          const parsed = parseGithubTrendingRssItem(sample);
+          if (!parsed?.description || parsed.description.includes('<')) {
+            throw new Error('RSS parser validation failed');
+          }
+          console.log('RSS parser OK:', parsed.description);
+          "
+
       - name: Sync GitHub trending repos to Supabase
         env:
           SUPABASE_URL: ${{ secrets.SUPABASE_URL }}

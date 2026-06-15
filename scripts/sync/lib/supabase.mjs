@@ -1,5 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 
+const INSERT_CHUNK_SIZE = 100;
+
 export function createServiceSupabaseClient() {
   const supabaseUrl = process.env.SUPABASE_URL;
   const supabaseSecretKey = process.env.SUPABASE_SECRET_KEY;
@@ -50,14 +52,24 @@ export async function insertRows(supabase, table, rows) {
     return;
   }
 
-  const chunkSize = 100;
-
-  for (let index = 0; index < rows.length; index += chunkSize) {
-    const chunk = rows.slice(index, index + chunkSize);
+  for (let index = 0; index < rows.length; index += INSERT_CHUNK_SIZE) {
+    const chunk = rows.slice(index, index + INSERT_CHUNK_SIZE);
     const { error } = await supabase.from(table).insert(chunk);
 
     if (error) {
       throw new Error(`Failed to insert into ${table}: ${error.message}`);
     }
+  }
+}
+
+export async function replaceRowsForDate(supabase, table, filters, rows) {
+  const fetchedDate = filters.fetched_date;
+  const { fetched_date: _ignored, ...extraFilters } = filters;
+
+  await clearRowsForDate(supabase, table, filters);
+  await insertRows(supabase, table, rows);
+
+  if (!shouldSkipDelete()) {
+    await deleteRowsBeforeDate(supabase, table, fetchedDate, extraFilters);
   }
 }
