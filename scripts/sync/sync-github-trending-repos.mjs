@@ -1,4 +1,5 @@
 import { XMLParser } from "fast-xml-parser";
+import { parseGithubTrendingRssItem } from "./parseGithubTrendingRss.mjs";
 import {
   clearRowsForDate,
   createServiceSupabaseClient,
@@ -9,6 +10,8 @@ import {
 } from "./_supabase.mjs";
 
 const TABLE_NAME = "github_trending_repos";
+
+// GitHubTrendingRSS — XML RSS feeds (not GitHub HTML pages)
 const RSS_FEEDS = {
   daily: "https://mshibanami.github.io/GitHubTrendingRSS/daily/all.xml",
   weekly: "https://mshibanami.github.io/GitHubTrendingRSS/weekly/all.xml",
@@ -29,19 +32,14 @@ function normalizeItems(items) {
 }
 
 function mapTrendingRow(item, period, fetchedDate) {
-  const title = typeof item.title === "string" ? item.title.trim() : "";
-  const url = typeof item.link === "string" ? item.link.trim() : "";
-  const description =
-    typeof item.description === "string" ? item.description.trim() : null;
+  const parsed = parseGithubTrendingRssItem(item);
 
-  if (!title || !url) {
+  if (!parsed) {
     return null;
   }
 
   return {
-    title,
-    url,
-    description: description || null,
+    ...parsed,
     period,
     fetched_date: fetchedDate,
   };
@@ -49,6 +47,8 @@ function mapTrendingRow(item, period, fetchedDate) {
 
 async function fetchRssItems(period) {
   const feedUrl = RSS_FEEDS[period];
+  console.log(`Fetching RSS XML: ${feedUrl}`);
+
   const response = await fetch(feedUrl);
 
   if (!response.ok) {
@@ -59,6 +59,8 @@ async function fetchRssItems(period) {
   const parsed = xmlParser.parse(xml);
   const items = normalizeItems(parsed?.rss?.channel?.item);
 
+  console.log(`RSS ${period}: ${items.length} items in XML feed.`);
+
   return items;
 }
 
@@ -67,6 +69,8 @@ async function syncPeriod(supabase, period, fetchedDate) {
   const rows = items
     .map((item) => mapTrendingRow(item, period, fetchedDate))
     .filter(Boolean);
+
+  console.log(`RSS ${period}: parsed ${rows.length} rows → inserting all (no limit).`);
 
   await clearRowsForDate(supabase, TABLE_NAME, {
     fetched_date: fetchedDate,

@@ -1,6 +1,3 @@
-const HUGGINGFACE_DAILY_PAPERS_URL = "https://huggingface.co/api/daily_papers";
-const TABLE_NAME = "huggingface_daily_papers";
-
 import {
   clearRowsForDate,
   createServiceSupabaseClient,
@@ -9,6 +6,9 @@ import {
   insertRows,
   shouldSkipDelete,
 } from "./_supabase.mjs";
+
+const HUGGINGFACE_DAILY_PAPERS_URL = "https://huggingface.co/api/daily_papers";
+const TABLE_NAME = "huggingface_daily_papers";
 
 function mapAuthors(authors) {
   if (!Array.isArray(authors)) {
@@ -52,6 +52,9 @@ async function fetchDailyPapers() {
 async function main() {
   const supabase = createServiceSupabaseClient();
   const fetchedDate = getUtcDateString();
+
+  console.log(`Fetching all papers from ${HUGGINGFACE_DAILY_PAPERS_URL}`);
+
   const entries = await fetchDailyPapers();
 
   if (!Array.isArray(entries)) {
@@ -61,6 +64,8 @@ async function main() {
   const rows = entries
     .map((entry) => mapPaperRow(entry, fetchedDate))
     .filter((row) => row.paper_id);
+
+  console.log(`API returned ${entries.length} entries → inserting ${rows.length} rows (no limit).`);
 
   await clearRowsForDate(supabase, TABLE_NAME, { fetched_date: fetchedDate });
   await insertRows(supabase, TABLE_NAME, rows);

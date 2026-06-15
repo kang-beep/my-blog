@@ -80,6 +80,10 @@
   }
 
   .home-feed-card {
-    @apply min-h-0;
+    @apply flex min-h-0 flex-col;
+  }
+
+  .home-feed-card-body {
+    @apply max-h-[32rem] min-h-0 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5;
   }
 }

@@ -7,9 +7,7 @@ import {
   GITHUB_TRENDING_PAGE_URL,
   GITHUB_TRENDING_PERIOD_LABELS,
   GITHUB_TRENDING_PERIODS,
-  GITHUB_TRENDING_REPOS_TOP_LIMIT,
 } from "@/features/github/trending-repos/constants/githubTrendingRepos";
-import { selectTopGithubTrendingRepos } from "@/features/github/trending-repos/utils/selectTopGithubTrendingRepos";
 
 export default function GithubTrendingReposList() {
   const [selectedPeriod, setSelectedPeriod] = useState("daily");
@@ -24,7 +22,7 @@ export default function GithubTrendingReposList() {
 
       try {
         const items = await fetchGithubTrendingRepos(selectedPeriod);
-        setRepos(selectTopGithubTrendingRepos(items, GITHUB_TRENDING_REPOS_TOP_LIMIT));
+        setRepos(items);
       } catch (requestError) {
         setError(requestError.message || "GitHub Trending을 불러오지 못했습니다.");
       } finally {
@@ -36,16 +34,14 @@ export default function GithubTrendingReposList() {
   }, [selectedPeriod]);
 
   return (
-    <section className="home-feed-card border border-slate-200 bg-white shadow-sm">
+    <section className="home-feed-card flex flex-col border border-slate-200 bg-white shadow-sm">
       <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 px-4 py-4 sm:px-6">
         <div>
           <h1 className="flex items-center gap-2 text-xl font-semibold text-slate-900">
             <span aria-hidden>⭐</span>
             <span>GitHub Trending</span>
           </h1>
-          <p className="mt-1 text-sm text-slate-500">
-            인기 레포 · Top {GITHUB_TRENDING_REPOS_TOP_LIMIT}
-          </p>
+          <p className="mt-1 text-sm text-slate-500">인기 레포 · RSS 순서</p>
         </div>
         <a
           className="btn inline-flex shrink-0 items-center gap-1.5 no-underline"
@@ -83,7 +79,7 @@ export default function GithubTrendingReposList() {
         </div>
       </div>
 
-      <div className="px-4 py-4 sm:px-6 sm:py-5" aria-busy={isLoading} aria-live="polite">
+      <div className="home-feed-card-body" aria-busy={isLoading} aria-live="polite">
         {isLoading ? (
           <>
             <p className="sr-only">GitHub Trending을 불러오는 중입니다.</p>
