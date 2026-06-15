@@ -1,5 +1,6 @@
 // posts 도메인 Supabase 접근 함수 모음
 import { supabase } from "@/shared/lib/supabaseClient";
+import { POST_STATUS_PUBLISHED } from "@/shared/constants/postStatus";
 
 const POST_LIST_FIELDS =
   "id, title, slug, excerpt, status, published_at, content, category, category_id, tags, image_url, like_count, created_at, updated_at";
@@ -15,11 +16,14 @@ function mapPost(record) {
   };
 }
 
+function applyPublishedFilter(query) {
+  return query.or(`status.eq.${POST_STATUS_PUBLISHED},status.is.null`);
+}
+
 export async function fetchPosts({ category, tag } = {}) {
-  let query = supabase
-    .from("posts")
-    .select(POST_LIST_FIELDS)
-    .order("created_at", { ascending: false });
+  let query = applyPublishedFilter(
+    supabase.from("posts").select(POST_LIST_FIELDS),
+  ).order("created_at", { ascending: false });
 
   if (category) {
     query = query.eq("category", category);
@@ -35,12 +39,25 @@ export async function fetchPosts({ category, tag } = {}) {
   return (data ?? []).map(mapPost);
 }
 
+export async function fetchLatestPosts(limit = 5) {
+  const { data, error } = await applyPublishedFilter(
+    supabase.from("posts").select(POST_CARD_FIELDS),
+  )
+    .order("created_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return (data ?? []).map(mapPost);
+}
+
 export async function fetchPostById(postId) {
-  const { data, error } = await supabase
-    .from("posts")
-    .select(POST_LIST_FIELDS)
-    .eq("id", postId)
-    .single();
+  const { data, error } = await applyPublishedFilter(
+    supabase.from("posts").select(POST_LIST_FIELDS).eq("id", postId),
+  ).single();
+
   if (error) {
     throw new Error(error.message);
   }
@@ -56,7 +73,8 @@ export async function fetchCategories() {
   if (!managed.error && managed.data && managed.data.length > 0) {
     return managed.data.map((item) => item.name);
   }
-  const fallback = await supabase.from("posts").select("category");
+
+  const fallback = await applyPublishedFilter(supabase.from("posts").select("category"));
   if (fallback.error) {
     throw new Error(fallback.error.message);
   }
@@ -68,34 +86,39 @@ export async function fetchCategorySections(limitPerCategory = 3) {
   const categories = await fetchCategories();
   const sections = await Promise.all(
     categories.map(async (category) => {
-      const { data, error } = await supabase
-        .from("posts")
-        .select(POST_CARD_FIELDS)
-        .eq("category", category)
+      const { data, error } = await applyPublishedFilter(
+        supabase.from("posts").select(POST_CARD_FIELDS).eq("category", category),
+      )
         .order("created_at", { ascending: false })
         .limit(limitPerCategory);
+
       if (error) {
         throw new Error(error.message);
       }
       return { category, posts: (data ?? []).map(mapPost) };
-    })
+    }),
   );
-  return sections;
+
+  return sections.filter((section) => section.posts.length > 0);
 }
 
 export async function fetchAdjacentPosts(createdAt) {
   const [previousResult, nextResult] = await Promise.all([
-    supabase
-      .from("posts")
-      .select("id, title, created_at")
-      .lt("created_at", createdAt)
+    applyPublishedFilter(
+      supabase
+        .from("posts")
+        .select("id, title, created_at")
+        .lt("created_at", createdAt),
+    )
       .order("created_at", { ascending: false })
       .limit(1)
       .maybeSingle(),
-    supabase
-      .from("posts")
-      .select("id, title, created_at")
-      .gt("created_at", createdAt)
+    applyPublishedFilter(
+      supabase
+        .from("posts")
+        .select("id, title, created_at")
+        .gt("created_at", createdAt),
+    )
       .order("created_at", { ascending: true })
       .limit(1)
       .maybeSingle(),

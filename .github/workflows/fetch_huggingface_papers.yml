@@ -1,0 +1,31 @@
+name: Fetch HuggingFace Daily Papers
+
+on:
+  schedule:
+    - cron: "0 1 * * *"
+  workflow_dispatch:
+    inputs:
+      skip_delete:
+        description: "Skip deleting rows older than today (test)"
+        type: boolean
+        default: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Sync Hugging Face daily papers to Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          SKIP_DELETE: ${{ inputs.skip_delete }}
+        run: node scripts/sync/sync-huggingface-daily-papers.mjs

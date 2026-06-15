@@ -42,7 +42,7 @@ export async function deletePost(postId) {
 export async function fetchAdminPosts() {
   const { data, error } = await supabase
     .from("posts")
-    .select("id, title, content, category, category_id, tags, image_url, created_at")
+    .select("id, title, content, category, category_id, tags, image_url, status, published_at, created_at")
     .order("created_at", { ascending: false });
   if (error) {
     throw new Error(error.message);
@@ -51,6 +51,25 @@ export async function fetchAdminPosts() {
     ...item,
     tags: Array.isArray(item.tags) ? item.tags : [],
   }));
+}
+
+export async function fetchAdminPostById(postId) {
+  const { data, error } = await supabase
+    .from("posts")
+    .select(
+      "id, title, content, category, category_id, tags, image_url, status, published_at, created_at, updated_at",
+    )
+    .eq("id", postId)
+    .single();
+
+  if (error) {
+    throw new Error(error.message);
+  }
+
+  return {
+    ...data,
+    tags: Array.isArray(data.tags) ? data.tags : [],
+  };
 }
 
 export async function uploadPostImage(file, postId) {

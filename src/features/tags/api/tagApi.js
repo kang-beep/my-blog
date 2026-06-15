@@ -1,46 +1,47 @@
-// 태그 집계/관계 데이터 조회 함수 모음
+// tag_stats · tag_edges 집계 테이블 조회 및 재집계
 import { supabase } from "@/shared/lib/supabaseClient";
 
 export async function fetchTagCounts() {
-  const { data, error } = await supabase.from("posts").select("tags");
+  const { data, error } = await supabase
+    .from("tag_stats")
+    .select("tag, post_count")
+    .order("post_count", { ascending: false });
+
   if (error) {
     throw new Error(error.message);
   }
 
-  const countMap = new Map();
-  (data ?? []).forEach((row) => {
-    (row.tags ?? []).forEach((tag) => {
-      countMap.set(tag, (countMap.get(tag) ?? 0) + 1);
-    });
-  });
-
-  return [...countMap.entries()]
-    .map(([tag, count]) => ({ tag, count }))
-    .sort((a, b) => b.count - a.count);
+  return (data ?? []).map((row) => ({
+    tag: row.tag,
+    count: row.post_count,
+  }));
 }
 
 export async function fetchTagEdges() {
-  const { data, error } = await supabase.from("posts").select("tags");
+  const { data, error } = await supabase
+    .from("tag_edges")
+    .select("source_tag, target_tag, weight")
+    .order("weight", { ascending: false });
+
   if (error) {
     throw new Error(error.message);
   }
 
-  const edgeMap = new Map();
-  (data ?? []).forEach((row) => {
-    const tags = [...new Set(row.tags ?? [])];
-    for (let i = 0; i < tags.length; i += 1) {
-      for (let j = i + 1; j < tags.length; j += 1) {
-        const [source, target] = [tags[i], tags[j]].sort();
-        const key = `${source}__${target}`;
-        edgeMap.set(key, (edgeMap.get(key) ?? 0) + 1);
-      }
-    }
-  });
+  return (data ?? []).map((row) => ({
+    source: row.source_tag,
+    target: row.target_tag,
+    weight: row.weight,
+  }));
+}
 
-  return [...edgeMap.entries()]
-    .map(([key, weight]) => {
-      const [source, target] = key.split("__");
-      return { source, target, weight };
-    })
-    .sort((a, b) => b.weight - a.weight);
+export async function fetchTagNetwork() {
+  const [nodes, edges] = await Promise.all([fetchTagCounts(), fetchTagEdges()]);
+  return { nodes, edges };
+}
+
+export async function refreshTagStats() {
+  const { error } = await supabase.rpc("refresh_tag_stats");
+  if (error) {
+    throw new Error(error.message);
+  }
 }

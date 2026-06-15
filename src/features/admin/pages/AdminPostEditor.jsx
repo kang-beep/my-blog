@@ -5,10 +5,15 @@ import PostEditorForm from "@/features/admin/components/PostEditorForm";
 import {
   createPost,
   deletePost,
+  fetchAdminPostById,
   updatePost,
   uploadPostImage,
 } from "@/features/admin/api/adminPostApi";
-import { fetchPostById } from "@/features/posts/api/postApi";
+import { refreshTagStats } from "@/features/tags/api/tagApi";
+import {
+  POST_STATUS_DRAFT,
+  POST_STATUS_PUBLISHED,
+} from "@/shared/constants/postStatus";
 import {
   createCategory,
   fetchCategories,
@@ -16,14 +21,22 @@ import {
 import { ROUTES } from "@/shared/constants/routes";
 
 function buildPostFields(payload, imageUrl) {
-  return {
+  const isPublished = payload.status === POST_STATUS_PUBLISHED;
+  const fields = {
     title: payload.title,
     content: payload.content,
     category: payload.category,
     category_id: payload.category_id ?? null,
     tags: payload.tags,
     image_url: imageUrl,
+    status: payload.status,
   };
+
+  if (isPublished) {
+    fields.published_at = payload.published_at ?? new Date().toISOString();
+  }
+
+  return fields;
 }
 
 export default function AdminPostEditor() {
@@ -60,7 +73,7 @@ export default function AdminPostEditor() {
       setIsLoading(true);
       setError("");
       try {
-        const item = await fetchPostById(id);
+        const item = await fetchAdminPostById(id);
         setPost(item);
       } catch (requestError) {
         setError(requestError.message || "글을 불러오지 못했습니다.");
@@ -81,33 +94,33 @@ export default function AdminPostEditor() {
     setIsSubmitting(true);
     setError("");
     try {
-      const publishMeta = {
-        status: "published",
-        published_at: new Date().toISOString(),
-      };
-
       if (isEditMode) {
         let imageUrl = payload.image_url ?? null;
         if (payload.imageFile) {
           imageUrl = await uploadPostImage(payload.imageFile, payload.id);
         }
-        await updatePost(payload.id, buildPostFields(payload, imageUrl));
+        await updatePost(
+          payload.id,
+          buildPostFields({ ...payload, published_at: post?.published_at ?? null }, imageUrl),
+        );
       } else if (payload.imageFile) {
         const created = await createPost({
           id: payload.id,
           ...buildPostFields(payload, null),
-          ...publishMeta,
         });
         const imageUrl = await uploadPostImage(payload.imageFile, created.id);
-        await updatePost(created.id, buildPostFields(payload, imageUrl));
+        await updatePost(
+          created.id,
+          buildPostFields({ ...payload, published_at: null }, imageUrl),
+        );
       } else {
         await createPost({
           id: payload.id,
           ...buildPostFields(payload, null),
-          ...publishMeta,
         });
       }
 
+      await refreshTagStats();
       navigate(ROUTES.ADMIN_POSTS);
     } catch (requestError) {
       setError(requestError.message || "글 저장에 실패했습니다.");
@@ -125,6 +138,7 @@ export default function AdminPostEditor() {
     setError("");
     try {
       await deletePost(id);
+      await refreshTagStats();
       navigate(ROUTES.ADMIN_POSTS);
     } catch (requestError) {
       setError(requestError.message || "글 삭제에 실패했습니다.");

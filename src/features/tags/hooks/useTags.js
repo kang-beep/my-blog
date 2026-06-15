@@ -1,6 +1,6 @@
-// 태그 네트워크용 노드/엣지 데이터를 로드하는 커스텀 훅
+// tag_stats · tag_edges 기반 태그 네트워크 데이터 로드
 import { useEffect, useState } from "react";
-import { fetchTagCounts, fetchTagEdges } from "@/features/tags/api/tagApi";
+import { fetchTagNetwork } from "@/features/tags/api/tagApi";
 
 export function useTags() {
   const [nodes, setNodes] = useState([]);
@@ -13,12 +13,9 @@ export function useTags() {
       setIsLoading(true);
       setError("");
       try {
-        const [counts, relations] = await Promise.all([
-          fetchTagCounts(),
-          fetchTagEdges(),
-        ]);
-        setNodes(counts);
-        setEdges(relations);
+        const network = await fetchTagNetwork();
+        setNodes(network.nodes);
+        setEdges(network.edges);
       } catch (requestError) {
         setError(requestError.message || "태그 데이터를 불러오지 못했습니다.");
       } finally {

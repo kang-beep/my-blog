@@ -33,6 +33,31 @@ export function formatDateTime(dateInput) {
   });
 }
 
+export function getMostRecentDate(createdAt, updatedAt) {
+  if (!createdAt && !updatedAt) {
+    return null;
+  }
+
+  if (!createdAt) {
+    return updatedAt;
+  }
+
+  if (!updatedAt) {
+    return createdAt;
+  }
+
+  const createdDate = new Date(createdAt);
+  const updatedDate = new Date(updatedAt);
+  if (Number.isNaN(createdDate.getTime())) {
+    return updatedAt;
+  }
+  if (Number.isNaN(updatedDate.getTime())) {
+    return createdAt;
+  }
+
+  return updatedDate > createdDate ? updatedAt : createdAt;
+}
+
 export function isSameMinute(left, right) {
   if (!left || !right) {
     return false;

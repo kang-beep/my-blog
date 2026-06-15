@@ -14,7 +14,7 @@
 
 | 경로 | 설명 |
 |---|---|
-| `/` | 홈 |
+| `/` | 홈 (HF Daily Papers + GitHub Trending + 태그 네트워크 + 최신 글) |
 | `/posts` | 글 목록 |
 | `/posts/:id` | 글 상세 |
 | `/write` | 글 작성 (인증) |
@@ -34,10 +34,16 @@
 src/
   app/           App, router, providers
   shared/        layout, constants, supabaseClient, 공용 UI
-  features/      posts, comments, auth, admin(에디터), settings, portfolio, categories …
+  features/      posts, comments, auth, admin(에디터), settings, portfolio, categories,
+                 huggingface/daily-papers, github/trending-repos …
 ```
 
 규칙: 도메인 코드는 `features/*`, 2곳 이상 재사용 시 `shared/*`로 승격.
+
+## 홈 외부 피드
+
+- Hugging Face / GitHub Trending 카드: Supabase 캐시 조회 (브라우저 직접 fetch 없음)
+- 상세: `docs/05_home_external_feeds.md`
 
 ## 로컬
 

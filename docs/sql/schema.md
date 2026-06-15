@@ -121,6 +121,43 @@ portfolio_projects
 
 **Source:** co-occurring tags in `posts.tags` (aggregated on admin CRUD)
 
+## huggingface_daily_papers
+
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | uuid | PK |
+| paper_id | text | NOT NULL |
+| title | text | NOT NULL |
+| summary | text | |
+| ai_summary | text | |
+| ai_keywords | text[] | |
+| authors | text[] | |
+| upvotes | int | default `0` |
+| github_repo | text | nullable |
+| published_at | timestamptz | |
+| fetched_date | date | NOT NULL |
+| created_at | timestamptz | default `now()` |
+
+**Indexes:** `idx_hf_papers_fetched_date`, unique `(paper_id, fetched_date)`
+
+**Source:** GitHub Actions → HF API (`docs/05_home_external_feeds.md`)
+
+## github_trending_repos
+
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | uuid | PK |
+| title | text | NOT NULL |
+| url | text | NOT NULL |
+| description | text | |
+| period | text | `daily` \| `weekly` \| `monthly` |
+| fetched_date | date | NOT NULL |
+| created_at | timestamptz | default `now()` |
+
+**Indexes:** `idx_gh_trending_fetched_date`, `idx_gh_trending_period`, unique `(url, period, fetched_date)`
+
+**Source:** GitHub Actions → GitHubTrendingRSS
+
 ## Storage
 
 | Bucket | Path pattern |

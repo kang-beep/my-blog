@@ -1,0 +1,41 @@
+name: Fetch GitHub Trending Repos
+
+on:
+  schedule:
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+    inputs:
+      period:
+        description: "RSS period to sync"
+        type: choice
+        options:
+          - all
+          - daily
+          - weekly
+          - monthly
+        default: all
+      skip_delete:
+        description: "Skip deleting rows older than today (test)"
+        type: boolean
+        default: false
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Sync GitHub trending repos to Supabase
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          PERIOD: ${{ inputs.period || 'all' }}
+          SKIP_DELETE: ${{ inputs.skip_delete }}
+        run: node scripts/sync/sync-github-trending-repos.mjs

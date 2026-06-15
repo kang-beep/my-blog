@@ -10,6 +10,7 @@
         ↔ Supabase (REST, Auth, Storage)
   → GitHub Actions (schedule)
       → Supabase REST ping (일시정지 방지)
+      → HF Daily Papers / GitHub Trending 동기화 → Supabase
 ```
 
 ## Vercel
@@ -34,6 +35,21 @@
 |---|---|
 | `SUPABASE_URL` | `https://<project>.supabase.co` |
 | `SUPABASE_SECRET_KEY` | Secret API key (프론트·VITE에 넣지 말 것) |
+
+## GitHub Actions — External feeds sync
+
+| 워크플로 | cron (UTC) | 수동 |
+|---|---|---|
+| `fetch_huggingface_papers.yml` | `0 1 * * *` | `workflow_dispatch` |
+| `fetch_github_trending.yml` | `0 2 * * *` | `workflow_dispatch` |
+
+Secrets: ping과 동일 (`SUPABASE_URL`, `SUPABASE_SECRET_KEY`).
+
+**선행 조건:** `docs/sql/migrate_home_external_feeds.sql` 실행 후 워크플로 실행.
+
+**수동 테스트:** Actions → Run workflow → `skip_delete: true` 권장(첫 검증).
+
+상세: `docs/05_home_external_feeds.md`
 
 ## 브랜치 (권장)
 

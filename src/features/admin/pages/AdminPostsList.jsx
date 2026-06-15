@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { fetchAdminPosts } from "@/features/admin/api/adminPostApi";
 import { ROUTES, getAdminPostEditPath } from "@/shared/constants/routes";
 import { formatDate } from "@/shared/utils/date";
+import { POST_STATUS_DRAFT, POST_STATUS_LABELS, POST_STATUS_PUBLISHED } from "@/shared/constants/postStatus";
 
 export default function AdminPostsList() {
   const [posts, setPosts] = useState([]);
@@ -51,8 +52,19 @@ export default function AdminPostsList() {
                 className="card block transition hover:border-indigo-200 hover:bg-indigo-50/30"
               >
                 <p className="font-semibold text-slate-900">{post.title}</p>
-                <p className="mt-1 text-sm text-slate-600">
-                  {post.category} · {formatDate(post.created_at)}
+                <p className="mt-1 flex flex-wrap items-center gap-2 text-sm text-slate-600">
+                  <span
+                    className={`rounded px-1.5 py-0.5 text-xs font-medium ${
+                      post.status === POST_STATUS_DRAFT
+                        ? "bg-amber-50 text-amber-700"
+                        : "bg-emerald-50 text-emerald-700"
+                    }`}
+                  >
+                    {POST_STATUS_LABELS[post.status] ?? POST_STATUS_LABELS[POST_STATUS_PUBLISHED]}
+                  </span>
+                  <span>
+                    {post.category} · {formatDate(post.created_at)}
+                  </span>
                 </p>
               </Link>
             </li>

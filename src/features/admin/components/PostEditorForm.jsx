@@ -1,11 +1,15 @@
 // 관리자 글 작성/수정 폼: 태그 파싱과 이미지 업로드를 함께 처리
 import { useEffect, useState } from "react";
 import RichTextEditor, { isEditorContentEmpty } from "@/features/admin/components/RichTextEditor/RichTextEditor";
+import {
+  POST_STATUS_DRAFT,
+  POST_STATUS_PUBLISHED,
+} from "@/shared/constants/postStatus";
 
 function parseTags(tagsInput) {
   return tagsInput
     .split(",")
-    .map((item) => item.trim())
+    .map((item) => item.trim().replace(/^#+/, "").trim())
     .filter(Boolean);
 }
 
@@ -23,6 +27,7 @@ export default function PostEditorForm({
   const [categoryId, setCategoryId] = useState("");
   const [newCategoryName, setNewCategoryName] = useState("");
   const [tagsInput, setTagsInput] = useState("");
+  const [status, setStatus] = useState(POST_STATUS_PUBLISHED);
   const [imageFile, setImageFile] = useState(null);
   const [contentError, setContentError] = useState("");
   const [categoryError, setCategoryError] = useState("");
@@ -32,6 +37,7 @@ export default function PostEditorForm({
     setContent(initialPost?.content ?? "");
     setCategory(initialPost?.category ?? "");
     setTagsInput((initialPost?.tags ?? []).join(", "));
+    setStatus(initialPost?.status === POST_STATUS_DRAFT ? POST_STATUS_DRAFT : POST_STATUS_PUBLISHED);
     setImageFile(null);
 
     const initialCategoryId = initialPost?.category_id ?? "";
@@ -58,6 +64,7 @@ export default function PostEditorForm({
       category: category.trim(),
       category_id: categoryId || null,
       tags: parseTags(tagsInput),
+      status,
       imageFile,
       image_url: initialPost?.image_url ?? null,
     });
@@ -163,6 +170,34 @@ export default function PostEditorForm({
           추가 버튼을 누르면 DB에 저장되고 목록에 바로 선택됩니다. (페이지 새로고침 없음)
         </p>
         {categoryError ? <p className="mt-1 text-sm text-rose-600">{categoryError}</p> : null}
+      </div>
+      <div>
+        <p className="label">공개 상태</p>
+        <div className="flex flex-wrap gap-2">
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm has-[:checked]:border-indigo-300 has-[:checked]:bg-indigo-50">
+            <input
+              type="radio"
+              name="post-status"
+              value={POST_STATUS_PUBLISHED}
+              checked={status === POST_STATUS_PUBLISHED}
+              onChange={() => setStatus(POST_STATUS_PUBLISHED)}
+            />
+            공개
+          </label>
+          <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm has-[:checked]:border-indigo-300 has-[:checked]:bg-indigo-50">
+            <input
+              type="radio"
+              name="post-status"
+              value={POST_STATUS_DRAFT}
+              checked={status === POST_STATUS_DRAFT}
+              onChange={() => setStatus(POST_STATUS_DRAFT)}
+            />
+            비공개
+          </label>
+        </div>
+        <p className="mt-1 text-xs text-slate-400">
+          비공개 글은 홈·목록·태그 네트워크에 표시되지 않습니다.
+        </p>
       </div>
       <div>
         <label className="label" htmlFor="tags">태그(쉼표 구분)</label>

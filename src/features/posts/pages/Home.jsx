@@ -1,53 +1,44 @@
-// 메인 페이지: 카테고리별 최신 글과 태그 네트워크 표시
+// 메인 페이지: 외부 피드 2열 + 태그 네트워크 + 최신 글
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import PostList from "@/features/posts/components/PostList";
-import { fetchCategorySections } from "@/features/posts/api/postApi";
-import { ROUTES } from "@/shared/constants/routes";
+import GithubTrendingReposList from "@/features/github/trending-repos/components/GithubTrendingReposList";
+import HuggingFaceDailyPapersList from "@/features/huggingface/daily-papers/components/HuggingFaceDailyPapersList";
+import { fetchLatestPosts } from "@/features/posts/api/postApi";
+import { HOME_LATEST_POST_LIMIT } from "@/features/posts/constants/home";
 import TagNetwork from "@/features/tags/components/TagNetwork";
 
 export default function Home() {
-  const navigate = useNavigate();
-  const [sections, setSections] = useState([]);
+  const [posts, setPosts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
   useEffect(() => {
-    const loadSections = async () => {
+    const loadLatestPosts = async () => {
       setIsLoading(true);
       setError("");
       try {
-        const data = await fetchCategorySections(3);
-        setSections(data);
+        const items = await fetchLatestPosts(HOME_LATEST_POST_LIMIT);
+        setPosts(items);
       } catch (requestError) {
-        setError(requestError.message || "메인 글 섹션을 불러오지 못했습니다.");
+        setError(requestError.message || "최신 글을 불러오지 못했습니다.");
       } finally {
         setIsLoading(false);
       }
     };
 
-    void loadSections();
+    void loadLatestPosts();
   }, []);
 
-  const handleTagClick = (tag) => {
-    navigate(`${ROUTES.POSTS}?tag=${encodeURIComponent(tag)}`);
-  };
-
   return (
-    <section className="space-y-6">
-      <h1>홈</h1>
-      {isLoading ? <p className="text-sm text-slate-500">글 섹션을 불러오는 중입니다...</p> : null}
-      {error ? <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</p> : null}
-      {!isLoading && !error && sections.length === 0 ? (
-        <p className="rounded-lg bg-slate-100 px-3 py-2 text-sm text-slate-600">아직 등록된 글이 없습니다.</p>
-      ) : null}
-      {sections.map((section) => (
-        <section key={section.category} className="space-y-3">
-          <h2 className="border-b border-slate-200 pb-2">{section.category}</h2>
-          <PostList posts={section.posts} onTagClick={handleTagClick} />
-        </section>
-      ))}
-      <TagNetwork />
-    </section>
+    <div className="space-y-6">
+      <section className="home-cards-grid">
+        <HuggingFaceDailyPapersList />
+        <GithubTrendingReposList />
+      </section>
+      <TagNetwork
+        latestPosts={posts}
+        latestPostsLoading={isLoading}
+        latestPostsError={error}
+      />
+    </div>
   );
 }
