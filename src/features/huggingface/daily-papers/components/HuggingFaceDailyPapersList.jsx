@@ -11,6 +11,7 @@ import HomeFeedBadge from "@/shared/ui/HomeFeedBadge";
 
 export default function HuggingFaceDailyPapersList() {
   const [papers, setPapers] = useState([]);
+  const [feedMeta, setFeedMeta] = useState({ fetchedDate: "", isStale: false });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -20,8 +21,9 @@ export default function HuggingFaceDailyPapersList() {
       setError("");
 
       try {
-        const items = await fetchHuggingFaceDailyPapers();
+        const { papers: items, fetchedDate, isStale } = await fetchHuggingFaceDailyPapers();
         setPapers(items);
+        setFeedMeta({ fetchedDate, isStale });
       } catch (requestError) {
         setError(requestError.message || "Failed to load Hugging Face daily papers.");
       } finally {
@@ -43,7 +45,11 @@ export default function HuggingFaceDailyPapersList() {
             </h3>
             <HomeFeedBadge>{HOME_FEED_BADGE_EXTERNAL}</HomeFeedBadge>
           </div>
-          <p className="mt-1 text-sm text-slate-500">Today&apos;s top papers · by upvotes</p>
+          <p className="mt-1 text-sm text-slate-500">
+            {feedMeta.isStale
+              ? `Latest synced papers · ${feedMeta.fetchedDate}`
+              : "Today's top papers · by upvotes"}
+          </p>
         </div>
         <a
           className="btn inline-flex shrink-0 items-center gap-1.5 no-underline"
@@ -70,7 +76,8 @@ export default function HuggingFaceDailyPapersList() {
 
         {!isLoading && !error && papers.length === 0 ? (
           <p className="rounded-lg bg-slate-50 px-3 py-8 text-center text-sm text-slate-500">
-            No papers to show. Run the GitHub Actions sync and check again.
+            No papers to show. Run the GitHub Actions workflow &quot;Fetch HuggingFace Daily Papers&quot; or{' '}
+            <code className="text-xs">npm run sync:hf-papers</code> locally.
           </p>
         ) : null}
 

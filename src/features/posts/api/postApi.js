@@ -6,7 +6,7 @@ const POST_LIST_FIELDS =
   "id, title, slug, excerpt, status, published_at, content, category, category_id, tags, image_url, like_count, created_at, updated_at";
 
 const POST_CARD_FIELDS =
-  "id, title, category, tags, image_url, like_count, created_at";
+  "id, title, excerpt, category, tags, image_url, content, like_count, created_at";
 
 function mapPost(record) {
   return {

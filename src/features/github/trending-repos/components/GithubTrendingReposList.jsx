@@ -15,6 +15,7 @@ import HomeFeedBadge from "@/shared/ui/HomeFeedBadge";
 export default function GithubTrendingReposList() {
   const [selectedPeriod, setSelectedPeriod] = useState("daily");
   const [repos, setRepos] = useState([]);
+  const [feedMeta, setFeedMeta] = useState({ fetchedDate: "", isStale: false });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -24,8 +25,9 @@ export default function GithubTrendingReposList() {
       setError("");
 
       try {
-        const items = await fetchGithubTrendingRepos(selectedPeriod);
+        const { repos: items, fetchedDate, isStale } = await fetchGithubTrendingRepos(selectedPeriod);
         setRepos(items);
+        setFeedMeta({ fetchedDate, isStale });
       } catch (requestError) {
         setError(requestError.message || "Failed to load GitHub Trending.");
       } finally {
@@ -47,7 +49,11 @@ export default function GithubTrendingReposList() {
             </h3>
             <HomeFeedBadge>{HOME_FEED_BADGE_EXTERNAL}</HomeFeedBadge>
           </div>
-          <p className="mt-1 text-sm text-slate-500">Top repos · RSS order</p>
+          <p className="mt-1 text-sm text-slate-500">
+            {feedMeta.isStale
+              ? `Latest synced repos · ${feedMeta.fetchedDate}`
+              : "Top repos · RSS order"}
+          </p>
         </div>
         <a
           className="btn inline-flex shrink-0 items-center gap-1.5 no-underline"
@@ -99,7 +105,8 @@ export default function GithubTrendingReposList() {
 
         {!isLoading && !error && repos.length === 0 ? (
           <p className="rounded-lg bg-slate-50 px-3 py-8 text-center text-sm text-slate-500">
-            No repos to show. Run the GitHub Actions sync and check again.
+            No repos to show. Run the GitHub Actions workflow &quot;Fetch GitHub Trending Repos&quot; or{' '}
+            <code className="text-xs">npm run sync:gh-trending</code> locally.
           </p>
         ) : null}
 

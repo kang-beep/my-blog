@@ -5,4 +5,4 @@ export const STORAGE_BUCKETS = {
   PORTFOLIO: "portfolio-images",
 };
 
-/** 본문 에디터 이미지 경로: `{postId}/content/{uuid}.webp` */
+/** 글 이미지 경로: 썸네일 `{postId}/{uuid}.webp` · 본문 `{postId}/content/{uuid}.webp` */

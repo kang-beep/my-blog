@@ -10,25 +10,30 @@ import {
   uploadPostImage,
 } from "@/features/admin/api/adminPostApi";
 import { refreshTagStats } from "@/features/tags/api/tagApi";
+import { extractFirstImageSrc } from "@/features/posts/utils/postDisplay";
 import {
   POST_STATUS_DRAFT,
   POST_STATUS_PUBLISHED,
 } from "@/shared/constants/postStatus";
-import {
-  createCategory,
-  fetchCategories,
-} from "@/features/categories/api/categoryApi";
+import { ensureDefaultCategory, fetchCategories } from "@/features/categories/api/categoryApi";
+import { resolvePostCategoryFields } from "@/features/categories/utils/resolvePostCategory";
 import { ROUTES } from "@/shared/constants/routes";
 
-function buildPostFields(payload, imageUrl) {
+function buildPostFields(payload, imageUrl, categories) {
   const isPublished = payload.status === POST_STATUS_PUBLISHED;
+  const excerpt = payload.excerpt?.trim() || null;
+  const resolvedImageUrl =
+    imageUrl?.trim() || payload.image_url?.trim() || extractFirstImageSrc(payload.content) || null;
+  const { category_id, category } = resolvePostCategoryFields(categories, payload.category_id);
+
   const fields = {
     title: payload.title,
     content: payload.content,
-    category: payload.category,
-    category_id: payload.category_id ?? null,
+    excerpt,
+    category,
+    category_id,
     tags: payload.tags,
-    image_url: imageUrl,
+    image_url: resolvedImageUrl,
     status: payload.status,
   };
 
@@ -55,6 +60,7 @@ export default function AdminPostEditor() {
   useEffect(() => {
     const loadCategories = async () => {
       try {
+        await ensureDefaultCategory();
         const items = await fetchCategories();
         setCategories(items);
       } catch (_error) {
@@ -84,12 +90,6 @@ export default function AdminPostEditor() {
     void loadPost();
   }, [id, isEditMode]);
 
-  const handleAddCategory = async (name) => {
-    const added = await createCategory(name);
-    setCategories((prev) => [...prev, added]);
-    return added;
-  };
-
   const handleSubmit = async (payload) => {
     setIsSubmitting(true);
     setError("");
@@ -101,22 +101,22 @@ export default function AdminPostEditor() {
         }
         await updatePost(
           payload.id,
-          buildPostFields({ ...payload, published_at: post?.published_at ?? null }, imageUrl),
+          buildPostFields({ ...payload, published_at: post?.published_at ?? null }, imageUrl, categories),
         );
       } else if (payload.imageFile) {
         const created = await createPost({
           id: payload.id,
-          ...buildPostFields(payload, null),
+          ...buildPostFields(payload, null, categories),
         });
         const imageUrl = await uploadPostImage(payload.imageFile, created.id);
         await updatePost(
           created.id,
-          buildPostFields({ ...payload, published_at: null }, imageUrl),
+          buildPostFields({ ...payload, published_at: null }, imageUrl, categories),
         );
       } else {
         await createPost({
           id: payload.id,
-          ...buildPostFields(payload, null),
+          ...buildPostFields(payload, null, categories),
         });
       }
 
@@ -167,7 +167,6 @@ export default function AdminPostEditor() {
             onSubmit={handleSubmit}
             isSubmitting={isSubmitting}
             categories={categories}
-            onAddCategory={handleAddCategory}
           />
           {isEditMode ? (
             <button

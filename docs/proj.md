@@ -1,5 +1,8 @@
 # portfolio & tech Blog
 
+> **이 파일은 초기 기획 초안입니다.** 현재 구현·운영 문서는 아래를 참고하세요.  
+> `docs/01_project_overview.md` · `02_frontend.md` · `03_db.md` · `04_ops.md` · `05_home_external_feeds.md` · `06_post_delete_and_giscus.md` · `sql/schema.md`
+
 ---
 ## 프로젝트 개요
 

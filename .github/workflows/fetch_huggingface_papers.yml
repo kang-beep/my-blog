@@ -2,7 +2,10 @@ name: Fetch HuggingFace Daily Papers
 
 on:
   schedule:
-    - cron: "0 1 * * *"
+    # UTC 00:30 — ~30m after typical HF daily list reset (~00:00 UTC)
+    - cron: "30 0 * * *"
+    # UTC 12:30 — midday refresh for papers/upvotes added through the day
+    - cron: "30 12 * * *"
   workflow_dispatch:
     inputs:
       skip_delete:

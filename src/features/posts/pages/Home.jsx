@@ -42,7 +42,7 @@ export default function Home() {
         </div>
       </HomeSection>
 
-      <HomeSection title={HOME_SECTION_MINE.title}>
+      <HomeSection title={HOME_SECTION_MINE.title} description={HOME_SECTION_MINE.description}>
         <TagNetwork
           latestPosts={posts}
           latestPostsLoading={isLoading}

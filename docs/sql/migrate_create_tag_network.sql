@@ -61,8 +61,8 @@ security definer
 set search_path = public
 as $$
 begin
-  delete from public.tag_edges;
-  delete from public.tag_stats;
+  truncate table public.tag_edges;
+  truncate table public.tag_stats;
 
   insert into public.tag_stats (tag, post_count, updated_at)
   select

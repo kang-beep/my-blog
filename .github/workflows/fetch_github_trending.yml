@@ -2,7 +2,10 @@ name: Fetch GitHub Trending Repos
 
 on:
   schedule:
-    - cron: "0 2 * * *"
+    # UTC 01:30 — ~30m after mshibanami/GitHubTrendingRSS feed (01:00 UTC)
+    - cron: "30 1 * * *"
+    # UTC 13:00 — midday refresh as GitHub Trending shifts through the day
+    - cron: "0 13 * * *"
   workflow_dispatch:
     inputs:
       period:

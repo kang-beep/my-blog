@@ -8,12 +8,13 @@
 ## 데이터 흐름
 
 ```
-GitHub Actions (매일)
-  ├─ UTC 01:00 — HF API → Supabase huggingface_daily_papers
-  └─ UTC 02:00 — GitHub Trending RSS (daily/weekly/monthly) → Supabase github_trending_repos
+GitHub Actions (하루 2회)
+  ├─ UTC 00:30, 12:30 — HF API → Supabase huggingface_daily_papers
+  └─ UTC 01:30, 13:00 — GitHub Trending RSS → Supabase github_trending_repos
 
 React (브라우저)
   ├─ Supabase SELECT (fetched_date = UTC 오늘)
+  ├─ 오늘 데이터 없으면 최신 fetched_date로 fallback (isStale)
   └─ 카드 렌더링 (self-contained 컴포넌트)
 ```
 
@@ -63,8 +64,8 @@ RLS: anon/authenticated **SELECT only**. INSERT/DELETE는 Actions(service_role)�
 
 | 워크플로 | cron (UTC) | 스크립트 |
 |---|---|---|
-| `fetch_huggingface_papers.yml` | `0 1 * * *` | `scripts/sync/sync-huggingface-daily-papers.mjs` |
-| `fetch_github_trending.yml` | `0 2 * * *` | `scripts/sync/sync-github-trending-repos.mjs` |
+| `fetch_huggingface_papers.yml` | `30 0 * * *`, `30 12 * * *` | `scripts/sync/sync-huggingface-daily-papers.mjs` |
+| `fetch_github_trending.yml` | `30 1 * * *`, `0 13 * * *` | `scripts/sync/sync-github-trending-repos.mjs` |
 
 공통 Secrets (기존 ping과 동일):
 
@@ -87,6 +88,8 @@ Actions 탭 → 워크플로 선택 → **Run workflow**
 3. INSERT
 4. `skip_delete`가 아니면 `fetched_date < today` 삭제
 5. GitHub Trending: period별 실패 시 해당 period만 skip (나머지 계속)
+
+**주의:** 2→3 순서 때문에 fetch 실패로 INSERT 0건이어도 당일 캐시는 비워진다. 프론트는 `externalFeedQuery` fallback으로 이전 `fetched_date`를 보여줄 수 있다 (`isStale`).
 
 ## 로컬 스크립트 (선택)
 
@@ -111,6 +114,7 @@ src/features/github/trending-repos/
 - 커스텀 훅 / Zustand / React Query **사용 안 함**
 - `useEffect` + `useState` + Supabase JS
 - `fetched_date`는 `getUtcDateString()` (Actions와 동일 UTC 날짜)
+- `fetchRowsForTodayOrLatest` (`src/shared/utils/externalFeedQuery.js`): 오늘 행이 0건이면 해당 테이블의 최신 `fetched_date`로 재조회 (`isStale: true`)
 
 ## Home 레이아웃
 
@@ -122,7 +126,8 @@ src/features/github/trending-repos/
 ### Mine
 
 - `.home-tag-posts-grid`: Posts + Tag Network — lg+ **`6fr : 4fr`**
-- Posts: 최대 10건 (`HOME_LATEST_POST_LIMIT`)
+- 섹션 제목 **내 글** (`HOME_SECTION_MINE`)
+- Posts 카드 헤더 **Latest Posts**, 최대 10건 (`HOME_LATEST_POST_LIMIT`)
 - Tag Network: `TagNetworkPanel` + `TagForceGraph`
   - 우상단 확대 → `TagNetworkFullscreenModal` (배경 딤, PC **정사각형** 창, 모바일 여백 유지)
   - Esc / X / 배경 클릭으로 닫기
@@ -153,3 +158,4 @@ src/shared/hooks/useProfileSidebarOpen.js
 - DB 상세: `docs/03_db.md`, `docs/sql/schema.md`
 - Ops: `docs/04_ops.md`
 - 프론트: `docs/02_frontend.md`
+- 글 삭제·Giscus: `docs/06_post_delete_and_giscus.md`

@@ -6,7 +6,8 @@ export const HOME_SECTION_TRENDS = {
 };
 
 export const HOME_SECTION_MINE = {
-  title: "Mine",
+  title: "내 글",
+  description: "Written here — originals from this blog.",
 };
 
 export const HOME_FEED_BADGE_EXTERNAL = "External";

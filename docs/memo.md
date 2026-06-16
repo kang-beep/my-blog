@@ -13,17 +13,17 @@
 | 1 | 태그 네트워크 그래프 | 데이터 집계는 `tag_stats` / `tag_edges` 테이블 + CRUD 시 갱신 |
 | 2 | 작성일·시간 표시 | DB 변경 거의 없음 |
 | 3 | 글 잠금 · 댓글 ON/OFF | 스키마 + RLS + 에디터 토글 |
-| 4 | 익명 좋아요 | `post_likes` 테이블 별도 |
+| 4 | 익명 좋아요 | ✅ `post_likes` + `like_count` (구현됨) |
 | 5 | 포트폴리오 CRUD | 범위 큼, 웹 카드형 우선 검토 |
 
 ---
 
 ### 1-1. 태그 네트워크 (홈)
 
-- [ ] 메인(홈)에 **force graph** 형태로 시각화
-- [ ] `posts.tags`는 원본 유지, 집계는 **`tag_stats` · `tag_edges`** 테이블
-- [ ] 관리자 글 **create / update / delete** 후 통계 테이블 **전체 재집계**
-- [ ] 노드 클릭 → `?tag=` 필터 (기존 동작 유지)
+- [x] 메인(홈)에 **force graph** 형태로 시각화
+- [x] `posts.tags`는 원본 유지, 집계는 **`tag_stats` · `tag_edges`** 테이블
+- [x] 관리자 글 **create / update / delete** 후 통계 테이블 **전체 재집계**
+- [x] 노드 클릭 → `?tag=` 필터 (기존 동작 유지)
 
 ---
 
@@ -42,11 +42,13 @@
 | 기능 | 방향 |
 |------|------|
 | 글 잠금 | 비공개 글: 목록·상세에서 비로그인 차단 (의미 확정 필요) |
-| 댓글 | **기본 OFF** (`comments_enabled = false`) |
-| 관리자 | 글마다 잠금·댓글 허용 토글 |
-| 스팸 방어 | 기본 OFF가 1순위 → rate limit · honeypot · (선택) captcha |
+| 댓글 | 현재 **Giscus 항상 ON** (글별 토글 미구현) |
+| 관리자 | 글마다 잠금·댓글 허용 토글 (미구현) |
+| 스팸 방어 | Giscus + GitHub; 글별 OFF는 미구현 |
 
 예상 컬럼: `posts.is_locked`, `posts.comments_enabled` (또는 `status`와 역할 분리)
+
+**구현됨:** 글 삭제 시 Giscus Discussion 제거 — `docs/06_post_delete_and_giscus.md`
 
 ---
 
@@ -54,9 +56,9 @@
 
 **좋아요**
 
-- [ ] 익명, **1인 1회** (완벽 방지는 불가, 실용 수준)
-- [ ] `post_likes(post_id, fingerprint)` + 필요 시 `posts.like_count` 캐시
-- [ ] 글 CRUD와 무관 → **클릭 시** 갱신
+- [x] 익명, **1인 1회** (`visitor_key`, 완벽 방지는 불가)
+- [x] `post_likes(post_id, visitor_key)` + `posts.like_count` 캐시
+- [x] 글 CRUD와 무관 → **클릭 시** 갱신; 글 삭제 시 CASCADE
 
 **날짜·시간**
 

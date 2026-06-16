@@ -21,10 +21,21 @@ export function shouldSkipDelete() {
   return process.env.SKIP_DELETE === "true";
 }
 
+function getDeleteFilters(filters) {
+  return Object.entries(filters).filter(
+    ([, value]) => value !== undefined && value !== null && value !== "",
+  );
+}
+
 export async function clearRowsForDate(supabase, table, filters) {
+  const entries = getDeleteFilters(filters);
+  if (entries.length === 0) {
+    throw new Error(`DELETE requires a WHERE clause: no filters for ${table}`);
+  }
+
   let query = supabase.from(table).delete();
 
-  for (const [column, value] of Object.entries(filters)) {
+  for (const [column, value] of entries) {
     query = query.eq(column, value);
   }
 
@@ -35,6 +46,10 @@ export async function clearRowsForDate(supabase, table, filters) {
 }
 
 export async function deleteRowsBeforeDate(supabase, table, fetchedDate, extraFilters = {}) {
+  if (!fetchedDate) {
+    throw new Error(`DELETE requires a WHERE clause: missing fetched_date for ${table}`);
+  }
+
   let query = supabase.from(table).delete().lt("fetched_date", fetchedDate);
 
   for (const [column, value] of Object.entries(extraFilters)) {

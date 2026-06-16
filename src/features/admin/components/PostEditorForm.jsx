@@ -5,6 +5,7 @@ import {
   POST_STATUS_DRAFT,
   POST_STATUS_PUBLISHED,
 } from "@/shared/constants/postStatus";
+import { DEFAULT_POST_CATEGORY_NAME } from "@/shared/constants/categories";
 
 function parseTags(tagsInput) {
   return tagsInput
@@ -19,21 +20,20 @@ export default function PostEditorForm({
   onSubmit,
   isSubmitting,
   categories = [],
-  onAddCategory,
 }) {
   const [title, setTitle] = useState("");
+  const [excerpt, setExcerpt] = useState("");
   const [content, setContent] = useState("");
   const [category, setCategory] = useState("");
   const [categoryId, setCategoryId] = useState("");
-  const [newCategoryName, setNewCategoryName] = useState("");
   const [tagsInput, setTagsInput] = useState("");
   const [status, setStatus] = useState(POST_STATUS_PUBLISHED);
   const [imageFile, setImageFile] = useState(null);
   const [contentError, setContentError] = useState("");
-  const [categoryError, setCategoryError] = useState("");
 
   useEffect(() => {
     setTitle(initialPost?.title ?? "");
+    setExcerpt(initialPost?.excerpt ?? "");
     setContent(initialPost?.content ?? "");
     setCategory(initialPost?.category ?? "");
     setTagsInput((initialPost?.tags ?? []).join(", "));
@@ -50,6 +50,19 @@ export default function PostEditorForm({
     setCategoryId(matched?.id ?? "");
   }, [initialPost, categories]);
 
+  useEffect(() => {
+    if (categoryId && !categories.some((item) => item.id === categoryId)) {
+      setCategoryId("");
+      setCategory("");
+      return;
+    }
+
+    const selected = categories.find((item) => item.id === categoryId);
+    if (selected) {
+      setCategory(selected.name);
+    }
+  }, [categories, categoryId]);
+
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (isEditorContentEmpty(content)) {
@@ -60,8 +73,8 @@ export default function PostEditorForm({
     await onSubmit?.({
       id: initialPost?.id ?? uploadPostId,
       title: title.trim(),
+      excerpt: excerpt.trim(),
       content: content.trim(),
-      category: category.trim(),
       category_id: categoryId || null,
       tags: parseTags(tagsInput),
       status,
@@ -70,28 +83,21 @@ export default function PostEditorForm({
     });
   };
 
-  const handleQuickAddCategory = async (event) => {
-    event?.preventDefault?.();
-    const nextName = newCategoryName.trim();
-    if (!nextName || !onAddCategory) {
-      return;
-    }
-
-    setCategoryError("");
-    try {
-      const added = await onAddCategory(nextName);
-      setCategory(nextName);
-      if (added?.id) {
-        setCategoryId(added.id);
-      }
-      setNewCategoryName("");
-    } catch (requestError) {
-      setCategoryError(requestError.message || "카테고리 추가에 실패했습니다.");
-    }
-  };
-
   const selectedCategoryName =
     categories.find((item) => item.id === categoryId)?.name ?? category;
+
+  const [thumbnailPreviewUrl, setThumbnailPreviewUrl] = useState(null);
+
+  useEffect(() => {
+    if (imageFile) {
+      const objectUrl = URL.createObjectURL(imageFile);
+      setThumbnailPreviewUrl(objectUrl);
+      return () => URL.revokeObjectURL(objectUrl);
+    }
+
+    setThumbnailPreviewUrl(initialPost?.image_url ?? null);
+    return undefined;
+  }, [imageFile, initialPost?.image_url]);
 
   return (
     <form onSubmit={handleSubmit} className="card space-y-3">
@@ -104,6 +110,16 @@ export default function PostEditorForm({
           value={title}
           onChange={(event) => setTitle(event.target.value)}
           required
+        />
+      </div>
+      <div>
+        <label className="label" htmlFor="excerpt">요약</label>
+        <textarea
+          className="input min-h-24 resize-y"
+          id="excerpt"
+          value={excerpt}
+          onChange={(event) => setExcerpt(event.target.value)}
+          placeholder="목록에 표시할 소개글 (비우면 본문 앞부분이 자동으로 사용됩니다)"
         />
       </div>
       <div>
@@ -126,13 +142,10 @@ export default function PostEditorForm({
             const nextId = event.target.value;
             setCategoryId(nextId);
             const selected = categories.find((item) => item.id === nextId);
-            if (selected?.name) {
-              setCategory(selected.name);
-            }
+            setCategory(selected?.name ?? "");
           }}
-          required
         >
-          <option value="">카테고리를 선택하세요</option>
+          <option value="">선택 안 함 → {DEFAULT_POST_CATEGORY_NAME}</option>
           {categories.map((item) => (
             <option key={item.id} value={item.id}>
               {item.name}
@@ -145,31 +158,9 @@ export default function PostEditorForm({
           </p>
         ) : (
           <p className="mt-1 text-sm text-slate-500">
-            위 목록에서 카테고리를 선택하거나, 아래에서 새로 추가하세요.
+            선택하지 않으면 「{DEFAULT_POST_CATEGORY_NAME}」로 저장됩니다.
           </p>
         )}
-        <div className="mt-3 flex gap-2">
-          <input
-            className="input"
-            value={newCategoryName}
-            onChange={(event) => setNewCategoryName(event.target.value)}
-            onKeyDown={(event) => {
-              if (event.key === "Enter") {
-                event.preventDefault();
-                void handleQuickAddCategory(event);
-              }
-            }}
-            placeholder="새 카테고리 이름"
-            aria-label="새 카테고리 이름"
-          />
-          <button className="btn shrink-0" type="button" onClick={handleQuickAddCategory}>
-            추가
-          </button>
-        </div>
-        <p className="mt-1 text-xs text-slate-400">
-          추가 버튼을 누르면 DB에 저장되고 목록에 바로 선택됩니다. (페이지 새로고침 없음)
-        </p>
-        {categoryError ? <p className="mt-1 text-sm text-rose-600">{categoryError}</p> : null}
       </div>
       <div>
         <p className="label">공개 상태</p>
@@ -212,8 +203,15 @@ export default function PostEditorForm({
       <div>
         <label className="label" htmlFor="image">대표 이미지 (썸네일)</label>
         <p className="mb-2 text-xs text-slate-400">
-          글 목록·상단에 보이는 대표 이미지 1장입니다. 본문 이미지는 에디터에서 별도로 삽입합니다.
+          글 목록에 표시됩니다. 비우면 본문의 첫 이미지가 자동으로 사용됩니다.
         </p>
+        {thumbnailPreviewUrl ? (
+          <img
+            src={thumbnailPreviewUrl}
+            alt="썸네일 미리보기"
+            className="mb-3 h-24 w-24 rounded-lg border border-slate-200 object-cover"
+          />
+        ) : null}
         <input
           className="input"
           id="image"

@@ -45,8 +45,6 @@ export default function PostDetail() {
     navigate(`${ROUTES.POSTS}?tag=${encodeURIComponent(tag)}`);
   };
 
-  const hasHeroImage = Boolean(post?.image_url);
-
   return (
     <section className="mx-auto w-full max-w-xl space-y-2 lg:max-w-5xl xl:max-w-6xl">
       {isLoading ? <p className="text-sm text-slate-500">글을 불러오는 중입니다...</p> : null}
@@ -54,54 +52,42 @@ export default function PostDetail() {
       {!isLoading && post ? (
         <>
           <article className="overflow-hidden border border-slate-200 bg-white shadow-sm">
-            <div className={hasHeroImage ? "lg:flex lg:items-stretch" : undefined}>
-              {hasHeroImage ? (
-                <div className="lg:w-[min(46%,32rem)] lg:shrink-0 lg:border-r lg:border-slate-100">
-                  <img
-                    src={post.image_url}
-                    alt={post.title}
-                    className="aspect-[4/3] w-full object-cover lg:aspect-auto lg:h-full lg:min-h-[20rem] lg:max-h-[44rem]"
-                  />
+            <div className="min-w-0 space-y-2 p-2 sm:p-2.5 lg:p-3">
+              <header className="space-y-1 border-b border-slate-100 pb-2">
+                <h1 className="text-2xl font-bold leading-snug tracking-tight text-slate-900 sm:text-[1.65rem] lg:text-3xl">
+                  {post.title}
+                </h1>
+                <PostMetaDates createdAt={post.created_at} updatedAt={post.updated_at} />
+              </header>
+
+              {isHtmlContent(post.content) ? (
+                <div
+                  className="post-content text-[0.95rem] leading-relaxed text-slate-800 lg:text-base"
+                  dangerouslySetInnerHTML={{ __html: sanitizePostHtml(post.content) }}
+                />
+              ) : (
+                <div className="whitespace-pre-wrap text-[0.95rem] leading-relaxed text-slate-800 lg:text-base">
+                  {post.content}
                 </div>
-              ) : null}
+              )}
 
-              <div className="min-w-0 flex-1 space-y-2 p-2 sm:p-2.5 lg:p-3">
-                <header className="space-y-1 border-b border-slate-100 pb-2">
-                  <h1 className="text-2xl font-bold leading-snug tracking-tight text-slate-900 sm:text-[1.65rem] lg:text-3xl">
-                    {post.title}
-                  </h1>
-                  <PostMetaDates createdAt={post.created_at} updatedAt={post.updated_at} />
-                </header>
-
-                {isHtmlContent(post.content) ? (
-                  <div
-                    className="post-content text-[0.95rem] leading-relaxed text-slate-800 lg:text-base"
-                    dangerouslySetInnerHTML={{ __html: sanitizePostHtml(post.content) }}
+              <PostCommentsSection
+                postId={post.id}
+                trailing={
+                  <PostLikeButton
+                    postId={post.id}
+                    initialLikeCount={post.like_count}
+                    variant="compact"
                   />
-                ) : (
-                  <div className="whitespace-pre-wrap text-[0.95rem] leading-relaxed text-slate-800 lg:text-base">
-                    {post.content}
-                  </div>
-                )}
-
-                <PostCommentsSection
-                  postId={post.id}
-                  trailing={
-                    <PostLikeButton
-                      postId={post.id}
-                      initialLikeCount={post.like_count}
-                      variant="compact"
-                    />
-                  }
-                >
-                  {post.category?.trim() ? (
-                    <TagBadge tag={post.category.trim()} onClick={goToCategory} />
-                  ) : null}
-                  {(post.tags ?? []).map((tag) => (
-                    <TagBadge key={`${post.id}-${tag}`} tag={tag} onClick={goToTag} />
-                  ))}
-                </PostCommentsSection>
-              </div>
+                }
+              >
+                {post.category?.trim() ? (
+                  <TagBadge tag={post.category.trim()} onClick={goToCategory} />
+                ) : null}
+                {(post.tags ?? []).map((tag) => (
+                  <TagBadge key={`${post.id}-${tag}`} tag={tag} onClick={goToTag} />
+                ))}
+              </PostCommentsSection>
             </div>
           </article>
 

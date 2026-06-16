@@ -1,9 +1,8 @@
 import { supabase } from "@/shared/lib/supabaseClient";
-import { getUtcDateString } from "@/shared/utils/utcDate";
+import { fetchRowsForTodayOrLatest } from "@/shared/utils/externalFeedQuery";
 import { HUGGINGFACE_DAILY_PAPERS_TABLE } from "@/features/huggingface/daily-papers/constants/huggingfaceDailyPapers";
 
-export async function fetchHuggingFaceDailyPapers() {
-  const fetchedDate = getUtcDateString();
+async function fetchRowsForDate(fetchedDate) {
   const { data, error } = await supabase
     .from(HUGGINGFACE_DAILY_PAPERS_TABLE)
     .select(
@@ -20,4 +19,18 @@ export async function fetchHuggingFaceDailyPapers() {
     ...row,
     ai_keywords: Array.isArray(row.ai_keywords) ? row.ai_keywords : [],
   }));
+}
+
+export async function fetchHuggingFaceDailyPapers() {
+  const result = await fetchRowsForTodayOrLatest(
+    supabase,
+    HUGGINGFACE_DAILY_PAPERS_TABLE,
+    fetchRowsForDate,
+  );
+
+  return {
+    papers: result.rows,
+    fetchedDate: result.fetchedDate,
+    isStale: result.isStale,
+  };
 }

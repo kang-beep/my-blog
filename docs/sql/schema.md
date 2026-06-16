@@ -37,7 +37,7 @@ portfolio_projects
 | status | text | NOT NULL, default `'published'` |
 | published_at | timestamptz | |
 | content | text | NOT NULL |
-| category | text | NOT NULL |
+| category | text | NOT NULL, 표시·검색 보조. 미선택 시 앱에서 「기타」로 저장 |
 | category_id | uuid | FK → `categories.id`, nullable |
 | tags | text[] | NOT NULL, default `'{}'` |
 | image_url | text | |
@@ -158,11 +158,25 @@ portfolio_projects
 
 **Source:** GitHub Actions → GitHubTrendingRSS
 
+## Post delete (application)
+
+글 삭제 시 앱 레이어에서 정리되는 범위 (`adminPostApi.deletePost`):
+
+| Target | Mechanism |
+|--------|-----------|
+| `posts-images/{postId}/` | `deletePostStorageFiles` |
+| Giscus Discussion (`title` = post UUID) | Edge Function **`dynamic-handler`** |
+| `posts` row | `DELETE` |
+| `post_likes` rows | FK **ON DELETE CASCADE** |
+| `tag_stats` / `tag_edges` | `refreshTagStats()` after delete (editor) |
+
+댓글은 DB가 아닌 GitHub Discussions. 상세: `docs/06_post_delete_and_giscus.md`.
+
 ## Storage
 
 | Bucket | Path pattern |
 |--------|----------------|
 | `avatars` | `{uuid}.{ext}` |
-| `posts-images` | `{postId}/{uuid}.{ext}` (thumbnail) |
+| `posts-images` | `{postId}/{uuid}.webp` (thumbnail) |
 | `posts-images` | `{postId}/content/{uuid}.webp` (body) |
 | `portfolio-images` | TBD |

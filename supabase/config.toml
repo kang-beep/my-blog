@@ -1,0 +1,5 @@
+[functions.delete-giscus-discussion]
+verify_jwt = false
+
+[functions.dynamic-handler]
+verify_jwt = false
