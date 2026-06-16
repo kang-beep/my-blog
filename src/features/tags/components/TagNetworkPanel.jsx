@@ -29,19 +29,25 @@ export default function TagNetworkPanel({ nodes, edges, isLoading, error }) {
   return (
     <>
       <div className="home-tag-posts-panel border-t border-slate-100 lg:border-t-0">
-        <div className="home-tag-posts-panel-header flex items-center justify-between gap-2">
-          <h3 className="text-base font-semibold text-slate-900">Tag Network</h3>
+        <div className="home-tag-posts-panel-header">
+          <h3>Tag Network</h3>
 
-          {canExpand ? (
-            <button
-              type="button"
-              className="btn shrink-0 px-2 py-1.5"
-              aria-label="Expand tag network"
-              onClick={() => setIsFullscreenOpen(true)}
-            >
-              <Maximize2 size={16} aria-hidden />
-            </button>
-          ) : null}
+          <div className="home-tag-posts-panel-header-action-slot">
+            {canExpand ? (
+              <button
+                type="button"
+                className="home-feed-card-header-action shrink-0"
+                aria-label="Expand tag network"
+                onClick={() => setIsFullscreenOpen(true)}
+              >
+                <Maximize2 size={16} aria-hidden />
+              </button>
+            ) : (
+              <span className="home-feed-card-header-action pointer-events-none shrink-0 opacity-0" aria-hidden="true">
+                <Maximize2 size={16} />
+              </span>
+            )}
+          </div>
         </div>
 
         <div className="home-tag-posts-panel-body">

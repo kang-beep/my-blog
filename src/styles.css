@@ -80,15 +80,19 @@
   }
 
   .header-nav-link {
-    @apply inline-flex cursor-pointer items-center gap-1.5 rounded-lg px-3 py-1.5 text-sm font-medium text-neutral-400 no-underline hover:bg-neutral-900 hover:text-white;
+    @apply inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-white/20 bg-white/5 px-3 py-1.5 text-sm font-medium text-neutral-200 no-underline hover:border-white/35 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30;
   }
 
   .header-nav-link-active {
-    @apply bg-neutral-900 text-white hover:bg-neutral-900 hover:text-white;
+    @apply border-white/35 bg-white/12 text-white hover:border-white/35 hover:bg-white/12 hover:text-white;
   }
 
   .btn-header-ghost {
-    @apply inline-flex items-center justify-center rounded-lg border border-neutral-700 bg-transparent px-3 py-2 text-sm font-medium text-neutral-300 hover:bg-neutral-900 hover:text-white disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex items-center justify-center rounded-lg border border-neutral-600 bg-transparent px-3 py-2 text-sm font-medium text-neutral-200 hover:border-neutral-400 hover:bg-white/10 hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/30 disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .home-page {
+    @apply max-lg:px-3;
   }
 
   .home-cards-grid {
@@ -103,12 +107,44 @@
     @apply bg-slate-100 text-slate-600;
   }
 
+  .home-feed-card-header .home-feed-badge-external {
+    @apply bg-white/10 text-neutral-200;
+  }
+
   .home-feed-badge-mine {
     @apply bg-indigo-50 text-indigo-700;
   }
 
   .home-feed-card {
-    @apply flex min-h-0 flex-col;
+    @apply flex min-h-0 flex-col overflow-hidden rounded-none;
+  }
+
+  .home-feed-card-header {
+    @apply flex flex-wrap items-start justify-between gap-3 border-b border-neutral-500 bg-neutral-600 px-4 py-4 text-white sm:px-6;
+  }
+
+  .home-feed-card-header-title {
+    @apply flex flex-wrap items-center gap-2 text-xl font-semibold text-white;
+  }
+
+  .home-feed-card-header-description {
+    @apply mt-1 text-sm text-neutral-200/80;
+  }
+
+  .home-feed-card-header-action {
+    @apply inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm font-medium text-neutral-100 no-underline hover:border-white/30 hover:bg-white/10 hover:text-white;
+  }
+
+  .home-feed-card-toolbar {
+    @apply border-b border-neutral-500 bg-neutral-700 px-4 sm:px-6;
+  }
+
+  .home-feed-card-tab {
+    @apply rounded-lg border border-transparent px-3 py-1.5 text-sm font-medium text-neutral-400 hover:border-white/10 hover:bg-white/5 hover:text-white;
+  }
+
+  .home-feed-card-tab-active {
+    @apply border-white/15 bg-white/10 text-white hover:border-white/15 hover:bg-white/10 hover:text-white;
   }
 
   .home-feed-card-body {
@@ -124,7 +160,15 @@
   }
 
   .home-tag-posts-panel-header {
-    @apply shrink-0 border-b border-slate-100 px-4 py-3 sm:px-5;
+    @apply flex h-14 shrink-0 items-center justify-between gap-2 border-b border-neutral-500 bg-neutral-600 px-4 text-white sm:px-5;
+  }
+
+  .home-tag-posts-panel-header h3 {
+    @apply text-base font-semibold text-white;
+  }
+
+  .home-tag-posts-panel-header-action-slot {
+    @apply inline-flex h-[2.375rem] shrink-0 items-center;
   }
 
   .home-tag-posts-panel-body {

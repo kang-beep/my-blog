@@ -107,9 +107,9 @@ export default function Posts() {
   const hasActiveFilter = Boolean(category || tag || searchQuery.trim());
 
   return (
-    <section className="border border-slate-200 bg-white shadow-sm">
-      <div className="border-b border-slate-200 px-4 py-4 sm:px-6">
-        <h1 className="text-xl font-semibold text-slate-900">Posts</h1>
+    <section className="border border-slate-400 bg-white shadow-sm">
+      <div className="border-b border-neutral-500 bg-neutral-600 px-4 py-4 sm:px-6">
+        <h1 className="text-xl font-semibold text-white">Posts</h1>
       </div>
 
       <div className="space-y-4 px-4 py-4 sm:px-6 sm:py-5">
@@ -172,7 +172,7 @@ export default function Posts() {
               ) : null}
             </p>
 
-            <ul className="divide-y divide-slate-200 rounded-lg border border-slate-200">
+            <ul className="divide-y divide-slate-200 rounded-lg border border-slate-400">
               {paginatedPosts.map((post) => (
                 <PostsListItem key={post.id} post={post} />
               ))}

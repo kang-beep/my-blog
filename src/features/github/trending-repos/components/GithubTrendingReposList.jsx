@@ -39,24 +39,24 @@ export default function GithubTrendingReposList() {
   }, [selectedPeriod]);
 
   return (
-    <section className="home-feed-card flex flex-col border border-slate-200 bg-white shadow-sm">
-      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 px-4 py-4 sm:px-6">
+    <section className="home-feed-card flex flex-col border border-slate-400 bg-white shadow-sm">
+      <div className="home-feed-card-header">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="flex items-center gap-2 text-xl font-semibold text-slate-900">
-              <GithubMarkIcon size={20} className="shrink-0 text-slate-800" />
+            <h3 className="home-feed-card-header-title">
+              <GithubMarkIcon size={20} className="shrink-0 text-white" />
               <span>GitHub Trending</span>
             </h3>
             <HomeFeedBadge>{HOME_FEED_BADGE_EXTERNAL}</HomeFeedBadge>
           </div>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="home-feed-card-header-description">
             {feedMeta.isStale
               ? `Latest synced repos · ${feedMeta.fetchedDate}`
               : "Top repos · RSS order"}
           </p>
         </div>
         <a
-          className="btn inline-flex shrink-0 items-center gap-1.5 no-underline"
+          className="home-feed-card-header-action"
           href={GITHUB_TRENDING_PAGE_URL}
           target="_blank"
           rel="noopener noreferrer"
@@ -66,7 +66,7 @@ export default function GithubTrendingReposList() {
         </a>
       </div>
 
-      <div className="border-b border-slate-100 px-4 sm:px-6">
+      <div className="home-feed-card-toolbar">
         <div className="flex flex-wrap gap-2 py-3" role="tablist" aria-label="GitHub Trending period">
           {GITHUB_TRENDING_PERIODS.map((period) => {
             const isActive = selectedPeriod === period;
@@ -77,11 +77,7 @@ export default function GithubTrendingReposList() {
                 type="button"
                 role="tab"
                 aria-selected={isActive}
-                className={`rounded-lg px-3 py-1.5 text-sm font-medium ${
-                  isActive
-                    ? "bg-indigo-50 text-indigo-700"
-                    : "text-slate-600 hover:bg-slate-100"
-                }`}
+                className={isActive ? "home-feed-card-tab home-feed-card-tab-active" : "home-feed-card-tab"}
                 onClick={() => setSelectedPeriod(period)}
               >
                 {GITHUB_TRENDING_PERIOD_LABELS[period]}

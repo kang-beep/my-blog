@@ -9,14 +9,16 @@ export default function TagNetwork({ latestPosts = [], latestPostsLoading = fals
   const { nodes, edges, isLoading, error } = useTags();
 
   return (
-    <section className="home-feed-card border border-slate-200 bg-white shadow-sm">
+    <section className="home-feed-card border border-slate-400 bg-white shadow-sm">
       <div className="home-tag-posts-grid">
         <div className="home-tag-posts-panel">
-          <div className="home-tag-posts-panel-header flex flex-wrap items-center justify-between gap-2">
-            <h3 className="text-base font-semibold text-slate-900">Latest Posts</h3>
-            <Link className="btn shrink-0 text-sm" to={ROUTES.POSTS}>
-              View all
-            </Link>
+          <div className="home-tag-posts-panel-header">
+            <h3>Latest Posts</h3>
+            <div className="home-tag-posts-panel-header-action-slot">
+              <Link className="home-feed-card-header-action shrink-0 text-sm" to={ROUTES.POSTS}>
+                View all
+              </Link>
+            </div>
           </div>
 
           <div className="home-tag-posts-panel-body home-tag-posts-panel-body-scroll">

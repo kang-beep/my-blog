@@ -35,24 +35,24 @@ export default function HuggingFaceDailyPapersList() {
   }, []);
 
   return (
-    <section className="home-feed-card flex flex-col border border-slate-200 bg-white shadow-sm">
-      <div className="flex flex-wrap items-start justify-between gap-3 border-b border-slate-100 px-4 py-4 sm:px-6">
+    <section className="home-feed-card flex flex-col border border-slate-400 bg-white shadow-sm">
+      <div className="home-feed-card-header">
         <div>
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="flex items-center gap-2 text-xl font-semibold text-slate-900">
+            <h3 className="home-feed-card-header-title">
               <span aria-hidden>🤗</span>
               <span>Hugging Face Daily Papers</span>
             </h3>
             <HomeFeedBadge>{HOME_FEED_BADGE_EXTERNAL}</HomeFeedBadge>
           </div>
-          <p className="mt-1 text-sm text-slate-500">
+          <p className="home-feed-card-header-description">
             {feedMeta.isStale
               ? `Latest synced papers · ${feedMeta.fetchedDate}`
               : "Today's top papers · by upvotes"}
           </p>
         </div>
         <a
-          className="btn inline-flex shrink-0 items-center gap-1.5 no-underline"
+          className="home-feed-card-header-action"
           href={HUGGINGFACE_DAILY_PAPERS_PAGE_URL}
           target="_blank"
           rel="noopener noreferrer"
