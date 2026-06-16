@@ -1,0 +1,2 @@
+export const SHORT_POST_CONTENT_HEIGHT_PX = 220;
+export const SHORT_POST_CONTENT_PADDING_CLASS = "pb-20 lg:pb-28";

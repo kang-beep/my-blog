@@ -23,13 +23,9 @@ export default function Header() {
   };
 
   return (
-    <header className="shrink-0 border-b border-slate-200 bg-white shadow-sm">
+    <header className="site-header shrink-0">
       <div className="flex w-full flex-wrap items-center gap-x-3 gap-y-2 px-4 py-3 lg:pl-4">
-        <NavLink
-          to={ROUTES.HOME}
-          end
-          className="shrink-0 text-lg font-bold text-slate-900 no-underline hover:text-indigo-700"
-        >
+        <NavLink to={ROUTES.HOME} end className="header-brand-link shrink-0">
           {SITE_NAME}
         </NavLink>
 
@@ -40,8 +36,8 @@ export default function Header() {
 
           {isAuthenticated ? (
             <>
-              <span className="mx-1 h-4 w-px bg-slate-200" aria-hidden />
-              <span className="px-1 text-xs font-semibold uppercase tracking-wide text-slate-400">
+              <span className="mx-1 h-4 w-px bg-neutral-800" aria-hidden />
+              <span className="px-1 text-xs font-semibold uppercase tracking-wide text-neutral-500">
                 Admin
               </span>
               {ADMIN_NAV.map((item) => (
@@ -52,13 +48,13 @@ export default function Header() {
         </nav>
 
         {isAuthenticated ? (
-          <button className="btn ml-auto shrink-0" type="button" onClick={handleSignOut}>
+          <button className="btn-header-ghost ml-auto shrink-0" type="button" onClick={handleSignOut}>
             Sign out
           </button>
         ) : null}
       </div>
 
-      {signOutError ? <p className="px-4 pb-2 text-sm text-rose-600">{signOutError}</p> : null}
+      {signOutError ? <p className="px-4 pb-2 text-sm text-rose-400">{signOutError}</p> : null}
     </header>
   );
 }

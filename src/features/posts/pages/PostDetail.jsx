@@ -4,10 +4,10 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { fetchAdjacentPosts, fetchPostById } from "@/features/posts/api/postApi";
 import { getPostDetailPath, ROUTES } from "@/shared/constants/routes";
 import PostCommentsSection from "@/features/comments/components/PostCommentsSection";
+import PostDetailBody from "@/features/posts/components/PostDetailBody";
 import PostLikeButton from "@/features/posts/components/PostLikeButton";
 import PostMetaDates from "@/features/posts/components/PostMetaDates";
 import TagBadge from "@/shared/ui/TagBadge";
-import { isHtmlContent, sanitizePostHtml } from "@/shared/lib/sanitizeHtml";
 
 export default function PostDetail() {
   const { id } = useParams();
@@ -46,30 +46,21 @@ export default function PostDetail() {
   };
 
   return (
-    <section className="mx-auto w-full max-w-xl space-y-2 lg:max-w-5xl xl:max-w-6xl">
+    <section className="mx-auto w-full max-w-7xl space-y-3">
       {isLoading ? <p className="text-sm text-slate-500">글을 불러오는 중입니다...</p> : null}
       {error ? <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</p> : null}
       {!isLoading && post ? (
         <>
-          <article className="overflow-hidden border border-slate-200 bg-white shadow-sm">
-            <div className="min-w-0 space-y-2 p-2 sm:p-2.5 lg:p-3">
-              <header className="space-y-1 border-b border-slate-100 pb-2">
+          <article className="w-full overflow-hidden border border-slate-200 bg-white shadow-sm">
+            <div className="min-w-0 space-y-4 px-2 py-4 sm:px-2.5 lg:px-3">
+              <header className="space-y-1 border-b border-slate-100 pb-3">
                 <h1 className="text-2xl font-bold leading-snug tracking-tight text-slate-900 sm:text-[1.65rem] lg:text-3xl">
                   {post.title}
                 </h1>
                 <PostMetaDates createdAt={post.created_at} updatedAt={post.updated_at} />
               </header>
 
-              {isHtmlContent(post.content) ? (
-                <div
-                  className="post-content text-[0.95rem] leading-relaxed text-slate-800 lg:text-base"
-                  dangerouslySetInnerHTML={{ __html: sanitizePostHtml(post.content) }}
-                />
-              ) : (
-                <div className="whitespace-pre-wrap text-[0.95rem] leading-relaxed text-slate-800 lg:text-base">
-                  {post.content}
-                </div>
-              )}
+              <PostDetailBody content={post.content} />
 
               <PostCommentsSection
                 postId={post.id}
@@ -91,7 +82,7 @@ export default function PostDetail() {
             </div>
           </article>
 
-          <nav className="flex flex-col gap-1 border border-slate-200 bg-white px-2 py-2 text-sm shadow-sm sm:px-2.5">
+          <nav className="flex flex-col gap-1 border border-slate-200 bg-white px-2 py-3 text-sm shadow-sm sm:px-2.5">
             {adjacent.previousPost ? (
               <Link className="truncate font-medium text-slate-700 hover:text-indigo-600" to={getPostDetailPath(adjacent.previousPost.id)}>
                 ← 이전글 · {adjacent.previousPost.title}
