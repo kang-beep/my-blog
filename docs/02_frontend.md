@@ -17,7 +17,7 @@
 
 | 경로 | 설명 |
 |---|---|
-| `/` | 홈 — Latest Trends + 내 글(Posts·Tag Network) |
+| `/` | 홈 — 내 글(Posts·Tag Network) + Latest Trends |
 | `/posts` | 글 목록 |
 | `/posts/:id` | 글 상세 + Giscus 댓글 |
 | `/portfolio` | 포트폴리오 |
@@ -38,7 +38,7 @@
 
 - 상단 `Header` (공개/관리 네비, 영문 라벨)
 - `ProfileSidebar` (프로필 레일, 접기/펼치기) + 본문
-  - lg+: 그리드 **2fr : 8fr** (사이드바 열림 시), 토글은 사이드바 우상단 `btn`
+  - lg+: 그리드 **1.5fr : 8.5fr** (사이드바 열림 시), 토글은 사이드바 우상단 `btn`
   - 모바일: 사이드바 기본 닫힘, 상·하단 바로 열기/닫기
 - 공개 네비에 관리 대시보드 링크 없음 (URL 직접 입력 또는 로그인 후 진입)
 
@@ -80,7 +80,7 @@ src/
 ## 홈 외부 피드
 
 - Hugging Face / GitHub Trending 카드: Supabase 캐시 조회 (브라우저 직접 fetch 없음)
-- 홈 섹션 **Latest Trends** (`External` 배지) / **내 글** (Posts + Tag Network)
+- 홈 섹션 **내 글** (상단) / **Latest Trends** (하단, `External` 배지)
 - 오늘(UTC) 데이터 없으면 최신 `fetched_date`로 fallback (`externalFeedQuery.js`)
 - 상세: `docs/05_home_external_feeds.md`
 

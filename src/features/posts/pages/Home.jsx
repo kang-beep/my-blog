@@ -35,19 +35,19 @@ export default function Home() {
 
   return (
     <div className="space-y-10">
-      <HomeSection title={HOME_SECTION_TRENDS.title} description={HOME_SECTION_TRENDS.description}>
-        <div className="home-cards-grid">
-          <HuggingFaceDailyPapersList />
-          <GithubTrendingReposList />
-        </div>
-      </HomeSection>
-
       <HomeSection title={HOME_SECTION_MINE.title} description={HOME_SECTION_MINE.description}>
         <TagNetwork
           latestPosts={posts}
           latestPostsLoading={isLoading}
           latestPostsError={error}
         />
+      </HomeSection>
+
+      <HomeSection title={HOME_SECTION_TRENDS.title} description={HOME_SECTION_TRENDS.description}>
+        <div className="home-cards-grid">
+          <HuggingFaceDailyPapersList />
+          <GithubTrendingReposList />
+        </div>
       </HomeSection>
     </div>
   );

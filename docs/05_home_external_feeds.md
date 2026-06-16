@@ -1,9 +1,9 @@
 # 05. Home External Feeds
 
-홈(`/`)은 **Latest Trends**(외부)와 **Mine**(내 콘텐츠) 두 섹션으로 구성된다.
+홈(`/`)은 **Mine**(내 콘텐츠)과 **Latest Trends**(외부) 두 섹션으로 구성된다. **Mine이 위**, Latest Trends가 아래.
 
-- **Latest Trends**: Hugging Face Daily Papers + GitHub Trending Repos (`External` 배지)
 - **Mine**: 최신 글 목록 + Tag Network (확대 시 창형 모달)
+- **Latest Trends**: Hugging Face Daily Papers + GitHub Trending Repos (`External` 배지)
 
 ## 데이터 흐름
 
@@ -118,12 +118,7 @@ src/features/github/trending-repos/
 
 ## Home 레이아웃
 
-### Latest Trends
-
-- `.home-cards-grid`: HF + GitHub 2열 (lg+) / 1열 (모바일)
-- 카드 헤더 `External` 배지, UI 라벨 영문
-
-### Mine
+### Mine (상단)
 
 - `.home-tag-posts-grid`: Posts + Tag Network — lg+ **`6fr : 4fr`**
 - 섹션 제목 **내 글** (`HOME_SECTION_MINE`)
@@ -131,6 +126,11 @@ src/features/github/trending-repos/
 - Tag Network: `TagNetworkPanel` + `TagForceGraph`
   - 우상단 확대 → `TagNetworkFullscreenModal` (배경 딤, PC **정사각형** 창, 모바일 여백 유지)
   - Esc / X / 배경 클릭으로 닫기
+
+### Latest Trends (하단)
+
+- `.home-cards-grid`: HF + GitHub 2열 (lg+) / 1열 (모바일)
+- 카드 헤더 `External` 배지, UI 라벨 영문
 
 ### 관련 컴포넌트
 
