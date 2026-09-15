@@ -1,0 +1,25 @@
+export const EDITOR_FONT_SIZE_OPTIONS = [
+  { label: "크기 (기본)", value: "" },
+  { label: "크기 10px", value: "10px" },
+  { label: "크기 11px", value: "11px" },
+  { label: "크기 12px", value: "12px" },
+  { label: "크기 13px", value: "13px" },
+  { label: "크기 14px", value: "14px" },
+  { label: "크기 15px", value: "15px" },
+  { label: "크기 16px", value: "16px" },
+  { label: "크기 18px", value: "18px" },
+  { label: "크기 20px", value: "20px" },
+  { label: "크기 22px", value: "22px" },
+  { label: "크기 24px", value: "24px" },
+  { label: "크기 26px", value: "26px" },
+  { label: "크기 28px", value: "28px" },
+  { label: "크기 30px", value: "30px" },
+  { label: "크기 32px", value: "32px" },
+  { label: "크기 36px", value: "36px" },
+  { label: "크기 40px", value: "40px" },
+  { label: "크기 48px", value: "48px" },
+  { label: "크기 56px", value: "56px" },
+  { label: "크기 64px", value: "64px" },
+] as const;
+
+export type EditorFontSizeValue = (typeof EDITOR_FONT_SIZE_OPTIONS)[number]["value"];

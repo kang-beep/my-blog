@@ -31,7 +31,7 @@ const DELETE_DISCUSSION_MUTATION = `
   }
 `;
 
-const GITHUB_TOKEN_SECRET = "my-tech-blog-comments-tokens";
+const GITHUB_TOKEN_SECRET = "my-blog-giscus-tokens";
 
 async function githubGraphql(query: string, variables: Record<string, unknown>) {
   const token = Deno.env.get(GITHUB_TOKEN_SECRET);
@@ -140,8 +140,8 @@ Deno.serve(async (req) => {
       return jsonResponse({ error: "postId is required" }, 400);
     }
 
-    const repo = Deno.env.get("GISCUS_REPO") ?? "kang-beep/my-tech-blog-comments";
-    const categoryId = Deno.env.get("GISCUS_CATEGORY_ID") ?? "DIC_kwDOS3olN84C-_3l";
+    const repo = Deno.env.get("GISCUS_REPO") ?? "kang-beep/my-blog";
+    const categoryId = Deno.env.get("GISCUS_CATEGORY_ID") ?? "DIC_kwDOSNYvx84DFpTp";
     const [owner, repoName] = repo.split("/");
 
     if (!owner || !repoName) {

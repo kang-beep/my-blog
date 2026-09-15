@@ -1,5 +1,7 @@
 # Schema
 
+> Supabase 초기 설정 SQL: [`bootstrap.sql`](./bootstrap.sql) · 실행 방법: [`README.md`](./README.md)
+
 ## Relations
 
 ```
@@ -140,7 +142,7 @@ portfolio_projects
 
 **Indexes:** `idx_hf_papers_fetched_date`, unique `(paper_id, fetched_date)`
 
-**Source:** GitHub Actions → HF API (`docs/05_home_external_feeds.md`)
+**Source:** GitHub Actions → HF API ([`../guide/05_home_external_feeds.md`](../guide/05_home_external_feeds.md))
 
 ## github_trending_repos
 
@@ -170,7 +172,7 @@ portfolio_projects
 | `post_likes` rows | FK **ON DELETE CASCADE** |
 | `tag_stats` / `tag_edges` | `refreshTagStats()` after delete (editor) |
 
-댓글은 DB가 아닌 GitHub Discussions. 상세: `docs/06_post_delete_and_giscus.md`.
+댓글은 DB가 아닌 GitHub Discussions. 상세: [`../guide/06_post_delete_and_giscus.md`](../guide/06_post_delete_and_giscus.md).
 
 ## Storage
 

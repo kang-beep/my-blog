@@ -1,42 +1,16 @@
 {
-  "name": "my-tech-blog",
+  "name": "my-blog-scripts",
   "private": true,
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview",
     "sync:hf-papers": "node scripts/sync/sync-huggingface-daily-papers.mjs",
     "sync:gh-trending": "node scripts/sync/sync-github-trending-repos.mjs"
   },
   "dependencies": {
-    "@giscus/react": "^3.1.0",
-    "@supabase/supabase-js": "^2.104.1",
-    "@tiptap/extension-image": "^3.26.0",
-    "@tiptap/extension-link": "^3.26.0",
-    "@tiptap/extension-placeholder": "^3.26.0",
-    "@tiptap/extension-underline": "^3.26.0",
-    "@tiptap/react": "^3.26.0",
-    "@tiptap/starter-kit": "^3.26.0",
-    "browser-image-compression": "^2.0.2",
-    "dompurify": "^3.4.8",
-    "lucide-react": "^1.17.0",
-    "react": "^19.2.5",
-    "react-dom": "^19.2.5",
-    "react-force-graph-2d": "^1.29.1",
-    "react-router-dom": "^7.14.2",
-    "zustand": "^5.0.12"
+    "@supabase/supabase-js": "^2.104.1"
   },
   "devDependencies": {
-    "@tailwindcss/vite": "^4.2.4",
-    "@types/dompurify": "^3.0.5",
-    "@types/react": "^19.2.17",
-    "@types/react-dom": "^19.2.3",
-    "@vitejs/plugin-react": "^5.2.0",
-    "fast-xml-parser": "^5.2.5",
-    "tailwindcss": "^4.2.4",
-    "typescript": "^6.0.3",
-    "vite": "^7.3.2"
+    "fast-xml-parser": "^5.2.5"
   }
 }

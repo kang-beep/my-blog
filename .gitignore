@@ -1,12 +1,25 @@
 # dependencies
 node_modules/
+frontend/node_modules/
 
 # build output
 dist/
+frontend/dist/
 
 # local env
+.env
 .env.local
 .env.*
+frontend/.env.local
+!.env.example
+
+# vercel
+.vercel/
+frontend/.vercel/
+
+# OS
+.DS_Store
+Thumbs.db
 
 # logs
 npm-debug.log*

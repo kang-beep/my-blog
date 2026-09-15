@@ -1,0 +1,11 @@
+export const DEFAULT_TABLE_ROWS = 3;
+export const DEFAULT_TABLE_COLS = 3;
+export const TABLE_CELL_MIN_WIDTH_PX = 48;
+export const TABLE_COLUMN_HANDLE_WIDTH_PX = 6;
+export const TABLE_MIN_WIDTH_PX = 120;
+export const TABLE_MIN_HEIGHT_PX = 72;
+export const TABLE_ROW_MIN_HEIGHT_PX = 28;
+export const TABLE_SE_HANDLE_CLASS = "table-se-resize-handle";
+export const TABLE_MOVE_HANDLE_CLASS = "table-move-handle";
+export const TABLE_WRAPPER_CLASS = "tableWrapper";
+export const TABLE_DRAGGING_CLASS = "table-is-dragging";
