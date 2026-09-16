@@ -8,10 +8,11 @@ import {
 } from "@/features/huggingface/daily-papers/constants/huggingfaceDailyPapers";
 import { HOME_FEED_BADGE_EXTERNAL } from "@/features/posts/constants/home";
 import HomeFeedBadge from "@/shared/ui/HomeFeedBadge";
+import { formatDateTimeKst } from "@/shared/utils/date";
 
 export default function HuggingFaceDailyPapersList() {
   const [papers, setPapers] = useState([]);
-  const [feedMeta, setFeedMeta] = useState({ fetchedDate: "", isStale: false });
+  const [feedMeta, setFeedMeta] = useState({ syncedAt: "" });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -21,9 +22,9 @@ export default function HuggingFaceDailyPapersList() {
       setError("");
 
       try {
-        const { papers: items, fetchedDate, isStale } = await fetchHuggingFaceDailyPapers();
+        const { papers: items, syncedAt } = await fetchHuggingFaceDailyPapers();
         setPapers(items);
-        setFeedMeta({ fetchedDate, isStale });
+        setFeedMeta({ syncedAt: syncedAt ?? "" });
       } catch (requestError) {
         setError(requestError.message || "Failed to load Hugging Face daily papers.");
       } finally {
@@ -33,6 +34,10 @@ export default function HuggingFaceDailyPapersList() {
 
     void loadHuggingFaceDailyPapers();
   }, []);
+
+  const syncedLabel = feedMeta.syncedAt
+    ? `Updated · ${formatDateTimeKst(feedMeta.syncedAt)}`
+    : "Today's top papers · by upvotes";
 
   return (
     <section className="home-feed-card flex flex-col border border-slate-400 bg-white shadow-sm">
@@ -45,11 +50,7 @@ export default function HuggingFaceDailyPapersList() {
             </h3>
             <HomeFeedBadge>{HOME_FEED_BADGE_EXTERNAL}</HomeFeedBadge>
           </div>
-          <p className="home-feed-card-header-description">
-            {feedMeta.isStale
-              ? `Latest synced papers · ${feedMeta.fetchedDate}`
-              : "Today's top papers · by upvotes"}
-          </p>
+          <p className="home-feed-card-header-description">{syncedLabel}</p>
         </div>
         <a
           className="home-feed-card-header-action"

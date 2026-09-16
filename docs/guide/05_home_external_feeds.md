@@ -8,9 +8,9 @@
 ## 데이터 흐름
 
 ```
-GitHub Actions (하루 2회)
-  ├─ UTC 00:30, 06:30, 09:30, 12:30 — HF API → Supabase huggingface_daily_papers
-  └─ UTC 01:30, 13:00 — GitHub Trending RSS → Supabase github_trending_repos
+GitHub Actions (각 하루 10회, ~2.5h 간격)
+  ├─ UTC 00:00, 02:30, 05:00, 07:30, 10:00, 12:30, 15:00, 17:30, 20:00, 22:30 — HF API → Supabase huggingface_daily_papers
+  └─ UTC 00:15, 02:45, 05:15, 07:45, 10:15, 12:45, 15:15, 17:45, 20:15, 22:45 — GitHub Trending RSS → Supabase github_trending_repos
 
 React (브라우저)
   ├─ Supabase SELECT (fetched_date = UTC 오늘)
@@ -64,8 +64,8 @@ RLS: anon/authenticated **SELECT only**. INSERT/DELETE는 Actions(service_role)�
 
 | 워크플로 | cron (UTC) | 스크립트 |
 |---|---|---|
-| `fetch_huggingface_papers.yml` | `30 0 * * *`, `30 6 * * *`, `30 9 * * *`, `30 12 * * *` | `scripts/sync/sync-huggingface-daily-papers.mjs` |
-| `fetch_github_trending.yml` | `30 1 * * *`, `0 13 * * *` | `scripts/sync/sync-github-trending-repos.mjs` |
+| `fetch_huggingface_papers.yml` | 10×/day: `0 0`, `30 2`, `0 5`, `30 7`, `0 10`, `30 12`, `0 15`, `30 17`, `0 20`, `30 22` | `scripts/sync/sync-huggingface-daily-papers.mjs` |
+| `fetch_github_trending.yml` | 10×/day: `15 0`, `45 2`, `15 5`, `45 7`, `15 10`, `45 12`, `15 15`, `45 17`, `15 20`, `45 22` | `scripts/sync/sync-github-trending-repos.mjs` |
 
 공통 Secrets (기존 ping과 동일):
 

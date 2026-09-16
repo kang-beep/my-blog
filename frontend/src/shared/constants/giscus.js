@@ -6,7 +6,7 @@ export const GISCUS_CONFIG = {
   categoryId: "DIC_kwDOSNYvx84DFpTp",
   mapping: "specific",
   strict: "0",
-  reactionsEnabled: "1",
+  reactionsEnabled: "0",
   emitMetadata: "0",
   inputPosition: "top",
   theme: "preferred_color_scheme",

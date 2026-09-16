@@ -57,8 +57,8 @@ Secret (Dashboard): `my-blog-giscus-tokens` = GitHub fine-grained PAT (Discussio
 
 | 워크플로 | cron (UTC) | 스크립트 |
 |---|---|---|
-| `fetch_huggingface_papers.yml` | `30 0 * * *`, `30 6 * * *`, `30 9 * * *`, `30 12 * * *` | `scripts/sync/sync-huggingface-daily-papers.mjs` |
-| `fetch_github_trending.yml` | `30 1 * * *`, `0 13 * * *` | `scripts/sync/sync-github-trending-repos.mjs` |
+| `fetch_huggingface_papers.yml` | 10×/day (~2.5h): `0 0`, `30 2`, `0 5`, `30 7`, `0 10`, `30 12`, `0 15`, `30 17`, `0 20`, `30 22` | `scripts/sync/sync-huggingface-daily-papers.mjs` |
+| `fetch_github_trending.yml` | 10×/day (+15m offset): `15 0`, `45 2`, `15 5`, `45 7`, `15 10`, `45 12`, `15 15`, `45 17`, `15 20`, `45 22` | `scripts/sync/sync-github-trending-repos.mjs` |
 
 수동: `workflow_dispatch`
 

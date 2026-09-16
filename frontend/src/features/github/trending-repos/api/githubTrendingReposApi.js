@@ -1,4 +1,5 @@
 import { supabase } from "@/shared/lib/supabaseClient";
+import { getLatestCreatedAt } from "@/shared/utils/date";
 import { fetchRowsForTodayOrLatest } from "@/shared/utils/externalFeedQuery";
 import { GITHUB_TRENDING_REPOS_TABLE } from "@/features/github/trending-repos/constants/githubTrendingRepos";
 
@@ -29,5 +30,6 @@ export async function fetchGithubTrendingRepos(period) {
     repos: result.rows,
     fetchedDate: result.fetchedDate,
     isStale: result.isStale,
+    syncedAt: getLatestCreatedAt(result.rows),
   };
 }

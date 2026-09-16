@@ -11,11 +11,12 @@ import {
 } from "@/features/github/trending-repos/constants/githubTrendingRepos";
 import { HOME_FEED_BADGE_EXTERNAL } from "@/features/posts/constants/home";
 import HomeFeedBadge from "@/shared/ui/HomeFeedBadge";
+import { formatDateTimeKst } from "@/shared/utils/date";
 
 export default function GithubTrendingReposList() {
   const [selectedPeriod, setSelectedPeriod] = useState("daily");
   const [repos, setRepos] = useState([]);
-  const [feedMeta, setFeedMeta] = useState({ fetchedDate: "", isStale: false });
+  const [feedMeta, setFeedMeta] = useState({ syncedAt: "" });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -25,9 +26,9 @@ export default function GithubTrendingReposList() {
       setError("");
 
       try {
-        const { repos: items, fetchedDate, isStale } = await fetchGithubTrendingRepos(selectedPeriod);
+        const { repos: items, syncedAt } = await fetchGithubTrendingRepos(selectedPeriod);
         setRepos(items);
-        setFeedMeta({ fetchedDate, isStale });
+        setFeedMeta({ syncedAt: syncedAt ?? "" });
       } catch (requestError) {
         setError(requestError.message || "Failed to load GitHub Trending.");
       } finally {
@@ -37,6 +38,10 @@ export default function GithubTrendingReposList() {
 
     void loadGithubTrendingRepos();
   }, [selectedPeriod]);
+
+  const syncedLabel = feedMeta.syncedAt
+    ? `Updated · ${formatDateTimeKst(feedMeta.syncedAt)}`
+    : "Top repos · RSS order";
 
   return (
     <section className="home-feed-card flex flex-col border border-slate-400 bg-white shadow-sm">
@@ -49,11 +54,7 @@ export default function GithubTrendingReposList() {
             </h3>
             <HomeFeedBadge>{HOME_FEED_BADGE_EXTERNAL}</HomeFeedBadge>
           </div>
-          <p className="home-feed-card-header-description">
-            {feedMeta.isStale
-              ? `Latest synced repos · ${feedMeta.fetchedDate}`
-              : "Top repos · RSS order"}
-          </p>
+          <p className="home-feed-card-header-description">{syncedLabel}</p>
         </div>
         <a
           className="home-feed-card-header-action"

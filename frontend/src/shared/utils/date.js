@@ -33,6 +33,49 @@ export function formatDateTime(dateInput) {
   });
 }
 
+/** Always render in Asia/Seoul, regardless of the browser timezone. */
+export function formatDateTimeKst(dateInput) {
+  if (!dateInput) {
+    return "";
+  }
+
+  const date = new Date(dateInput);
+  if (Number.isNaN(date.getTime())) {
+    return "";
+  }
+
+  return date.toLocaleString("ko-KR", {
+    timeZone: "Asia/Seoul",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+}
+
+export function getLatestCreatedAt(rows) {
+  let latest = null;
+  let latestMs = Number.NEGATIVE_INFINITY;
+
+  for (const row of rows ?? []) {
+    if (!row?.created_at) {
+      continue;
+    }
+
+    const timestamp = new Date(row.created_at).getTime();
+    if (Number.isNaN(timestamp) || timestamp <= latestMs) {
+      continue;
+    }
+
+    latestMs = timestamp;
+    latest = row.created_at;
+  }
+
+  return latest;
+}
+
 export function getMostRecentDate(createdAt, updatedAt) {
   if (!createdAt && !updatedAt) {
     return null;

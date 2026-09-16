@@ -2,10 +2,17 @@ name: Fetch GitHub Trending Repos
 
 on:
   schedule:
-    # UTC 01:30 — ~30m after mshibanami/GitHubTrendingRSS feed (01:00 UTC)
-    - cron: "30 1 * * *"
-    # UTC 13:00 — midday refresh as GitHub Trending shifts through the day
-    - cron: "0 13 * * *"
+    # 10×/day, ~every 2.5h (UTC), offset +15m from HF to avoid overlap.
+    - cron: "15 0 * * *"
+    - cron: "45 2 * * *"
+    - cron: "15 5 * * *"
+    - cron: "45 7 * * *"
+    - cron: "15 10 * * *"
+    - cron: "45 12 * * *"
+    - cron: "15 15 * * *"
+    - cron: "45 17 * * *"
+    - cron: "15 20 * * *"
+    - cron: "45 22 * * *"
   workflow_dispatch:
     inputs:
       period:
@@ -30,7 +37,7 @@ jobs:
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: npm
 
       - run: npm ci
