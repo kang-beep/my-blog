@@ -137,10 +137,11 @@ portfolio_projects
 | upvotes | int | default `0` |
 | github_repo | text | nullable |
 | published_at | timestamptz | |
+| period | text | `daily` \| `weekly` \| `monthly` |
 | fetched_date | date | NOT NULL |
 | created_at | timestamptz | default `now()` |
 
-**Indexes:** `idx_hf_papers_fetched_date`, unique `(paper_id, fetched_date)`
+**Indexes:** `idx_hf_papers_fetched_date`, `idx_hf_papers_period`, unique `(paper_id, period, fetched_date)`
 
 **Source:** GitHub Actions → HF API ([`../guide/05_home_external_feeds.md`](../guide/05_home_external_feeds.md))
 

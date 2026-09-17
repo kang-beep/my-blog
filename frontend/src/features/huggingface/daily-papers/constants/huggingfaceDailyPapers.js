@@ -3,3 +3,10 @@ export const HUGGINGFACE_DAILY_PAPERS_TOP_LIMIT = 10;
 export const HUGGINGFACE_DAILY_PAPERS_KEYWORD_LIMIT = 3;
 export const HUGGINGFACE_DAILY_PAPERS_PAGE_URL = "https://huggingface.co/papers";
 export const HUGGINGFACE_PAPER_BASE_URL = "https://huggingface.co/papers";
+export const HUGGINGFACE_PAPER_PERIODS = ["daily", "weekly", "monthly"];
+
+export const HUGGINGFACE_PAPER_PERIOD_LABELS = {
+  daily: "Daily",
+  weekly: "Weekly",
+  monthly: "Monthly",
+};

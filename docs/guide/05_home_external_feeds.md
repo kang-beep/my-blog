@@ -24,7 +24,7 @@ React (브라우저)
 
 | | daily | weekly | monthly |
 |---|---|---|---|
-| Hugging Face | ✅ | ❌ (추후) | ❌ (추후) |
+| Hugging Face | ✅ | ✅ | ✅ |
 | GitHub Trending | ✅ | ✅ | ✅ |
 
 ## Supabase 테이블
@@ -42,9 +42,10 @@ React (브라우저)
 | upvotes | int |
 | github_repo | text, **nullable** |
 | published_at | timestamptz |
+| period | `daily` \| `weekly` \| `monthly` |
 | fetched_date | date (UTC 기준) |
 
-Unique: `(paper_id, fetched_date)`
+Unique: `(paper_id, period, fetched_date)`
 
 ### `github_trending_repos`
 

@@ -199,6 +199,7 @@ create table if not exists public.huggingface_daily_papers (
   upvotes int default 0,
   github_repo text,
   published_at timestamptz,
+  period text not null default 'daily' check (period in ('daily', 'weekly', 'monthly')),
   fetched_date date not null default current_date,
   created_at timestamptz default now()
 );
@@ -206,8 +207,11 @@ create table if not exists public.huggingface_daily_papers (
 create index if not exists idx_hf_papers_fetched_date
   on public.huggingface_daily_papers (fetched_date desc);
 
-create unique index if not exists idx_hf_papers_paper_id_fetched_date
-  on public.huggingface_daily_papers (paper_id, fetched_date);
+create index if not exists idx_hf_papers_period
+  on public.huggingface_daily_papers (period);
+
+create unique index if not exists idx_hf_papers_paper_id_period_fetched_date
+  on public.huggingface_daily_papers (paper_id, period, fetched_date);
 
 create table if not exists public.github_trending_repos (
   id uuid primary key default gen_random_uuid(),

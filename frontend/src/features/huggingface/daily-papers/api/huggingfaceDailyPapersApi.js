@@ -3,13 +3,14 @@ import { getLatestCreatedAt } from "@/shared/utils/date";
 import { fetchRowsForTodayOrLatest } from "@/shared/utils/externalFeedQuery";
 import { HUGGINGFACE_DAILY_PAPERS_TABLE } from "@/features/huggingface/daily-papers/constants/huggingfaceDailyPapers";
 
-async function fetchRowsForDate(fetchedDate) {
+async function fetchRowsForDate(fetchedDate, period) {
   const { data, error } = await supabase
     .from(HUGGINGFACE_DAILY_PAPERS_TABLE)
     .select(
-      "id, paper_id, title, ai_summary, ai_keywords, upvotes, github_repo, fetched_date, created_at",
+      "id, paper_id, title, ai_summary, ai_keywords, upvotes, github_repo, period, fetched_date, created_at",
     )
     .eq("fetched_date", fetchedDate)
+    .eq("period", period)
     .order("upvotes", { ascending: false });
 
   if (error) {
@@ -22,11 +23,12 @@ async function fetchRowsForDate(fetchedDate) {
   }));
 }
 
-export async function fetchHuggingFaceDailyPapers() {
+export async function fetchHuggingFaceDailyPapers(period = "daily") {
   const result = await fetchRowsForTodayOrLatest(
     supabase,
     HUGGINGFACE_DAILY_PAPERS_TABLE,
-    fetchRowsForDate,
+    (fetchedDate) => fetchRowsForDate(fetchedDate, period),
+    { period },
   );
 
   return {

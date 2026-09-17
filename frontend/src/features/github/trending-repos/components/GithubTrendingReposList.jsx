@@ -40,7 +40,7 @@ export default function GithubTrendingReposList() {
   }, [selectedPeriod]);
 
   const syncedLabel = feedMeta.syncedAt
-    ? `Updated · ${formatDateTimeKst(feedMeta.syncedAt)}`
+    ? `Updated · ${formatDateTimeKst(feedMeta.syncedAt)} KST`
     : "Top repos · RSS order";
 
   return (
