@@ -3,6 +3,7 @@ import {
   FolderKanban,
   Home,
   LibraryBig,
+  Settings,
   SquarePen,
   UserRound,
 } from "lucide-react";
@@ -23,4 +24,5 @@ export const ADMIN_NAV = [
   { to: ROUTES.ADMIN_PROFILE, label: "Profile Edit", end: true, icon: UserRound },
   { to: ROUTES.ADMIN_POSTS, label: "Post Edit", end: false, icon: SquarePen },
   { to: ROUTES.ADMIN_PORTFOLIO, label: "Portfolio Edit", end: true, icon: FolderKanban },
+  { to: ROUTES.ADMIN_SETTINGS, label: "Settings", end: true, icon: Settings },
 ];

@@ -18,6 +18,7 @@
 | [guide/04_ops.md](./guide/04_ops.md) | 배포, Actions, Edge Functions |
 | [guide/05_home_external_feeds.md](./guide/05_home_external_feeds.md) | HF·GitHub Trending 캐시 |
 | [guide/06_post_delete_and_giscus.md](./guide/06_post_delete_and_giscus.md) | 글 삭제, Giscus, Edge Function |
+| [guide/07_admin_secrets_and_notion.md](./guide/07_admin_secrets_and_notion.md) | Admin 시크릿 DB, Notion import |
 
 ## 빠른 시작 (clone 후)
 

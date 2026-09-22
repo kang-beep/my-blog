@@ -11,9 +11,23 @@ posts.tags ──────> tag_stats (derived)
 posts.tags ──────> tag_edges (derived)
 profiles
 portfolio_projects
+admin_secrets
 ```
 
 **Comments:** Supabase `comments` 테이블 없음 → [Giscus](https://giscus.app) (GitHub Discussions)
+
+**Admin secrets:** Notion / Giscus PAT 등. 원문은 RPC로만 읽고, 목록은 마스킹. 마이그레이션: [`migrations/20260321_admin_secrets.sql`](./migrations/20260321_admin_secrets.sql)
+
+## admin_secrets
+
+| Column | Type | Constraints |
+|--------|------|-------------|
+| key | text | PK |
+| value | text | NOT NULL |
+| updated_at | timestamptz | NOT NULL, default `now()` |
+
+**RPCs (authenticated):** `list_admin_secrets()`, `upsert_admin_secret(key, value)`, `delete_admin_secret(key)`  
+**Known keys:** `notion_token`, `giscus_github_pat`
 
 ## categories
 

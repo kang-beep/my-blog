@@ -11,6 +11,7 @@ import AdminProfile from "@/features/admin/pages/AdminProfile";
 import AdminPostsList from "@/features/admin/pages/AdminPostsList";
 import AdminPostEditor from "@/features/admin/pages/AdminPostEditor";
 import AdminPortfolio from "@/features/admin/pages/AdminPortfolio";
+import AdminSettings from "@/features/admin/pages/AdminSettings";
 import Portfolio from "@/features/portfolio/pages/Portfolio";
 
 export default function AppRouter() {
@@ -35,6 +36,7 @@ export default function AppRouter() {
         <Route path="posts/new" element={<AdminPostEditor />} />
         <Route path="posts/:id/edit" element={<AdminPostEditor />} />
         <Route path="portfolio" element={<AdminPortfolio />} />
+        <Route path="settings" element={<AdminSettings />} />
       </Route>
       <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
     </Routes>

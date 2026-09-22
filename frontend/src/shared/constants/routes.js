@@ -11,6 +11,7 @@ export const ROUTES = {
   ADMIN_POSTS_NEW: "/admin/posts/new",
   ADMIN_POSTS_EDIT: "/admin/posts/:id/edit",
   ADMIN_PORTFOLIO: "/admin/portfolio",
+  ADMIN_SETTINGS: "/admin/settings",
 };
 
 export function getPostDetailPath(postId) {

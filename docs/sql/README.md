@@ -7,6 +7,7 @@ Supabase 초기 설정용 SQL입니다.
 | 파일 | 용도 |
 |------|------|
 | `bootstrap.sql` | 신규 Supabase 프로젝트 **1회 실행** — 테이블·RLS·Storage 정책·시드 |
+| `migrations/` | 기존 프로젝트용 추가 SQL (예: `admin_secrets`) |
 | `schema.md` | 현재 스키마 상세 (컬럼·관계·운영 참고) |
 
 ## 신규 프로젝트 설정 순서
@@ -25,6 +26,7 @@ Supabase 초기 설정용 SQL입니다.
 - 좋아요: `post_likes` + `like_count` 트리거
 - 태그 네트워크: `tag_stats`, `tag_edges`, `refresh_tag_stats()`
 - 홈 외부 피드 캐시: `huggingface_daily_papers`, `github_trending_repos`
+- 관리자 시크릿: `admin_secrets` + list/upsert/delete RPC
 - RLS / GRANT (anon·authenticated·service_role)
 - Storage 객체 정책 (버킷 3개)
 

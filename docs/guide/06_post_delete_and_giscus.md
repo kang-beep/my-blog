@@ -92,7 +92,8 @@ supabase/functions/delete-giscus-discussion/index.ts
 |------|--------|------|
 | `GISCUS_REPO` | `kang-beep/my-blog` | Discussion 저장소 |
 | `GISCUS_CATEGORY_ID` | (giscus.app 발급값) | 카테고리 ID |
-| `my-blog-giscus-tokens` | (Secret) | GitHub fine-grained PAT |
+| `my-blog-giscus-tokens` | (Secret, optional fallback) | GitHub fine-grained PAT |
+| `giscus_github_pat` in `admin_secrets` | Admin → Settings | **권장** — DB에 저장, Edge가 우선 조회 |
 
 `SUPABASE_URL`, `SUPABASE_ANON_KEY`는 Edge Runtime에 자동 주입된다.
 
@@ -104,7 +105,7 @@ supabase/functions/delete-giscus-discussion/index.ts
 | `GISCUS_REPO` | `kang-beep/my-blog` |
 | `GISCUS_CATEGORY_ID` | giscus.app에서 복사한 categoryId |
 
-Secret 이름 `my-blog-giscus-tokens`는 코드의 `GITHUB_TOKEN_SECRET` 상수와 **정확히 일치**해야 한다.  
+Secret 이름 `my-blog-giscus-tokens`는 **env fallback**용이다. 권장 경로는 Admin Settings의 `giscus_github_pat`이다.  
 구 Secret `my-tech-blog-comments-tokens`가 있으면 삭제한다.
 
 ### 배포

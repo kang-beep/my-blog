@@ -1,6 +1,7 @@
 // 관리자 글 작성/수정 폼: 태그 파싱과 이미지 업로드를 함께 처리
 import { useEffect, useRef, useState } from "react";
 import { RefreshCw, Upload, X } from "lucide-react";
+import NotionImportModal from "@/features/admin/components/NotionImportModal";
 import RichTextEditor, { isEditorContentEmpty } from "@/features/admin/components/RichTextEditor/RichTextEditor";
 import {
   POST_STATUS_DRAFT,
@@ -36,6 +37,8 @@ export default function PostEditorForm({
   const [imageFile, setImageFile] = useState(null);
   const [thumbnailCleared, setThumbnailCleared] = useState(false);
   const [contentError, setContentError] = useState("");
+  const [notionOpen, setNotionOpen] = useState(false);
+  const [importNotice, setImportNotice] = useState("");
   const formRef = useRef(null);
   const imageInputRef = useRef(null);
 
@@ -135,6 +138,20 @@ export default function PostEditorForm({
     imageInputRef.current?.click();
   };
 
+  const handleNotionImport = ({ title: nextTitle, content: nextContent, warnings = [] }) => {
+    setTitle(nextTitle || "");
+    setContent(nextContent || "");
+    setStatus(POST_STATUS_DRAFT);
+    setContentError("");
+    if (warnings.length) {
+      setImportNotice(
+        `Notion에서 가져왔습니다(비공개 draft). 일부 블록이 단순화되었을 수 있습니다: ${warnings.slice(0, 3).join(", ")}`,
+      );
+      return;
+    }
+    setImportNotice("Notion에서 가져왔습니다. 상태는 비공개(draft)로 맞춰 두었습니다. 확인 후 저장하세요.");
+  };
+
   const selectedCategoryName =
     categories.find((item) => item.id === categoryId)?.name ?? category;
 
@@ -159,18 +176,32 @@ export default function PostEditorForm({
   const hasThumbnail = Boolean(thumbnailPreviewUrl);
 
   return (
+    <>
     <form ref={formRef} onSubmit={handleSubmit} className="card space-y-3">
       <div className="flex items-start justify-between gap-3">
         <h2 className="text-2xl font-semibold">{initialPost ? "글 수정" : "새 글 작성"}</h2>
-        <button
-          type="button"
-          className="btn shrink-0 gap-1.5"
-          onClick={handleGoToList}
-        >
-          <span aria-hidden>📋</span>
-          목록으로
-        </button>
+        <div className="flex shrink-0 flex-wrap gap-2">
+          <button
+            type="button"
+            className="btn"
+            onClick={() => setNotionOpen(true)}
+            disabled={isSubmitting}
+          >
+            Notion에서 가져오기
+          </button>
+          <button
+            type="button"
+            className="btn gap-1.5"
+            onClick={handleGoToList}
+          >
+            <span aria-hidden>📋</span>
+            목록으로
+          </button>
+        </div>
       </div>
+      {importNotice ? (
+        <p className="rounded-lg bg-indigo-50 px-3 py-2 text-sm text-indigo-800">{importNotice}</p>
+      ) : null}
       <div>
         <label className="label" htmlFor="title">제목</label>
         <input
@@ -337,5 +368,11 @@ export default function PostEditorForm({
         {isSubmitting ? "저장 중..." : initialPost ? "수정 저장" : "글 등록"}
       </button>
     </form>
+    <NotionImportModal
+      open={notionOpen}
+      onClose={() => setNotionOpen(false)}
+      onImport={handleNotionImport}
+    />
+    </>
   );
 }

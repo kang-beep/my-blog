@@ -3,3 +3,6 @@ verify_jwt = false
 
 [functions.dynamic-handler]
 verify_jwt = false
+
+[functions.notion-import]
+verify_jwt = false
