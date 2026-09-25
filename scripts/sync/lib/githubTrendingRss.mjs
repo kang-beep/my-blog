@@ -3,6 +3,8 @@
 const GITHUB_REPO_URL_PATTERN = /github\.com\/([^/?#]+)\/([^/?#]+)/i;
 const HTML_TAG_PATTERN = /<[^>]*>/g;
 const HR_SPLIT_PATTERN = /<hr\b[^>]*>/i;
+const LEFTOVER_HTML_TAG_PATTERN = /<\/?[a-zA-Z!][^>]{0,200}>/;
+const MAX_DESCRIPTION_LENGTH = 280;
 
 function decodeHtmlEntities(text) {
   return text
@@ -57,6 +59,15 @@ function normalizeRssRepoTitle(rssTitle) {
   return coerceRssText(rssTitle).replace(/\s*\/\s*/g, "/").trim();
 }
 
+function truncatePlainText(text, maxLength = MAX_DESCRIPTION_LENGTH) {
+  if (text.length <= maxLength) {
+    return text;
+  }
+
+  const truncated = text.slice(0, maxLength).replace(/\s+\S*$/, "").trim();
+  return truncated || text.slice(0, maxLength).trim();
+}
+
 function extractShortDescription(rawDescription) {
   const rawText = coerceRssText(rawDescription).trim();
   if (!rawText) {
@@ -64,7 +75,10 @@ function extractShortDescription(rawDescription) {
   }
 
   const shortSegment = rawText.split(HR_SPLIT_PATTERN)[0] ?? rawText;
-  const plainText = decodeHtmlEntities(stripHtml(shortSegment)).replace(/\s+/g, " ").trim();
+  // Decode first so entity-encoded tags become real markup, then strip.
+  let plainText = stripHtml(decodeHtmlEntities(shortSegment));
+  plainText = stripHtml(decodeHtmlEntities(plainText)).replace(/\s+/g, " ").trim();
+  plainText = truncatePlainText(plainText);
 
   return plainText || null;
 }
@@ -84,9 +98,7 @@ export function parseGithubTrendingRssItem(item) {
 
 export function assertPlainTextDescriptions(rows, period) {
   const invalidRows = rows.filter(
-    (row) =>
-      typeof row.description === "string" &&
-      (row.description.includes("<") || row.description.includes("</")),
+    (row) => typeof row.description === "string" && LEFTOVER_HTML_TAG_PATTERN.test(row.description),
   );
 
   if (invalidRows.length > 0) {
