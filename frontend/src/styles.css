@@ -179,6 +179,14 @@
     @apply lg:overflow-y-auto;
   }
 
+  .posts-split-panel-body {
+    @apply flex min-h-[15rem] flex-col px-4 py-3 sm:px-5 lg:h-[32rem] lg:min-h-[32rem] lg:overflow-hidden;
+  }
+
+  .posts-split-panel-body-scroll {
+    @apply overflow-y-auto;
+  }
+
   .app-body {
     @apply min-h-0;
   }

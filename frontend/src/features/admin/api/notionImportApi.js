@@ -8,7 +8,21 @@ async function invokeNotionImport(body) {
   });
 
   if (error) {
-    const details = typeof data?.error === "string" ? data.error : error.message;
+    let details = error.message;
+    try {
+      const response = error.context;
+      if (response && typeof response.json === "function") {
+        const payload = await response.json();
+        if (typeof payload?.error === "string") {
+          details = payload.error;
+        }
+      }
+    } catch {
+      // keep generic message
+    }
+    if (typeof data?.error === "string") {
+      details = data.error;
+    }
     throw new Error(details || "Notion import request failed.");
   }
   if (data?.error) {

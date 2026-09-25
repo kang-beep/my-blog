@@ -8,5 +8,5 @@ export default function PostMetaDates({ createdAt, updatedAt }) {
     return null;
   }
 
-  return <p className="text-xs text-slate-500">{dateLabel}</p>;
+  return <time className="text-sm tabular-nums text-slate-400">{dateLabel}</time>;
 }

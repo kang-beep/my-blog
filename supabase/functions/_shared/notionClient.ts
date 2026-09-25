@@ -85,36 +85,85 @@ async function notionFetch(
   return payload;
 }
 
-export async function searchNotionPages(token: string, query = "") {
-  const payload = await notionFetch(token, "/search", {
-    method: "POST",
-    body: JSON.stringify({
-      query: query || undefined,
-      filter: { property: "object", value: "page" },
-      sort: { direction: "descending", timestamp: "last_edited_time" },
-      page_size: 50,
-    }),
-  }) as {
-    results?: Array<{
-      id: string;
-      url?: string;
-      last_edited_time?: string;
-      properties?: Record<string, { type?: string; title?: NotionRichText[] }>;
-    }>;
-  };
+function resolveParentId(parent: {
+  type?: string;
+  page_id?: string;
+  database_id?: string;
+  block_id?: string;
+} | undefined): string | null {
+  if (!parent?.type) {
+    return null;
+  }
+  if (parent.type === "page_id" && parent.page_id) {
+    return parent.page_id;
+  }
+  if (parent.type === "database_id" && parent.database_id) {
+    return parent.database_id;
+  }
+  if (parent.type === "block_id" && parent.block_id) {
+    return parent.block_id;
+  }
+  return null;
+}
 
-  return (payload.results ?? []).map((page) => {
-    const titleProp = Object.values(page.properties ?? {}).find(
-      (prop) => prop?.type === "title",
-    );
-    const title = plainTextFromRichText(titleProp?.title) || "Untitled";
-    return {
-      id: page.id,
-      title,
-      url: page.url ?? null,
-      lastEditedTime: page.last_edited_time ?? null,
+export async function searchNotionPages(token: string, query = "") {
+  const pages: Array<{
+    id: string;
+    title: string;
+    url: string | null;
+    lastEditedTime: string | null;
+    parentId: string | null;
+  }> = [];
+  let cursor: string | null = null;
+
+  for (;;) {
+    const payload = await notionFetch(token, "/search", {
+      method: "POST",
+      body: JSON.stringify({
+        query: query || undefined,
+        filter: { property: "object", value: "page" },
+        sort: { direction: "descending", timestamp: "last_edited_time" },
+        page_size: 100,
+        start_cursor: cursor || undefined,
+      }),
+    }) as {
+      results?: Array<{
+        id: string;
+        url?: string;
+        last_edited_time?: string;
+        parent?: {
+          type?: string;
+          page_id?: string;
+          database_id?: string;
+          block_id?: string;
+        };
+        properties?: Record<string, { type?: string; title?: NotionRichText[] }>;
+      }>;
+      has_more?: boolean;
+      next_cursor?: string | null;
     };
-  });
+
+    for (const page of payload.results ?? []) {
+      const titleProp = Object.values(page.properties ?? {}).find(
+        (prop) => prop?.type === "title",
+      );
+      const title = plainTextFromRichText(titleProp?.title) || "Untitled";
+      pages.push({
+        id: page.id,
+        title,
+        url: page.url ?? null,
+        lastEditedTime: page.last_edited_time ?? null,
+        parentId: resolveParentId(page.parent),
+      });
+    }
+
+    if (!payload.has_more || !payload.next_cursor) {
+      break;
+    }
+    cursor = payload.next_cursor;
+  }
+
+  return pages;
 }
 
 async function listBlockChildren(
@@ -141,6 +190,12 @@ async function listBlockChildren(
   return blocks;
 }
 
+const NO_NESTED_CONTENT_TYPES = new Set([
+  "child_page",
+  "child_database",
+  "link_to_page",
+]);
+
 async function blockToHtml(
   token: string,
   block: NotionBlock,
@@ -150,9 +205,27 @@ async function blockToHtml(
     return "";
   }
 
+  if (block.type === "child_page") {
+    const title =
+      (block.child_page as { title?: string } | undefined)?.title ||
+      "Untitled page";
+    return `<p><em>하위 페이지:</em> ${escapeHtml(title)}</p>`;
+  }
+
+  if (block.type === "child_database") {
+    const title =
+      (block.child_database as { title?: string } | undefined)?.title ||
+      "Database";
+    return `<p><em>하위 데이터베이스:</em> ${escapeHtml(title)}</p>`;
+  }
+
+  if (block.type === "link_to_page") {
+    return `<p><em>[다른 페이지 링크]</em></p>`;
+  }
+
   const inner = richTextToHtml(blockRichText(block));
   let childrenHtml = "";
-  if (block.has_children) {
+  if (block.has_children && !NO_NESTED_CONTENT_TYPES.has(block.type)) {
     const children = await listBlockChildren(token, block.id);
     const parts: string[] = [];
     for (const child of children) {
@@ -236,8 +309,6 @@ export async function fetchNotionPage(token: string, pageId: string) {
   for (const block of blocks) {
     if (
       [
-        "child_database",
-        "child_page",
         "embed",
         "bookmark",
         "synced_block",

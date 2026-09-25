@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { X } from "lucide-react";
 import TagForceGraph from "@/features/tags/components/TagForceGraph";
 
-export default function TagNetworkFullscreenModal({ isOpen, onClose, nodes, edges }) {
+export default function TagNetworkFullscreenModal({ isOpen, onClose, nodes, edges, onTagSelect }) {
   useEffect(() => {
     if (!isOpen) {
       return undefined;
@@ -52,7 +52,7 @@ export default function TagNetworkFullscreenModal({ isOpen, onClose, nodes, edge
         </header>
 
         <div className="tag-network-modal-body min-h-0 flex-1 p-3 sm:p-4">
-          <TagForceGraph nodes={nodes} edges={edges} fillContainer />
+          <TagForceGraph nodes={nodes} edges={edges} fillContainer onNodeClick={onTagSelect} />
         </div>
       </div>
     </div>,

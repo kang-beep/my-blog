@@ -22,9 +22,21 @@ function TagNetworkStatus({ isLoading, error }) {
   return null;
 }
 
-export default function TagNetworkPanel({ nodes, edges, isLoading, error }) {
+export default function TagNetworkPanel({
+  nodes,
+  edges,
+  isLoading,
+  error,
+  bodyClassName = "home-tag-posts-panel-body",
+  onTagSelect,
+}) {
   const [isFullscreenOpen, setIsFullscreenOpen] = useState(false);
   const canExpand = !isLoading && !error && nodes.length > 0;
+
+  const handleTagSelect = (tag) => {
+    onTagSelect?.(tag);
+    setIsFullscreenOpen(false);
+  };
 
   return (
     <>
@@ -50,9 +62,16 @@ export default function TagNetworkPanel({ nodes, edges, isLoading, error }) {
           </div>
         </div>
 
-        <div className="home-tag-posts-panel-body">
+        <div className={bodyClassName}>
           <TagNetworkStatus isLoading={isLoading} error={error} />
-          {canExpand ? <TagForceGraph nodes={nodes} edges={edges} /> : null}
+          {canExpand ? (
+            <TagForceGraph
+              nodes={nodes}
+              edges={edges}
+              fillContainer
+              onNodeClick={onTagSelect ? handleTagSelect : undefined}
+            />
+          ) : null}
         </div>
       </div>
 
@@ -61,6 +80,7 @@ export default function TagNetworkPanel({ nodes, edges, isLoading, error }) {
         onClose={() => setIsFullscreenOpen(false)}
         nodes={nodes}
         edges={edges}
+        onTagSelect={onTagSelect ? handleTagSelect : undefined}
       />
     </>
   );

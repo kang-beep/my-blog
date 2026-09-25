@@ -7,7 +7,7 @@ export const ADMIN_SECRET_FIELDS = [
   {
     key: ADMIN_SECRET_KEYS.NOTION_TOKEN,
     label: "Notion Integration Token",
-    help: "Internal Integration Secret (공부 읽기). Settings → Connections에 페이지가 연결되어 있어야 합니다.",
+    help: "Notion Internal Integration Secret. 가져올 페이지에 Integration이 Connections로 연결되어 있어야 합니다.",
     placeholder: "ntn_... 또는 secret_...",
   },
   {

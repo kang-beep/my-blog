@@ -21,11 +21,7 @@ function CategoryTab({ label, isActive, onClick }) {
 
 export default function PostsCategoryTabs({ categories, selectedCategory, onSelect }) {
   return (
-    <div
-      className="scrollbar-hide -mx-4 flex gap-2 overflow-x-auto px-4 pb-1 sm:-mx-6 sm:px-6"
-      role="tablist"
-      aria-label="Post categories"
-    >
+    <div className="flex flex-wrap gap-2" role="tablist" aria-label="Post categories">
       <CategoryTab
         label={ALL_TAB_LABEL}
         isActive={selectedCategory === POSTS_CATEGORY_ALL}

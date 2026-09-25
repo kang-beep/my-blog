@@ -1,12 +1,12 @@
-// Home: latest posts (left 6) + tag network (right 4)
+// Home: latest posts (left 6) + tag ranking (right 4)
 import { Link } from "react-router-dom";
 import HomeLatestPosts from "@/features/posts/components/HomeLatestPosts";
-import TagNetworkPanel from "@/features/tags/components/TagNetworkPanel";
+import TagRankingPanel from "@/features/tags/components/TagRankingPanel";
 import { ROUTES } from "@/shared/constants/routes";
-import { useTags } from "@/features/tags/hooks/useTags";
+import { useTagRanking } from "@/features/tags/hooks/useTagRanking";
 
 export default function TagNetwork({ latestPosts = [], latestPostsLoading = false, latestPostsError = "" }) {
-  const { nodes, edges, isLoading, error } = useTags();
+  const { nodes, isLoading, error } = useTagRanking();
 
   return (
     <section className="home-feed-card border border-slate-400 bg-white shadow-sm">
@@ -32,7 +32,7 @@ export default function TagNetwork({ latestPosts = [], latestPostsLoading = fals
           </div>
         </div>
 
-        <TagNetworkPanel nodes={nodes} edges={edges} isLoading={isLoading} error={error} />
+        <TagRankingPanel nodes={nodes} isLoading={isLoading} error={error} />
       </div>
     </section>
   );

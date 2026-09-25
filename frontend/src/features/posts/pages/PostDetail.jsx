@@ -52,33 +52,43 @@ export default function PostDetail() {
       {!isLoading && post ? (
         <>
           <article className="w-full overflow-hidden border border-slate-200 bg-white shadow-sm">
-            <div className="min-w-0 space-y-4 px-2 py-4 sm:px-2.5 lg:px-3">
-              <header className="space-y-1 border-b border-slate-100 pb-3">
+            <div className="min-w-0 px-2 py-0 sm:px-2.5 lg:px-3">
+              <header className="space-y-3 border-b border-slate-200 bg-slate-50 px-1 py-4 sm:px-1.5">
                 <h1 className="text-2xl font-bold leading-snug tracking-tight text-slate-900 sm:text-[1.65rem] lg:text-3xl">
                   {post.title}
                 </h1>
-                <PostMetaDates createdAt={post.created_at} updatedAt={post.updated_at} />
+                <div className="flex flex-wrap items-center justify-end gap-x-2.5 gap-y-1">
+                  {post.category?.trim() ? (
+                    <button
+                      type="button"
+                      onClick={() => goToCategory(post.category.trim())}
+                      className="rounded border border-slate-300 bg-white px-2 py-0.5 text-sm font-semibold text-slate-700 hover:border-slate-400 hover:bg-slate-100"
+                    >
+                      {post.category.trim()}
+                    </button>
+                  ) : null}
+                  <PostMetaDates createdAt={post.created_at} updatedAt={post.updated_at} />
+                </div>
               </header>
 
-              <PostDetailBody content={post.content} />
+              <div className="space-y-4 py-4">
+                <PostDetailBody content={post.content} />
 
-              <PostCommentsSection
-                postId={post.id}
-                trailing={
-                  <PostLikeButton
-                    postId={post.id}
-                    initialLikeCount={post.like_count}
-                    variant="compact"
-                  />
-                }
-              >
-                {post.category?.trim() ? (
-                  <TagBadge tag={post.category.trim()} onClick={goToCategory} />
-                ) : null}
-                {(post.tags ?? []).map((tag) => (
-                  <TagBadge key={`${post.id}-${tag}`} tag={tag} onClick={goToTag} />
-                ))}
-              </PostCommentsSection>
+                <PostCommentsSection
+                  postId={post.id}
+                  trailing={
+                    <PostLikeButton
+                      postId={post.id}
+                      initialLikeCount={post.like_count}
+                      variant="compact"
+                    />
+                  }
+                >
+                  {(post.tags ?? []).map((tag) => (
+                    <TagBadge key={`${post.id}-${tag}`} tag={tag} onClick={goToTag} />
+                  ))}
+                </PostCommentsSection>
+              </div>
             </div>
           </article>
 

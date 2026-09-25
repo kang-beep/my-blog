@@ -1,4 +1,4 @@
-// Posts list: category tabs, search, pagination
+// Posts list: category tabs, search, pagination + tag network
 import { useEffect, useMemo, useState } from "react";
 import { Search, X } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
@@ -12,7 +12,114 @@ import {
   filterPostsByTag,
 } from "@/features/posts/utils/filterPosts";
 import { mergeCategoryNames, paginatePosts, parsePostsPage } from "@/features/posts/utils/postsList";
+import TagNetworkPanel from "@/features/tags/components/TagNetworkPanel";
+import { useTags } from "@/features/tags/hooks/useTags";
 import Pagination from "@/shared/ui/Pagination";
+
+function PostsListPanel({
+  tabCategories,
+  category,
+  onSelectCategory,
+  searchQuery,
+  onSearchChange,
+  tag,
+  onClearTag,
+  isLoading,
+  error,
+  hasActiveFilter,
+  filteredEmpty,
+  totalCount,
+  paginatedPosts,
+  currentPage,
+  totalPages,
+  onPageChange,
+}) {
+  return (
+    <div className="home-tag-posts-panel">
+      <div className="home-tag-posts-panel-header">
+        <h3>Posts</h3>
+        <div className="home-tag-posts-panel-header-action-slot" />
+      </div>
+
+      <div className="posts-split-panel-body posts-split-panel-body-scroll space-y-4">
+        <PostsCategoryTabs
+          categories={tabCategories}
+          selectedCategory={category}
+          onSelect={onSelectCategory}
+        />
+
+        <label className="relative block">
+          <Search
+            size={18}
+            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
+            aria-hidden
+          />
+          <input
+            className="input pl-10"
+            type="search"
+            value={searchQuery}
+            onChange={(event) => onSearchChange(event.target.value)}
+            placeholder="Search by title, category, or tag"
+            aria-label="Search posts"
+          />
+        </label>
+
+        {tag ? (
+          <p className="flex items-center gap-2 text-sm text-slate-600">
+            <span>
+              Tag: <span className="font-medium text-slate-900">#{tag}</span>
+            </span>
+            <button
+              type="button"
+              className="inline-flex items-center gap-0.5 text-indigo-600 hover:text-indigo-500"
+              onClick={onClearTag}
+            >
+              <X size={14} aria-hidden />
+              Clear
+            </button>
+          </p>
+        ) : null}
+
+        {isLoading ? <p className="text-sm text-slate-500">Loading posts...</p> : null}
+        {error ? <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</p> : null}
+
+        {!isLoading && !error && filteredEmpty ? (
+          <p className="rounded-lg bg-slate-50 px-3 py-8 text-center text-sm text-slate-500">
+            {hasActiveFilter ? "No posts match your filters." : "No posts yet."}
+          </p>
+        ) : null}
+
+        {!isLoading && !error && paginatedPosts.length > 0 ? (
+          <>
+            <p className="text-xs text-slate-500 sm:text-sm">
+              {totalCount} post{totalCount === 1 ? "" : "s"}
+              {category ? (
+                <>
+                  {" "}
+                  in <span className="font-medium text-slate-700">{category}</span>
+                </>
+              ) : null}
+            </p>
+
+            <ul className="divide-y divide-slate-200 rounded-lg border border-slate-400">
+              {paginatedPosts.map((post) => (
+                <PostsListItem key={post.id} post={post} />
+              ))}
+            </ul>
+
+            <div className="pt-2">
+              <Pagination
+                currentPage={currentPage}
+                totalPages={totalPages}
+                onPageChange={onPageChange}
+              />
+            </div>
+          </>
+        ) : null}
+      </div>
+    </div>
+  );
+}
 
 export default function Posts() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -25,6 +132,7 @@ export default function Posts() {
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const { nodes, edges, isLoading: tagsLoading, error: tagsError } = useTags();
 
   useEffect(() => {
     const loadData = async () => {
@@ -81,6 +189,10 @@ export default function Posts() {
     });
   };
 
+  const selectTag = (nextTag) => {
+    updateSearchParams({ tag: nextTag, page: "" });
+  };
+
   const selectPage = (nextPage) => {
     if (nextPage < 1 || nextPage > totalPages) {
       return;
@@ -108,85 +220,34 @@ export default function Posts() {
 
   return (
     <section className="border border-slate-400 bg-white shadow-sm">
-      <div className="border-b border-neutral-500 bg-neutral-600 px-4 py-4 sm:px-6">
-        <h1 className="text-xl font-semibold text-white">Posts</h1>
-      </div>
-
-      <div className="space-y-4 px-4 py-4 sm:px-6 sm:py-5">
-        <PostsCategoryTabs
-          categories={tabCategories}
-          selectedCategory={category}
-          onSelect={selectCategory}
+      <div className="home-tag-posts-grid">
+        <PostsListPanel
+          tabCategories={tabCategories}
+          category={category}
+          onSelectCategory={selectCategory}
+          searchQuery={searchQuery}
+          onSearchChange={handleSearchChange}
+          tag={tag}
+          onClearTag={() => clearUrlFilter("tag")}
+          isLoading={isLoading}
+          error={error}
+          hasActiveFilter={hasActiveFilter}
+          filteredEmpty={filteredPosts.length === 0}
+          totalCount={totalCount}
+          paginatedPosts={paginatedPosts}
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={selectPage}
         />
 
-        <label className="relative block">
-          <Search
-            size={18}
-            className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
-            aria-hidden
-          />
-          <input
-            className="input pl-10"
-            type="search"
-            value={searchQuery}
-            onChange={(event) => handleSearchChange(event.target.value)}
-            placeholder="Search by title, category, or tag"
-            aria-label="Search posts"
-          />
-        </label>
-
-        {tag ? (
-          <p className="flex items-center gap-2 text-sm text-slate-600">
-            <span>
-              Tag: <span className="font-medium text-slate-900">#{tag}</span>
-            </span>
-            <button
-              type="button"
-              className="inline-flex items-center gap-0.5 text-indigo-600 hover:text-indigo-500"
-              onClick={() => clearUrlFilter("tag")}
-            >
-              <X size={14} aria-hidden />
-              Clear
-            </button>
-          </p>
-        ) : null}
-
-        {isLoading ? <p className="text-sm text-slate-500">Loading posts...</p> : null}
-        {error ? <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</p> : null}
-
-        {!isLoading && !error && filteredPosts.length === 0 ? (
-          <p className="rounded-lg bg-slate-50 px-3 py-8 text-center text-sm text-slate-500">
-            {hasActiveFilter ? "No posts match your filters." : "No posts yet."}
-          </p>
-        ) : null}
-
-        {!isLoading && !error && paginatedPosts.length > 0 ? (
-          <>
-            <p className="text-xs text-slate-500 sm:text-sm">
-              {totalCount} post{totalCount === 1 ? "" : "s"}
-              {category ? (
-                <>
-                  {" "}
-                  in <span className="font-medium text-slate-700">{category}</span>
-                </>
-              ) : null}
-            </p>
-
-            <ul className="divide-y divide-slate-200 rounded-lg border border-slate-400">
-              {paginatedPosts.map((post) => (
-                <PostsListItem key={post.id} post={post} />
-              ))}
-            </ul>
-
-            <div className="pt-2">
-              <Pagination
-                currentPage={currentPage}
-                totalPages={totalPages}
-                onPageChange={selectPage}
-              />
-            </div>
-          </>
-        ) : null}
+        <TagNetworkPanel
+          nodes={nodes}
+          edges={edges}
+          isLoading={tagsLoading}
+          error={tagsError}
+          bodyClassName="posts-split-panel-body"
+          onTagSelect={selectTag}
+        />
       </div>
     </section>
   );
