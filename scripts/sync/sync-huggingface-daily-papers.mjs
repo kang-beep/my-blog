@@ -82,7 +82,22 @@ async function fetchPapers(period, fetchedDate) {
     throw new Error(`Hugging Face API failed for ${period} (${response.status})`);
   }
 
-  return response.json();
+  const payload = await response.json();
+  if (period !== "daily" || (Array.isArray(payload) && payload.length > 0)) {
+    return payload;
+  }
+
+  // HF dated daily endpoint can return [] even when the undated feed has papers.
+  console.log("Daily dated feed empty; falling back to undated HF daily_papers");
+  const fallbackResponse = await fetch(HUGGINGFACE_DAILY_PAPERS_URL, {
+    headers: { Accept: "application/json" },
+  });
+
+  if (!fallbackResponse.ok) {
+    throw new Error(`Hugging Face fallback API failed for daily (${fallbackResponse.status})`);
+  }
+
+  return fallbackResponse.json();
 }
 
 async function syncPeriod(supabase, period, fetchedDate) {
@@ -97,6 +112,11 @@ async function syncPeriod(supabase, period, fetchedDate) {
     .filter((row) => row.paper_id);
 
   console.log(`HF ${period}: API ${entries.length} → insert ${rows.length}`);
+
+  if (rows.length === 0) {
+    console.warn(`HF ${period}: empty payload, skip replace to keep existing rows.`);
+    return;
+  }
 
   await replaceRowsForDate(
     supabase,
