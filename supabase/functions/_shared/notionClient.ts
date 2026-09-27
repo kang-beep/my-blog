@@ -194,7 +194,67 @@ const NO_NESTED_CONTENT_TYPES = new Set([
   "child_page",
   "child_database",
   "link_to_page",
+  "table",
+  "table_row",
 ]);
+
+function tableCellToHtml(
+  cell: NotionRichText[],
+  isHeader: boolean,
+): string {
+  const content = richTextToHtml(cell);
+  const tag = isHeader ? "th" : "td";
+  return `<${tag}><p>${content || "<br>"}</p></${tag}>`;
+}
+
+function tableRowToHtml(
+  row: NotionBlock,
+  rowIndex: number,
+  hasColumnHeader: boolean,
+  hasRowHeader: boolean,
+): string {
+  if (row.type !== "table_row") {
+    return "";
+  }
+
+  const cells =
+    (row.table_row as { cells?: NotionRichText[][] } | undefined)?.cells ?? [];
+  const cellsHtml = cells
+    .map((cell, colIndex) => {
+      const isHeader =
+        (hasColumnHeader && rowIndex === 0) ||
+        (hasRowHeader && colIndex === 0);
+      return tableCellToHtml(cell, isHeader);
+    })
+    .join("");
+
+  return cellsHtml ? `<tr>${cellsHtml}</tr>` : "";
+}
+
+async function tableBlockToHtml(
+  token: string,
+  block: NotionBlock,
+): Promise<string> {
+  const meta = block.table as {
+    has_column_header?: boolean;
+    has_row_header?: boolean;
+  } | undefined;
+  const hasColumnHeader = Boolean(meta?.has_column_header);
+  const hasRowHeader = Boolean(meta?.has_row_header);
+  const rows = await listBlockChildren(token, block.id);
+  const rowsHtml = rows
+    .map((row, rowIndex) =>
+      tableRowToHtml(row, rowIndex, hasColumnHeader, hasRowHeader),
+    )
+    .filter(Boolean)
+    .join("");
+
+  if (!rowsHtml) {
+    return "";
+  }
+
+  return `<div class="tableWrapper"><table><tbody>${rowsHtml}</tbody></table></div>`;
+}
 
 async function blockToHtml(
   token: string,
@@ -221,6 +281,14 @@ async function blockToHtml(
 
   if (block.type === "link_to_page") {
     return `<p><em>[다른 페이지 링크]</em></p>`;
+  }
+
+  if (block.type === "table") {
+    return tableBlockToHtml(token, block);
+  }
+
+  if (block.type === "table_row") {
+    return "";
   }
 
   const inner = richTextToHtml(blockRichText(block));
@@ -314,8 +382,6 @@ export async function fetchNotionPage(token: string, pageId: string) {
         "synced_block",
         "column_list",
         "column",
-        "table",
-        "table_row",
       ].includes(block.type)
     ) {
       warnings.push(`Unsupported block simplified/skipped: ${block.type}`);

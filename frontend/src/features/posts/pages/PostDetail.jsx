@@ -54,7 +54,7 @@ export default function PostDetail() {
           <article className="w-full overflow-hidden border border-slate-200 bg-white shadow-sm">
             <div className="min-w-0 px-2 py-0 sm:px-2.5 lg:px-3">
               <header className="space-y-3 border-b border-slate-200 bg-slate-50 px-1 py-4 sm:px-1.5">
-                <h1 className="text-2xl font-bold leading-snug tracking-tight text-slate-900 sm:text-[1.65rem] lg:text-3xl">
+                <h1 className="text-xl font-bold leading-snug tracking-tight text-slate-900 sm:text-2xl lg:text-[1.65rem]">
                   {post.title}
                 </h1>
                 <div className="flex flex-wrap items-center justify-end gap-x-2.5 gap-y-1">

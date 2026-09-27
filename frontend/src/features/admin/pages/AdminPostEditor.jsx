@@ -9,6 +9,7 @@ import {
   updatePost,
   uploadPostImage,
 } from "@/features/admin/api/adminPostApi";
+import { persistExternalPostImages } from "@/features/admin/api/persistPostImagesApi";
 import { refreshTagStats } from "@/features/tags/api/tagApi";
 import { extractFirstImageSrc } from "@/features/posts/utils/postDisplay";
 import {
@@ -110,29 +111,44 @@ export default function AdminPostEditor() {
     setIsSubmitting(true);
     setError("");
     try {
+      const persisted = await persistExternalPostImages({
+        postId: payload.id,
+        contentHtml: payload.content ?? "",
+        imageUrl: payload.image_url ?? null,
+      });
+      const nextPayload = {
+        ...payload,
+        content: persisted.contentHtml,
+        image_url: persisted.imageUrl,
+      };
+
       if (isEditMode) {
-        let imageUrl = payload.image_url ?? null;
-        if (payload.imageFile) {
-          imageUrl = await uploadPostImage(payload.imageFile, payload.id);
+        let imageUrl = nextPayload.image_url ?? null;
+        if (nextPayload.imageFile) {
+          imageUrl = await uploadPostImage(nextPayload.imageFile, nextPayload.id);
         }
         await updatePost(
-          payload.id,
-          buildPostFields({ ...payload, published_at: post?.published_at ?? null }, imageUrl, categories),
+          nextPayload.id,
+          buildPostFields(
+            { ...nextPayload, published_at: post?.published_at ?? null },
+            imageUrl,
+            categories,
+          ),
         );
         await refreshTagStats();
         setToastMessage("글이 저장되었습니다.");
         return;
       }
 
-      if (payload.imageFile) {
+      if (nextPayload.imageFile) {
         const created = await createPost({
-          id: payload.id,
-          ...buildPostFields(payload, null, categories),
+          id: nextPayload.id,
+          ...buildPostFields(nextPayload, null, categories),
         });
-        const imageUrl = await uploadPostImage(payload.imageFile, created.id);
+        const imageUrl = await uploadPostImage(nextPayload.imageFile, created.id);
         await updatePost(
           created.id,
-          buildPostFields({ ...payload, published_at: null }, imageUrl, categories),
+          buildPostFields({ ...nextPayload, published_at: null }, imageUrl, categories),
         );
         await refreshTagStats();
         navigate(getAdminPostEditPath(created.id), {
@@ -143,11 +159,11 @@ export default function AdminPostEditor() {
       }
 
       await createPost({
-        id: payload.id,
-        ...buildPostFields(payload, null, categories),
+        id: nextPayload.id,
+        ...buildPostFields(nextPayload, null, categories),
       });
       await refreshTagStats();
-      navigate(getAdminPostEditPath(payload.id), {
+      navigate(getAdminPostEditPath(nextPayload.id), {
         replace: true,
         state: { toastMessage: "글이 등록되었습니다." },
       });
