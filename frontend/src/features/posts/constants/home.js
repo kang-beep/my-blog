@@ -2,12 +2,10 @@ export const HOME_LATEST_POST_LIMIT = 10;
 
 export const HOME_SECTION_TRENDS = {
   title: "Latest Trends",
-  description: "Synced from external sources — not written on this blog.",
 };
 
 export const HOME_SECTION_MINE = {
-  title: "내 글",
-  description: "Written here — originals from this blog.",
+  title: "My Posts",
 };
 
 export const HOME_FEED_BADGE_EXTERNAL = "External";

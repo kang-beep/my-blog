@@ -8,7 +8,7 @@ React + Vite + Supabase 기반의 `kang-beep tech` 블로그입니다.
 ├── frontend/     React (Vite) 웹 앱
 ├── docs/         프로젝트·DB 문서
 ├── supabase/     Edge Functions, CLI 설정
-├── scripts/      GitHub Actions 동기화 스크립트
+├── scripts/github-actions/   GitHub Actions 동기화 스크립트
 └── .github/      CI 워크플로
 ```
 
@@ -44,7 +44,7 @@ npm run dev
 
 ## GitHub Actions
 
-루트에서 `npm ci` 후 `scripts/sync/` 실행 (HF Papers, GitHub Trending).
+루트에서 `npm ci` 후 `scripts/github-actions/` 실행 (HF Papers, GitHub Trending).
 
 Secrets: `SUPABASE_URL`, `SUPABASE_SECRET_KEY`
 

@@ -57,7 +57,7 @@
 frontend/     React (Vite) 웹 앱 — src/app, src/shared, src/features
 docs/         문서
 supabase/     Edge Functions
-scripts/      GitHub Actions 동기화
+scripts/github-actions/   GitHub Actions 동기화
 ```
 
 프론트엔드 코드는 **공용 영역(`shared`) + 기능 영역(`features`)** 절충형 구조를 기준으로 `frontend/src/` 아래에 구성한다.

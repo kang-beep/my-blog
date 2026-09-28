@@ -12,8 +12,8 @@ function PostListMeta({ post, showTags = false, statusLabel, statusTone = "publi
   const hasLikeCount = typeof post.like_count === "number";
   const statusClassName =
     statusTone === "draft"
-      ? "rounded bg-amber-50 px-1.5 py-0.5 text-xs font-medium text-amber-700"
-      : "rounded bg-emerald-50 px-1.5 py-0.5 text-xs font-medium text-emerald-700";
+      ? "rounded-none bg-amber-50 px-1.5 py-0.5 text-xs font-medium text-amber-700"
+      : "rounded-none bg-emerald-50 px-1.5 py-0.5 text-xs font-medium text-emerald-700";
 
   return (
     <p className="flex flex-wrap items-center gap-x-1.5 gap-y-0.5 text-xs text-slate-500 sm:text-sm">
@@ -39,7 +39,7 @@ function PostListMeta({ post, showTags = false, statusLabel, statusTone = "publi
 export default function PostListRow({
   post,
   to,
-  titleClassName = "text-lg font-bold leading-snug text-slate-900",
+  titleClassName = "text-base font-semibold leading-snug text-slate-900",
   showTags = false,
   statusLabel,
   statusTone = "published",
@@ -51,12 +51,12 @@ export default function PostListRow({
   return (
     <Link
       to={linkTo}
-      className="post-list-row group block min-w-0 rounded-lg text-inherit no-underline transition-colors hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
+      className="post-list-row group block min-w-0 rounded-none text-inherit no-underline transition-colors hover:bg-slate-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-500"
       aria-label={post.title ?? "Untitled"}
     >
       <div className="flex min-w-0 items-start gap-3 sm:gap-3.5">
         <PostListThumbnail src={thumbnailUrl} />
-        <div className="min-w-0 flex-1 space-y-1">
+        <div className="min-w-0 flex-1 space-y-0.5">
           <h3
             className={`leading-snug transition-colors group-hover:text-indigo-600 ${titleClassName}`}
           >
@@ -64,7 +64,9 @@ export default function PostListRow({
           </h3>
 
           {excerpt ? (
-            <p className="line-clamp-2 text-sm leading-relaxed text-slate-500">{excerpt}</p>
+            <p className="line-clamp-2 text-xs leading-relaxed text-slate-500 sm:text-[0.8125rem]">
+              {excerpt}
+            </p>
           ) : null}
 
           <PostListMeta

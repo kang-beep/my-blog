@@ -13,7 +13,7 @@ export default function TagNetwork({ latestPosts = [], latestPostsLoading = fals
       <div className="home-tag-posts-grid">
         <div className="home-tag-posts-panel">
           <div className="home-tag-posts-panel-header">
-            <h3>Latest Posts</h3>
+            <h3>Latest my Posts</h3>
             <div className="home-tag-posts-panel-header-action-slot">
               <Link className="home-feed-card-header-action shrink-0 text-sm" to={ROUTES.POSTS}>
                 View all

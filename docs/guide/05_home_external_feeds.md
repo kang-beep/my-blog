@@ -65,8 +65,8 @@ RLS: anon/authenticated **SELECT only**. INSERT/DELETE는 Actions(service_role)�
 
 | 워크플로 | cron (UTC) | 스크립트 |
 |---|---|---|
-| `fetch_huggingface_papers.yml` | 10×/day: `0 0`, `30 2`, `0 5`, `30 7`, `0 10`, `30 12`, `0 15`, `30 17`, `0 20`, `30 22` | `scripts/sync/sync-huggingface-daily-papers.mjs` |
-| `fetch_github_trending.yml` | 10×/day: `15 0`, `45 2`, `15 5`, `45 7`, `15 10`, `45 12`, `15 15`, `45 17`, `15 20`, `45 22` | `scripts/sync/sync-github-trending-repos.mjs` |
+| `fetch_huggingface_papers.yml` | 10×/day: `0 0`, `30 2`, `0 5`, `30 7`, `0 10`, `30 12`, `0 15`, `30 17`, `0 20`, `30 22` | `scripts/github-actions/sync-huggingface-daily-papers.mjs` |
+| `fetch_github_trending.yml` | 10×/day: `15 0`, `45 2`, `15 5`, `45 7`, `15 10`, `45 12`, `15 15`, `45 17`, `15 20`, `45 22` | `scripts/github-actions/sync-github-trending-repos.mjs` |
 
 공통 Secrets (기존 ping과 동일):
 

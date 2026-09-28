@@ -48,4 +48,4 @@ jobs:
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
           PERIOD: ${{ inputs.period || 'all' }}
           SKIP_DELETE: ${{ inputs.skip_delete }}
-        run: node scripts/sync/sync-huggingface-daily-papers.mjs
+        run: node scripts/github-actions/sync-huggingface-daily-papers.mjs

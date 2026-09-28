@@ -10,7 +10,7 @@ function TagNetworkStatus({ isLoading, error }) {
 
   if (error) {
     return (
-      <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">
+      <p className="rounded-none bg-rose-50 px-3 py-2 text-sm text-rose-600">
         {error}
         <span className="mt-1 block text-xs text-rose-500">
           Make sure docs/sql/bootstrap.sql has been applied in Supabase.

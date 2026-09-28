@@ -15,6 +15,8 @@ import { mergeCategoryNames, paginatePosts, parsePostsPage } from "@/features/po
 import TagNetworkPanel from "@/features/tags/components/TagNetworkPanel";
 import { useTags } from "@/features/tags/hooks/useTags";
 import Pagination from "@/shared/ui/Pagination";
+import PageBackLink from "@/shared/ui/PageBackLink";
+import { ROUTES } from "@/shared/constants/routes";
 
 function PostsListPanel({
   tabCategories,
@@ -37,11 +39,11 @@ function PostsListPanel({
   return (
     <div className="home-tag-posts-panel">
       <div className="home-tag-posts-panel-header">
-        <h3>Posts</h3>
+        <h3 className="page-card-title">Posts</h3>
         <div className="home-tag-posts-panel-header-action-slot" />
       </div>
 
-      <div className="posts-split-panel-body posts-split-panel-body-scroll space-y-4">
+      <div className="posts-split-panel-body space-y-4">
         <PostsCategoryTabs
           categories={tabCategories}
           selectedCategory={category}
@@ -55,7 +57,7 @@ function PostsListPanel({
             aria-hidden
           />
           <input
-            className="input pl-10"
+            className="input !rounded-none pl-10"
             type="search"
             value={searchQuery}
             onChange={(event) => onSearchChange(event.target.value)}
@@ -81,10 +83,10 @@ function PostsListPanel({
         ) : null}
 
         {isLoading ? <p className="text-sm text-slate-500">Loading posts...</p> : null}
-        {error ? <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</p> : null}
+        {error ? <p className="rounded-none bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</p> : null}
 
         {!isLoading && !error && filteredEmpty ? (
-          <p className="rounded-lg bg-slate-50 px-3 py-8 text-center text-sm text-slate-500">
+          <p className="rounded-none bg-slate-50 px-3 py-8 text-center text-sm text-slate-500">
             {hasActiveFilter ? "No posts match your filters." : "No posts yet."}
           </p>
         ) : null}
@@ -101,7 +103,7 @@ function PostsListPanel({
               ) : null}
             </p>
 
-            <ul className="divide-y divide-slate-200 rounded-lg border border-slate-400">
+            <ul className="divide-y divide-slate-100 border-t border-slate-100">
               {paginatedPosts.map((post) => (
                 <PostsListItem key={post.id} post={post} />
               ))}
@@ -219,36 +221,40 @@ export default function Posts() {
   const hasActiveFilter = Boolean(category || tag || searchQuery.trim());
 
   return (
-    <section className="border border-slate-400 bg-white shadow-sm">
-      <div className="home-tag-posts-grid">
-        <PostsListPanel
-          tabCategories={tabCategories}
-          category={category}
-          onSelectCategory={selectCategory}
-          searchQuery={searchQuery}
-          onSearchChange={handleSearchChange}
-          tag={tag}
-          onClearTag={() => clearUrlFilter("tag")}
-          isLoading={isLoading}
-          error={error}
-          hasActiveFilter={hasActiveFilter}
-          filteredEmpty={filteredPosts.length === 0}
-          totalCount={totalCount}
-          paginatedPosts={paginatedPosts}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={selectPage}
-        />
+    <div className="space-y-3">
+      <PageBackLink to={ROUTES.HOME} label="Home" />
 
-        <TagNetworkPanel
-          nodes={nodes}
-          edges={edges}
-          isLoading={tagsLoading}
-          error={tagsError}
-          bodyClassName="posts-split-panel-body"
-          onTagSelect={selectTag}
-        />
-      </div>
-    </section>
+      <section className="border border-slate-400 bg-white shadow-sm">
+        <div className="home-tag-posts-grid">
+          <PostsListPanel
+            tabCategories={tabCategories}
+            category={category}
+            onSelectCategory={selectCategory}
+            searchQuery={searchQuery}
+            onSearchChange={handleSearchChange}
+            tag={tag}
+            onClearTag={() => clearUrlFilter("tag")}
+            isLoading={isLoading}
+            error={error}
+            hasActiveFilter={hasActiveFilter}
+            filteredEmpty={filteredPosts.length === 0}
+            totalCount={totalCount}
+            paginatedPosts={paginatedPosts}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={selectPage}
+          />
+
+          <TagNetworkPanel
+            nodes={nodes}
+            edges={edges}
+            isLoading={tagsLoading}
+            error={tagsError}
+            bodyClassName="posts-split-panel-body posts-tag-network-body"
+            onTagSelect={selectTag}
+          />
+        </div>
+      </section>
+    </div>
   );
 }

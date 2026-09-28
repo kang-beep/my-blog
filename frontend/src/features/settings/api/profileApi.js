@@ -10,7 +10,7 @@ import {
 export async function fetchProfile() {
   const { data, error } = await supabase
     .from("profiles")
-    .select("id, display_name, headline, bio, avatar_url, github_url, email, updated_at")
+    .select("id, display_name, headline, avatar_url, github_url, email, updated_at")
     .limit(1)
     .maybeSingle();
   if (error) {

@@ -4,8 +4,8 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "sync:hf-papers": "node scripts/sync/sync-huggingface-daily-papers.mjs",
-    "sync:gh-trending": "node scripts/sync/sync-github-trending-repos.mjs"
+    "sync:hf-papers": "node scripts/github-actions/sync-huggingface-daily-papers.mjs",
+    "sync:gh-trending": "node scripts/github-actions/sync-github-trending-repos.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.104.1"

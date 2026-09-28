@@ -11,7 +11,6 @@ export default function AdminProfile() {
   const loadProfile = useProfileStore((state) => state.loadProfile);
   const [displayName, setDisplayName] = useState("");
   const [headline, setHeadline] = useState("");
-  const [bio, setBio] = useState("");
   const [githubUrl, setGithubUrl] = useState("");
   const [email, setEmail] = useState("");
   const [avatarFile, setAvatarFile] = useState(null);
@@ -24,7 +23,6 @@ export default function AdminProfile() {
       const item = await loadProfile();
       setDisplayName(item?.display_name ?? "");
       setHeadline(item?.headline ?? "");
-      setBio(item?.bio ?? "");
       setGithubUrl(item?.github_url ?? "");
       setEmail(item?.email ?? "");
     };
@@ -45,7 +43,6 @@ export default function AdminProfile() {
         id: profile?.id ?? crypto.randomUUID(),
         display_name: displayName,
         headline,
-        bio,
         github_url: githubUrl,
         email,
         avatar_url: avatarUrl,
@@ -84,15 +81,6 @@ export default function AdminProfile() {
             className="input"
             value={headline}
             onChange={(event) => setHeadline(event.target.value)}
-          />
-        </div>
-        <div>
-          <label className="label" htmlFor="bio">소개</label>
-          <textarea
-            id="bio"
-            className="input min-h-24"
-            value={bio}
-            onChange={(event) => setBio(event.target.value)}
           />
         </div>
         <div>

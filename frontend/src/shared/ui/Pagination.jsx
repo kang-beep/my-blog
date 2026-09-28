@@ -21,8 +21,8 @@ function PageButton({ page, isActive, onClick }) {
       aria-current={isActive ? "page" : undefined}
       className={
         isActive
-          ? "inline-flex h-9 min-w-9 items-center justify-center rounded-lg bg-indigo-600 px-2 text-sm font-medium text-white"
-          : "inline-flex h-9 min-w-9 items-center justify-center rounded-lg border border-slate-200 bg-white px-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
+          ? "inline-flex h-9 min-w-9 items-center justify-center rounded-none bg-indigo-600 px-2 text-sm font-medium text-white"
+          : "inline-flex h-9 min-w-9 items-center justify-center rounded-none border border-slate-200 bg-white px-2 text-sm font-medium text-slate-700 hover:bg-slate-50"
       }
     >
       {page}
@@ -41,7 +41,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
     <nav className="flex flex-wrap items-center justify-center gap-1.5" aria-label="Pagination">
       <button
         type="button"
-        className="inline-flex h-9 items-center justify-center rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+        className="inline-flex h-9 items-center justify-center rounded-none border border-slate-200 bg-white px-2.5 text-sm text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage <= 1}
         aria-label="Previous page"
@@ -63,7 +63,7 @@ export default function Pagination({ currentPage, totalPages, onPageChange }) {
 
       <button
         type="button"
-        className="inline-flex h-9 items-center justify-center rounded-lg border border-slate-200 bg-white px-2.5 text-sm text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
+        className="inline-flex h-9 items-center justify-center rounded-none border border-slate-200 bg-white px-2.5 text-sm text-slate-700 hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-40"
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage >= totalPages}
         aria-label="Next page"

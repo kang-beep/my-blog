@@ -1,7 +1,7 @@
 import { ImageOff } from "lucide-react";
 
 const THUMBNAIL_CLASS_NAME =
-  "h-14 w-14 shrink-0 rounded-lg border border-slate-200 sm:h-16 sm:w-16";
+  "h-14 w-14 shrink-0 rounded-none border border-slate-200 sm:h-16 sm:w-16";
 
 export default function PostListThumbnail({ src }) {
   if (src) {

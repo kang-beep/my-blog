@@ -35,7 +35,7 @@ export default function Home() {
 
   return (
     <div className="home-page space-y-10">
-      <HomeSection title={HOME_SECTION_MINE.title} description={HOME_SECTION_MINE.description}>
+      <HomeSection title={HOME_SECTION_MINE.title}>
         <TagNetwork
           latestPosts={posts}
           latestPostsLoading={isLoading}
@@ -43,7 +43,7 @@ export default function Home() {
         />
       </HomeSection>
 
-      <HomeSection title={HOME_SECTION_TRENDS.title} description={HOME_SECTION_TRENDS.description}>
+      <HomeSection title={HOME_SECTION_TRENDS.title}>
         <div className="home-cards-grid">
           <HuggingFaceDailyPapersList />
           <GithubTrendingReposList />

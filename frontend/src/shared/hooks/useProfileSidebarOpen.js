@@ -10,6 +10,11 @@ function getDefaultOpen() {
   return window.matchMedia(LG_MEDIA_QUERY).matches;
 }
 
+function isDesktopViewport() {
+  return window.matchMedia(LG_MEDIA_QUERY).matches;
+}
+
+// Desktop defaults open; mobile defaults closed. Desktop stays collapsible.
 export function useProfileSidebarOpen() {
   const [isOpen, setIsOpen] = useState(getDefaultOpen);
 
@@ -17,9 +22,7 @@ export function useProfileSidebarOpen() {
     const mediaQuery = window.matchMedia(LG_MEDIA_QUERY);
 
     const handleChange = (event) => {
-      if (!event.matches) {
-        setIsOpen(false);
-      }
+      setIsOpen(event.matches);
     };
 
     mediaQuery.addEventListener("change", handleChange);
@@ -28,6 +31,11 @@ export function useProfileSidebarOpen() {
 
   const toggle = () => setIsOpen((previous) => !previous);
   const close = () => setIsOpen(false);
+  const closeIfMobile = () => {
+    if (!isDesktopViewport()) {
+      setIsOpen(false);
+    }
+  };
 
-  return { isOpen, toggle, close };
+  return { isOpen, toggle, close, closeIfMobile };
 }

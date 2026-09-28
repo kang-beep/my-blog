@@ -8,6 +8,31 @@ import PostDetailBody from "@/features/posts/components/PostDetailBody";
 import PostLikeButton from "@/features/posts/components/PostLikeButton";
 import PostMetaDates from "@/features/posts/components/PostMetaDates";
 import TagBadge from "@/shared/ui/TagBadge";
+import PageBackLink from "@/shared/ui/PageBackLink";
+
+function AdjacentPostLink({ post, direction }) {
+  const isPrevious = direction === "previous";
+  const label = isPrevious ? "Previous" : "Next";
+
+  if (!post) {
+    return (
+      <div className={`post-adjacent-slot ${isPrevious ? "post-adjacent-slot-prev" : "post-adjacent-slot-next"}`}>
+        <span className="post-adjacent-label">{label}</span>
+        <span className="post-adjacent-empty">No post</span>
+      </div>
+    );
+  }
+
+  return (
+    <Link
+      to={getPostDetailPath(post.id)}
+      className={`post-adjacent-slot ${isPrevious ? "post-adjacent-slot-prev" : "post-adjacent-slot-next"} post-adjacent-link`}
+    >
+      <span className="post-adjacent-label">{label}</span>
+      <span className="post-adjacent-title">{post.title}</span>
+    </Link>
+  );
+}
 
 export default function PostDetail() {
   const { id } = useParams();
@@ -47,27 +72,35 @@ export default function PostDetail() {
 
   return (
     <section className="mx-auto w-full max-w-7xl space-y-3">
+      <PageBackLink to={ROUTES.POSTS} label="Posts" />
+
       {isLoading ? <p className="text-sm text-slate-500">글을 불러오는 중입니다...</p> : null}
       {error ? <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</p> : null}
       {!isLoading && post ? (
         <>
           <article className="w-full overflow-hidden border border-slate-200 bg-white shadow-sm">
             <div className="min-w-0 px-2 py-0 sm:px-2.5 lg:px-3">
-              <header className="space-y-3 border-b border-slate-200 bg-slate-50 px-1 py-4 sm:px-1.5">
-                <h1 className="text-xl font-bold leading-snug tracking-tight text-slate-900 sm:text-2xl lg:text-[1.65rem]">
-                  {post.title}
-                </h1>
-                <div className="flex flex-wrap items-center justify-end gap-x-2.5 gap-y-1">
+              <header className="post-detail-header">
+                <p className="page-card-label">Post</p>
+                <h1 className="post-detail-title">{post.title}</h1>
+                <div className="post-meta-inline">
                   {post.category?.trim() ? (
-                    <button
-                      type="button"
-                      onClick={() => goToCategory(post.category.trim())}
-                      className="rounded border border-slate-300 bg-white px-2 py-0.5 text-sm font-semibold text-slate-700 hover:border-slate-400 hover:bg-slate-100"
-                    >
-                      {post.category.trim()}
-                    </button>
+                    <p className="post-meta-inline-item">
+                      <span className="post-meta-inline-label">Category:</span>{" "}
+                      <button
+                        type="button"
+                        onClick={() => goToCategory(post.category.trim())}
+                        className="post-meta-inline-value post-meta-inline-button"
+                      >
+                        {post.category.trim()}
+                      </button>
+                    </p>
                   ) : null}
-                  <PostMetaDates createdAt={post.created_at} updatedAt={post.updated_at} />
+                  <PostMetaDates
+                    createdAt={post.created_at}
+                    updatedAt={post.updated_at}
+                    labeled
+                  />
                 </div>
               </header>
 
@@ -92,21 +125,10 @@ export default function PostDetail() {
             </div>
           </article>
 
-          <nav className="flex flex-col gap-1 border border-slate-200 bg-white px-2 py-3 text-sm shadow-sm sm:px-2.5">
-            {adjacent.previousPost ? (
-              <Link className="truncate font-medium text-slate-700 hover:text-indigo-600" to={getPostDetailPath(adjacent.previousPost.id)}>
-                ← 이전글 · {adjacent.previousPost.title}
-              </Link>
-            ) : (
-              <span className="text-slate-400">이전글 없음</span>
-            )}
-            {adjacent.nextPost ? (
-              <Link className="truncate font-medium text-slate-700 hover:text-indigo-600" to={getPostDetailPath(adjacent.nextPost.id)}>
-                다음글 · {adjacent.nextPost.title} →
-              </Link>
-            ) : (
-              <span className="text-slate-400">다음글 없음</span>
-            )}
+          <nav className="post-adjacent-nav" aria-label="Adjacent posts">
+            <AdjacentPostLink post={adjacent.previousPost} direction="previous" />
+            <div className="post-adjacent-divider" aria-hidden />
+            <AdjacentPostLink post={adjacent.nextPost} direction="next" />
           </nav>
         </>
       ) : null}

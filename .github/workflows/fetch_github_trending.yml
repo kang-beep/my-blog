@@ -43,12 +43,12 @@ jobs:
       - run: npm ci
 
       - name: Verify RSS parser is present
-        run: test -f scripts/sync/lib/githubTrendingRss.mjs
+        run: test -f scripts/github-actions/lib/githubTrendingRss.mjs
 
       - name: Verify RSS parser output
         run: |
           node --input-type=module -e "
-          import { parseGithubTrendingRssItem } from './scripts/sync/lib/githubTrendingRss.mjs';
+          import { parseGithubTrendingRssItem } from './scripts/github-actions/lib/githubTrendingRss.mjs';
           const sample = {
             title: 'iptv-org/iptv',
             link: 'https://github.com/iptv-org/iptv',
@@ -67,4 +67,4 @@ jobs:
           SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
           PERIOD: ${{ inputs.period || 'all' }}
           SKIP_DELETE: ${{ inputs.skip_delete }}
-        run: node scripts/sync/sync-github-trending-repos.mjs
+        run: node scripts/github-actions/sync-github-trending-repos.mjs
