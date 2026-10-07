@@ -14,7 +14,7 @@ export default function MobileSiteHeader({ isOpen, onToggle, onNavigate }) {
         </NavLink>
         <button
           type="button"
-          className="btn-header-ghost shrink-0 rounded-none px-2.5 py-2"
+          className="btn-header-ghost shrink-0 rounded-lg px-2.5 py-2"
           aria-expanded={isOpen}
           aria-controls="site-mobile-menu"
           aria-label={isOpen ? "Close menu" : "Open menu"}

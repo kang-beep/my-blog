@@ -16,7 +16,7 @@ export default function PostCommentsSection({ postId, trailing, children }) {
 
   return (
     <section>
-      <div className="flex items-start justify-between gap-4 border-t border-slate-100 pt-2">
+      <div className="flex items-start justify-between gap-4 border-t border-slate-300 pt-2">
         <div className="flex min-w-0 flex-wrap items-center gap-2">{children}</div>
         <div className="flex shrink-0 items-start gap-3">
           {trailing}
@@ -44,7 +44,7 @@ export default function PostCommentsSection({ postId, trailing, children }) {
         </div>
       </div>
       {isOpen ? (
-        <div className="mt-2 border-t border-slate-100 pt-2">
+        <div className="mt-2 border-t border-slate-300 pt-2">
           <p className="mb-2 text-xs text-slate-500">GitHub 계정으로 댓글을 남길 수 있습니다.</p>
           <GiscusComments postId={postId} />
         </div>

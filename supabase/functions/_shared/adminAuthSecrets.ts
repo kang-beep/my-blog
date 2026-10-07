@@ -2,6 +2,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 
 const SECRET_KEY_NOTION = "notion_token";
 const SECRET_KEY_GISCUS_PAT = "giscus_github_pat";
+const SECRET_KEY_GEMINI = "gemini_api_key";
 const ENV_FALLBACK_GISCUS = "my-blog-giscus-tokens";
 
 function createServiceClient() {
@@ -52,6 +53,16 @@ export async function getGiscusGithubPat(): Promise<string> {
   }
   throw new Error(
     "giscus_github_pat is not set (Admin Settings) and env fallback my-blog-giscus-tokens is missing.",
+  );
+}
+
+export async function getGeminiApiKey(): Promise<string> {
+  const fromDb = await readSecretFromDb(SECRET_KEY_GEMINI);
+  if (fromDb) {
+    return fromDb;
+  }
+  throw new Error(
+    "gemini_api_key is not set. Save it in Admin → Settings.",
   );
 }
 

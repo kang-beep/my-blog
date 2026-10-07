@@ -1,15 +1,17 @@
-// Home: external trends + my content
+// Home: my posts + external trends
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import GithubTrendingReposList from "@/features/github/trending-repos/components/GithubTrendingReposList";
 import HuggingFaceDailyPapersList from "@/features/huggingface/daily-papers/components/HuggingFaceDailyPapersList";
 import { fetchLatestPosts } from "@/features/posts/api/postApi";
+import HomeMyPosts from "@/features/posts/components/HomeMyPosts";
 import HomeSection from "@/features/posts/components/HomeSection";
 import {
   HOME_LATEST_POST_LIMIT,
   HOME_SECTION_MINE,
   HOME_SECTION_TRENDS,
 } from "@/features/posts/constants/home";
-import TagNetwork from "@/features/tags/components/TagNetwork";
+import { ROUTES } from "@/shared/constants/routes";
 
 export default function Home() {
   const [posts, setPosts] = useState([]);
@@ -35,18 +37,23 @@ export default function Home() {
 
   return (
     <div className="home-page space-y-10">
-      <HomeSection title={HOME_SECTION_MINE.title}>
-        <TagNetwork
-          latestPosts={posts}
-          latestPostsLoading={isLoading}
-          latestPostsError={error}
-        />
+      <HomeSection
+        title={HOME_SECTION_MINE.title}
+        description={HOME_SECTION_MINE.description}
+        action={
+          <Link className="home-section-action" to={ROUTES.POSTS}>
+            {HOME_SECTION_MINE.viewAllLabel}
+            <span aria-hidden>→</span>
+          </Link>
+        }
+      >
+        <HomeMyPosts posts={posts} isLoading={isLoading} error={error} />
       </HomeSection>
 
-      <HomeSection title={HOME_SECTION_TRENDS.title}>
+      <HomeSection title={HOME_SECTION_TRENDS.title} description={HOME_SECTION_TRENDS.description}>
         <div className="home-cards-grid">
-          <HuggingFaceDailyPapersList />
           <GithubTrendingReposList />
+          <HuggingFaceDailyPapersList />
         </div>
       </HomeSection>
     </div>

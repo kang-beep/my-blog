@@ -37,7 +37,10 @@ export default function App() {
 
       <main
         className={`min-h-0 min-w-0 flex-1 overflow-y-auto bg-white ${
-          isPostDetailPage ? "px-1 py-4 lg:px-2 lg:py-5" : "px-4 py-5 lg:px-8 lg:py-6"
+          isPostDetailPage
+            ? "px-4 py-4 sm:px-6 lg:px-12 xl:px-16 lg:py-6"
+            : "px-4 py-5 lg:px-8 lg:py-6"
+
         }`}
       >
         <AppRouter />

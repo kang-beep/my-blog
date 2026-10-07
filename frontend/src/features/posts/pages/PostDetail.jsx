@@ -1,5 +1,5 @@
-// 글 상세 페이지: 인스타 스타일 카드 + Giscus 댓글
-import { useEffect, useState } from "react";
+// Post detail: article + sticky On this page (h2/h3 TOC)
+import { useCallback, useState, useEffect } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { fetchAdjacentPosts, fetchPostById } from "@/features/posts/api/postApi";
 import { getPostDetailPath, ROUTES } from "@/shared/constants/routes";
@@ -7,12 +7,14 @@ import PostCommentsSection from "@/features/comments/components/PostCommentsSect
 import PostDetailBody from "@/features/posts/components/PostDetailBody";
 import PostLikeButton from "@/features/posts/components/PostLikeButton";
 import PostMetaDates from "@/features/posts/components/PostMetaDates";
+import PostOnThisPage from "@/features/posts/components/PostOnThisPage";
+import { useActiveHeadingId } from "@/features/posts/hooks/useActiveHeadingId";
 import TagBadge from "@/shared/ui/TagBadge";
 import PageBackLink from "@/shared/ui/PageBackLink";
 
 function AdjacentPostLink({ post, direction }) {
   const isPrevious = direction === "previous";
-  const label = isPrevious ? "Previous" : "Next";
+  const label = isPrevious ? "← Previous Post" : "Next Post →";
 
   if (!post) {
     return (
@@ -41,6 +43,16 @@ export default function PostDetail() {
   const [adjacent, setAdjacent] = useState({ previousPost: null, nextPost: null });
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
+  const [headings, setHeadings] = useState([]);
+  const activeHeadingId = useActiveHeadingId(headings);
+
+  const handleHeadingsChange = useCallback((nextHeadings) => {
+    setHeadings(nextHeadings);
+  }, []);
+
+  useEffect(() => {
+    setHeadings([]);
+  }, [id]);
 
   useEffect(() => {
     const loadPostDetail = async () => {
@@ -71,69 +83,89 @@ export default function PostDetail() {
   };
 
   return (
-    <section className="mx-auto w-full max-w-7xl space-y-3">
-      <PageBackLink to={ROUTES.POSTS} label="Posts" />
+    <section className="post-detail-page">
+      {isLoading ? (
+        <p className="mx-auto max-w-3xl text-sm text-slate-500">글을 불러오는 중입니다...</p>
+      ) : null}
+      {error ? (
+        <p className="mx-auto max-w-3xl rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</p>
+      ) : null}
 
-      {isLoading ? <p className="text-sm text-slate-500">글을 불러오는 중입니다...</p> : null}
-      {error ? <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</p> : null}
       {!isLoading && post ? (
-        <>
-          <article className="w-full overflow-hidden border border-slate-200 bg-white shadow-sm">
-            <div className="min-w-0 px-2 py-0 sm:px-2.5 lg:px-3">
-              <header className="post-detail-header">
-                <p className="page-card-label">Post</p>
-                <h1 className="post-detail-title">{post.title}</h1>
-                <div className="post-meta-inline">
-                  {post.category?.trim() ? (
-                    <p className="post-meta-inline-item">
-                      <span className="post-meta-inline-label">Category:</span>{" "}
-                      <button
-                        type="button"
-                        onClick={() => goToCategory(post.category.trim())}
-                        className="post-meta-inline-value post-meta-inline-button"
-                      >
-                        {post.category.trim()}
-                      </button>
-                    </p>
+        <div
+          className={
+            headings.length > 0 ? "post-detail-layout" : "post-detail-layout post-detail-layout-no-toc"
+          }
+        >
+          <div className="post-detail-main space-y-3">
+            <PageBackLink to={ROUTES.POSTS} label="Posts" />
+
+            <article className="overflow-hidden rounded-xl border border-slate-300 bg-white shadow-sm">
+              <div className="min-w-0 px-3 py-0 sm:px-4 lg:px-5">
+                <header className="post-detail-header">
+                  <p className="page-card-label">Post</p>
+                  <h1 className="post-detail-title">{post.title}</h1>
+                  <div className="post-meta-inline">
+                    {post.category?.trim() ? (
+                      <p className="post-meta-inline-item">
+                        <span className="post-meta-inline-label">Category:</span>{" "}
+                        <button
+                          type="button"
+                          onClick={() => goToCategory(post.category.trim())}
+                          className="post-meta-inline-value post-meta-inline-button"
+                        >
+                          {post.category.trim()}
+                        </button>
+                      </p>
+                    ) : null}
+                    <PostMetaDates
+                      createdAt={post.created_at}
+                      updatedAt={post.updated_at}
+                      labeled
+                    />
+                  </div>
+                  {(post.tags ?? []).length > 0 ? (
+                    <div className="post-detail-tags">
+                      {(post.tags ?? []).map((tag) => (
+                        <TagBadge key={`${post.id}-${tag}`} tag={tag} onClick={goToTag} />
+                      ))}
+                    </div>
                   ) : null}
-                  <PostMetaDates
-                    createdAt={post.created_at}
-                    updatedAt={post.updated_at}
-                    labeled
+                </header>
+
+                <div className="space-y-4 py-4">
+                  <PostDetailBody content={post.content} onHeadingsChange={handleHeadingsChange} />
+
+                  <nav className="post-adjacent-nav" aria-label="Adjacent posts">
+                    <AdjacentPostLink post={adjacent.previousPost} direction="previous" />
+                    <AdjacentPostLink post={adjacent.nextPost} direction="next" />
+                  </nav>
+
+                  <PostCommentsSection
+                    postId={post.id}
+                    trailing={
+                      <PostLikeButton
+                        postId={post.id}
+                        initialLikeCount={post.like_count}
+                        variant="compact"
+                      />
+                    }
                   />
                 </div>
-              </header>
-
-              <div className="space-y-4 py-4">
-                <PostDetailBody content={post.content} />
-
-                <PostCommentsSection
-                  postId={post.id}
-                  trailing={
-                    <PostLikeButton
-                      postId={post.id}
-                      initialLikeCount={post.like_count}
-                      variant="compact"
-                    />
-                  }
-                >
-                  {(post.tags ?? []).map((tag) => (
-                    <TagBadge key={`${post.id}-${tag}`} tag={tag} onClick={goToTag} />
-                  ))}
-                </PostCommentsSection>
               </div>
-            </div>
-          </article>
+            </article>
+          </div>
 
-          <nav className="post-adjacent-nav" aria-label="Adjacent posts">
-            <AdjacentPostLink post={adjacent.previousPost} direction="previous" />
-            <div className="post-adjacent-divider" aria-hidden />
-            <AdjacentPostLink post={adjacent.nextPost} direction="next" />
-          </nav>
-        </>
+          {headings.length > 0 ? (
+            <aside className="post-detail-toc-aside">
+              <PostOnThisPage headings={headings} activeId={activeHeadingId} />
+            </aside>
+          ) : null}
+        </div>
       ) : null}
+
       {!isLoading && !post && !error ? (
-        <p className="text-sm text-slate-600">
+        <p className="mx-auto max-w-3xl text-sm text-slate-600">
           존재하지 않는 글입니다. <Link to={ROUTES.POSTS}>목록으로 이동</Link>
         </p>
       ) : null}

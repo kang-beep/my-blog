@@ -9,6 +9,7 @@ import {
   HUGGINGFACE_PAPER_PERIODS,
 } from "@/features/huggingface/daily-papers/constants/huggingfaceDailyPapers";
 import { HOME_FEED_BADGE_EXTERNAL } from "@/features/posts/constants/home";
+import ExternalFeedUnavailable from "@/shared/ui/ExternalFeedUnavailable";
 import HomeFeedBadge from "@/shared/ui/HomeFeedBadge";
 import { formatDateTimeKst } from "@/shared/utils/date";
 
@@ -17,19 +18,27 @@ export default function HuggingFaceDailyPapersList() {
   const [papers, setPapers] = useState([]);
   const [feedMeta, setFeedMeta] = useState({ syncedAt: "" });
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [isUnavailable, setIsUnavailable] = useState(false);
 
   useEffect(() => {
     const loadHuggingFaceDailyPapers = async () => {
       setIsLoading(true);
-      setError("");
+      setIsUnavailable(false);
 
       try {
-        const { papers: items, syncedAt } = await fetchHuggingFaceDailyPapers(selectedPeriod);
+        const { papers: items, syncedAt, isStale } = await fetchHuggingFaceDailyPapers(selectedPeriod);
+        if (isStale || items.length === 0) {
+          setPapers([]);
+          setFeedMeta({ syncedAt: "" });
+          setIsUnavailable(true);
+          return;
+        }
         setPapers(items);
         setFeedMeta({ syncedAt: syncedAt ?? "" });
-      } catch (requestError) {
-        setError(requestError.message || "Failed to load Hugging Face daily papers.");
+      } catch {
+        setPapers([]);
+        setFeedMeta({ syncedAt: "" });
+        setIsUnavailable(true);
       } finally {
         setIsLoading(false);
       }
@@ -95,18 +104,9 @@ export default function HuggingFaceDailyPapersList() {
           </>
         ) : null}
 
-        {error ? (
-          <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</p>
-        ) : null}
+        {!isLoading && isUnavailable ? <ExternalFeedUnavailable /> : null}
 
-        {!isLoading && !error && papers.length === 0 ? (
-          <p className="rounded-lg bg-slate-50 px-3 py-8 text-center text-sm text-slate-500">
-            No papers to show. Run the GitHub Actions workflow &quot;Fetch HuggingFace Daily Papers&quot; or{" "}
-            <code className="text-xs">npm run sync:hf-papers</code> locally.
-          </p>
-        ) : null}
-
-        {!isLoading && !error && papers.length > 0 ? (
+        {!isLoading && !isUnavailable && papers.length > 0 ? (
           <ul className="divide-y divide-slate-100">
             {papers.map((paper) => (
               <HuggingFaceDailyPapersListItem key={paper.id ?? paper.paper_id} paper={paper} />

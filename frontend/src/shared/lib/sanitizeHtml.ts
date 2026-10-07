@@ -36,6 +36,7 @@ const POST_CONTENT_ALLOWED_ATTR = [
   "src",
   "alt",
   "class",
+  "id",
   "width",
   "height",
   "colspan",

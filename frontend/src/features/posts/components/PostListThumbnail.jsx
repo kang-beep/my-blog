@@ -1,7 +1,7 @@
 import { ImageOff } from "lucide-react";
 
 const THUMBNAIL_CLASS_NAME =
-  "h-14 w-14 shrink-0 rounded-none border border-slate-200 sm:h-16 sm:w-16";
+  "h-14 w-14 shrink-0 rounded-lg border border-slate-200 sm:h-16 sm:w-16";
 
 export default function PostListThumbnail({ src }) {
   if (src) {
@@ -19,7 +19,7 @@ export default function PostListThumbnail({ src }) {
     <div
       className={`${THUMBNAIL_CLASS_NAME} flex items-center justify-center border-dashed bg-slate-50 text-slate-300`}
       role="img"
-      aria-label="대표 이미지 없음"
+      aria-label="?? ??? ??"
     >
       <ImageOff size={22} strokeWidth={1.5} aria-hidden />
     </div>

@@ -1,6 +1,7 @@
 export const ADMIN_SECRET_KEYS = {
   NOTION_TOKEN: "notion_token",
   GISCUS_GITHUB_PAT: "giscus_github_pat",
+  GEMINI_API_KEY: "gemini_api_key",
 };
 
 export const ADMIN_SECRET_FIELDS = [
@@ -15,5 +16,11 @@ export const ADMIN_SECRET_FIELDS = [
     label: "Giscus GitHub PAT",
     help: "Discussions read/write용 fine-grained PAT. 글 삭제 시 Discussion 제거에 사용됩니다.",
     placeholder: "github_pat_... 또는 ghp_...",
+  },
+  {
+    key: ADMIN_SECRET_KEYS.GEMINI_API_KEY,
+    label: "Gemini API Key",
+    help: "Google AI Studio / Gemini API 키. Edge Function 등 서버 측에서 사용됩니다.",
+    placeholder: "AIza...",
   },
 ];

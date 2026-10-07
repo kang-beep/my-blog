@@ -77,14 +77,19 @@ async function syncPeriod(supabase, period, fetchedDate) {
 
   console.log(`RSS ${period}: parsed ${rows.length} rows → inserting all (no limit).`);
 
-  await replaceRowsForDate(
+  const { replaced } = await replaceRowsForDate(
     supabase,
     TABLE_NAME,
     { fetched_date: fetchedDate, period },
     rows,
   );
 
-  console.log(`Synced ${rows.length} GitHub trending repos (${period}) for ${fetchedDate}.`);
+  if (replaced) {
+    console.log(`Synced ${rows.length} GitHub trending repos (${period}) for ${fetchedDate}.`);
+    return;
+  }
+
+  console.log(`GH ${period}: identical to DB; kept ${rows.length} rows for ${fetchedDate}.`);
 }
 
 function resolvePeriods() {

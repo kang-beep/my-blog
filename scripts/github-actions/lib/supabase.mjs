@@ -1,6 +1,8 @@
+import { createHash } from "node:crypto";
 import { createClient } from "@supabase/supabase-js";
 
 const INSERT_CHUNK_SIZE = 100;
+const META_COLUMNS = new Set(["id", "created_at"]);
 
 export function createServiceSupabaseClient() {
   const supabaseUrl = process.env.SUPABASE_URL;
@@ -25,6 +27,55 @@ function getDeleteFilters(filters) {
   return Object.entries(filters).filter(
     ([, value]) => value !== undefined && value !== null && value !== "",
   );
+}
+
+function normalizeValue(value) {
+  if (value === undefined) {
+    return null;
+  }
+
+  if (Array.isArray(value)) {
+    return value.map((item) => normalizeValue(item));
+  }
+
+  if (typeof value === "string" && /^\d{4}-\d{2}-\d{2}T/.test(value)) {
+    const parsed = new Date(value);
+    if (!Number.isNaN(parsed.getTime())) {
+      return parsed.toISOString();
+    }
+  }
+
+  return value;
+}
+
+function normalizeRow(row, columns) {
+  const normalized = {};
+
+  for (const column of columns) {
+    normalized[column] = normalizeValue(row?.[column] ?? null);
+  }
+
+  return normalized;
+}
+
+function getContentColumns(rows) {
+  const columns = new Set();
+
+  for (const row of rows) {
+    for (const key of Object.keys(row ?? {})) {
+      if (!META_COLUMNS.has(key)) {
+        columns.add(key);
+      }
+    }
+  }
+
+  return [...columns].sort();
+}
+
+/** One fingerprint for the whole ordered list (API/insert order = rank). */
+export function fingerprintRows(rows, columns = getContentColumns(rows)) {
+  const payload = rows.map((row) => normalizeRow(row, columns));
+  return createHash("sha256").update(JSON.stringify(payload)).digest("hex");
 }
 
 export async function clearRowsForDate(supabase, table, filters) {
@@ -77,9 +128,41 @@ export async function insertRows(supabase, table, rows) {
   }
 }
 
+async function fetchRowsForFilters(supabase, table, filters) {
+  const entries = getDeleteFilters(filters);
+  if (entries.length === 0) {
+    throw new Error(`SELECT requires a WHERE clause: no filters for ${table}`);
+  }
+
+  let query = supabase.from(table).select("*").order("created_at", { ascending: true });
+
+  for (const [column, value] of entries) {
+    query = query.eq(column, value);
+  }
+
+  const { data, error } = await query;
+  if (error) {
+    throw new Error(`Failed to read ${table}: ${error.message}`);
+  }
+
+  return data ?? [];
+}
+
 export async function replaceRowsForDate(supabase, table, filters, rows) {
   const fetchedDate = filters.fetched_date;
   const { fetched_date: _ignored, ...extraFilters } = filters;
+  const existingRows = await fetchRowsForFilters(supabase, table, filters);
+  const columns = getContentColumns(rows);
+  const incomingFingerprint = fingerprintRows(rows, columns);
+  const existingFingerprint = fingerprintRows(existingRows, columns);
+
+  if (existingRows.length > 0 && incomingFingerprint === existingFingerprint) {
+    console.log(`Unchanged ${table} ${JSON.stringify(filters)}; skip replace.`);
+    if (!shouldSkipDelete()) {
+      await deleteRowsBeforeDate(supabase, table, fetchedDate, extraFilters);
+    }
+    return { replaced: false };
+  }
 
   await clearRowsForDate(supabase, table, filters);
   await insertRows(supabase, table, rows);
@@ -87,4 +170,6 @@ export async function replaceRowsForDate(supabase, table, filters, rows) {
   if (!shouldSkipDelete()) {
     await deleteRowsBeforeDate(supabase, table, fetchedDate, extraFilters);
   }
+
+  return { replaced: true };
 }

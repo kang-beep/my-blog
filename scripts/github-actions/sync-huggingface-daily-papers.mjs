@@ -118,14 +118,19 @@ async function syncPeriod(supabase, period, fetchedDate) {
     return;
   }
 
-  await replaceRowsForDate(
+  const { replaced } = await replaceRowsForDate(
     supabase,
     TABLE_NAME,
     { fetched_date: fetchedDate, period },
     rows,
   );
 
-  console.log(`Synced ${rows.length} HF papers (${period}) for ${fetchedDate}.`);
+  if (replaced) {
+    console.log(`Synced ${rows.length} HF papers (${period}) for ${fetchedDate}.`);
+    return;
+  }
+
+  console.log(`HF ${period}: identical to DB; kept ${rows.length} rows for ${fetchedDate}.`);
 }
 
 function resolvePeriods() {

@@ -24,17 +24,25 @@ function getPostsTagPath(tag) {
   return `${ROUTES.POSTS}?tag=${encodeURIComponent(tag)}`;
 }
 
+function getBarWidthPercent(count, maxCount) {
+  if (!maxCount || maxCount <= 0) {
+    return 0;
+  }
+
+  return Math.max(8, Math.round((count / maxCount) * 100));
+}
+
 export default function TagRankingPanel({ nodes = [], isLoading, error }) {
   const hasRanks = !isLoading && !error && nodes.length > 0;
+  const maxCount = hasRanks ? Math.max(...nodes.map((node) => node.count ?? 0)) : 0;
 
   return (
-    <div className="home-tag-posts-panel border-t border-slate-100 lg:border-t-0">
-      <div className="home-tag-posts-panel-header">
-        <h3>Tag Ranking</h3>
-        <div className="home-tag-posts-panel-header-action-slot" />
+    <section className="posts-side-card">
+      <div className="posts-side-card-header">
+        <h3 className="posts-side-card-title">Tag Ranking</h3>
       </div>
 
-      <div className="home-tag-posts-panel-body home-tag-posts-panel-body-scroll">
+      <div className="posts-side-card-body">
         <TagRankingStatus isLoading={isLoading} error={error} />
 
         {!isLoading && !error && nodes.length === 0 ? (
@@ -42,26 +50,27 @@ export default function TagRankingPanel({ nodes = [], isLoading, error }) {
         ) : null}
 
         {hasRanks ? (
-          <ol className="divide-y divide-slate-100">
-            {nodes.map((node, index) => (
-              <li key={node.tag}>
-                <Link
-                  to={getPostsTagPath(node.tag)}
-                  className="flex items-center gap-3 py-2.5 text-sm text-slate-800 transition-colors hover:bg-slate-50"
-                >
-                  <span className="w-6 shrink-0 text-center text-xs font-semibold tabular-nums text-slate-500">
-                    {index + 1}
-                  </span>
-                  <span className="min-w-0 flex-1 truncate font-medium">#{node.tag}</span>
-                  <span className="shrink-0 tabular-nums text-xs text-slate-500">
-                    {node.count}
-                  </span>
-                </Link>
-              </li>
-            ))}
+          <ol className="posts-tag-ranking-list">
+            {nodes.map((node, index) => {
+              const rank = String(index + 1).padStart(2, "0");
+              const barWidth = getBarWidthPercent(node.count ?? 0, maxCount);
+
+              return (
+                <li key={node.tag}>
+                  <Link to={getPostsTagPath(node.tag)} className="posts-tag-ranking-row">
+                    <span className="posts-tag-ranking-index">{rank}</span>
+                    <span className="posts-tag-ranking-name">#{node.tag}</span>
+                    <span className="posts-tag-ranking-bar-track" aria-hidden>
+                      <span className="posts-tag-ranking-bar-fill" style={{ width: `${barWidth}%` }} />
+                    </span>
+                    <span className="posts-tag-ranking-count">{node.count}</span>
+                  </Link>
+                </li>
+              );
+            })}
           </ol>
         ) : null}
       </div>
-    </div>
+    </section>
   );
 }
