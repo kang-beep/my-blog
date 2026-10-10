@@ -6,7 +6,7 @@ const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
 if (!supabaseUrl || !supabasePublishableKey) {
   throw new Error(
-    "Supabase 환경변수가 누락되었습니다. 로컬은 .env.local, 배포는 Vercel Environment Variables의 VITE_SUPABASE_URL 및 VITE_SUPABASE_PUBLISHABLE_KEY를 확인하세요."
+    "Missing Supabase env vars. Locally check .env.local; in production set VITE_SUPABASE_URL and VITE_SUPABASE_PUBLISHABLE_KEY in Vercel Environment Variables."
   );
 }
 

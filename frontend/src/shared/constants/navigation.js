@@ -1,5 +1,6 @@
 import {
   Briefcase,
+  ChartColumnIncreasing,
   FolderKanban,
   Home,
   LibraryBig,
@@ -17,6 +18,7 @@ export const ICON_STROKE = 1.75;
 export const PUBLIC_NAV = [
   { to: ROUTES.HOME, label: "Home", end: true, icon: Home },
   { to: ROUTES.POSTS, label: "Posts", end: false, icon: LibraryBig },
+  { to: ROUTES.TRENDS, label: "Trends", end: true, icon: ChartColumnIncreasing },
   { to: ROUTES.PORTFOLIO, label: "Portfolio", end: true, icon: Briefcase },
 ];
 

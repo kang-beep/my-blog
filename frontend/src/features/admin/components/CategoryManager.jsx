@@ -22,7 +22,7 @@ function CategoryRow({ category, onUpdate, onDelete, isBusy }) {
   const saveEdit = async () => {
     const nextName = editName.trim();
     if (!nextName) {
-      setRowError("이름을 입력해 주세요.");
+      setRowError("Enter a name.");
       return;
     }
     if (nextName === category.name) {
@@ -35,12 +35,12 @@ function CategoryRow({ category, onUpdate, onDelete, isBusy }) {
       await onUpdate(category.id, nextName);
       setIsEditing(false);
     } catch (requestError) {
-      setRowError(requestError.message || "수정에 실패했습니다.");
+      setRowError(requestError.message || "Update failed.");
     }
   };
 
   const handleDelete = async () => {
-    const confirmed = window.confirm(`"${category.name}" 카테고리를 삭제할까요?\n연결된 글의 카테고리는 해제됩니다.`);
+    const confirmed = window.confirm(`Delete category "${category.name}"?\nLinked posts will have their category cleared.`);
     if (!confirmed) {
       return;
     }
@@ -49,7 +49,7 @@ function CategoryRow({ category, onUpdate, onDelete, isBusy }) {
     try {
       await onDelete(category.id);
     } catch (requestError) {
-      setRowError(requestError.message || "삭제에 실패했습니다.");
+      setRowError(requestError.message || "Delete failed.");
     }
   };
 
@@ -71,7 +71,7 @@ function CategoryRow({ category, onUpdate, onDelete, isBusy }) {
           }}
           disabled={isBusy}
           autoFocus
-          aria-label="카테고리 이름 수정"
+          aria-label="Edit category name"
         />
         <div className="flex shrink-0 gap-1.5">
           <button
@@ -79,7 +79,7 @@ function CategoryRow({ category, onUpdate, onDelete, isBusy }) {
             className="btn btn-primary px-2.5"
             onClick={() => void saveEdit()}
             disabled={isBusy}
-            aria-label="저장"
+            aria-label="Save"
           >
             <Check size={16} aria-hidden />
           </button>
@@ -88,7 +88,7 @@ function CategoryRow({ category, onUpdate, onDelete, isBusy }) {
             className="btn px-2.5"
             onClick={cancelEdit}
             disabled={isBusy}
-            aria-label="취소"
+            aria-label="Cancel"
           >
             <X size={16} aria-hidden />
           </button>
@@ -107,7 +107,7 @@ function CategoryRow({ category, onUpdate, onDelete, isBusy }) {
           className="btn px-2.5"
           onClick={startEdit}
           disabled={isBusy}
-          aria-label={`${category.name} 수정`}
+          aria-label={`Edit ${category.name}`}
         >
           <Pencil size={15} aria-hidden />
         </button>
@@ -116,7 +116,7 @@ function CategoryRow({ category, onUpdate, onDelete, isBusy }) {
           className="btn px-2.5 text-rose-600 hover:bg-rose-50"
           onClick={() => void handleDelete()}
           disabled={isBusy}
-          aria-label={`${category.name} 삭제`}
+          aria-label={`Delete ${category.name}`}
         >
           <Trash2 size={15} aria-hidden />
         </button>
@@ -140,7 +140,7 @@ export default function CategoryManager({
     event.preventDefault();
     const nextName = newCategoryName.trim();
     if (!nextName) {
-      setError("카테고리 이름을 입력해 주세요.");
+      setError("Enter a category name.");
       return;
     }
 
@@ -149,15 +149,15 @@ export default function CategoryManager({
       await onAdd(nextName);
       setNewCategoryName("");
     } catch (requestError) {
-      setError(requestError.message || "카테고리 추가에 실패했습니다.");
+      setError(requestError.message || "Could not add category.");
     }
   };
 
   return (
     <section className="card space-y-4">
       <div>
-        <h3 className="text-base font-semibold text-slate-900">카테고리 관리</h3>
-        <p className="mt-1 text-sm text-slate-500">추가·수정·삭제한 내용은 글 작성 폼에 바로 반영됩니다.</p>
+        <h3 className="text-base font-semibold text-slate-900">Manage categories</h3>
+        <p className="mt-1 text-sm text-slate-500">Changes apply immediately in the post editor.</p>
       </div>
 
       <form className="flex flex-col gap-2 sm:flex-row" onSubmit={handleAdd}>
@@ -165,19 +165,19 @@ export default function CategoryManager({
           className="input min-w-0 flex-1"
           value={newCategoryName}
           onChange={(event) => setNewCategoryName(event.target.value)}
-          placeholder="새 카테고리 이름"
+          placeholder="New category name"
           disabled={isBusy}
-          aria-label="새 카테고리 이름"
+          aria-label="New category name"
         />
         <button className="btn btn-primary shrink-0" type="submit" disabled={isBusy}>
-          추가
+          Add
         </button>
       </form>
       {error ? <p className="text-sm text-rose-600">{error}</p> : null}
 
       {categories.length === 0 ? (
         <p className="rounded-lg bg-slate-50 px-3 py-4 text-center text-sm text-slate-500">
-          등록된 카테고리가 없습니다.
+          No categories yet.
         </p>
       ) : (
         <ul

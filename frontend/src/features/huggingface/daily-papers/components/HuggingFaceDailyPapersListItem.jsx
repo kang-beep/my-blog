@@ -1,32 +1,4 @@
-import {
-  HUGGINGFACE_DAILY_PAPERS_KEYWORD_LIMIT,
-  HUGGINGFACE_PAPER_BASE_URL,
-} from "@/features/huggingface/daily-papers/constants/huggingfaceDailyPapers";
-
-function formatKeywordTag(keyword) {
-  const trimmed = String(keyword).trim();
-  if (!trimmed) {
-    return "";
-  }
-
-  return trimmed.startsWith("#") ? trimmed : `#${trimmed}`;
-}
-
-function PaperKeywords({ keywords = [] }) {
-  const visibleKeywords = keywords.slice(0, HUGGINGFACE_DAILY_PAPERS_KEYWORD_LIMIT);
-
-  if (visibleKeywords.length === 0) {
-    return null;
-  }
-
-  return (
-    <p className="flex flex-wrap gap-x-2 gap-y-1 text-xs text-indigo-600">
-      {visibleKeywords.map((keyword) => (
-        <span key={keyword}>{formatKeywordTag(keyword)}</span>
-      ))}
-    </p>
-  );
-}
+import { HUGGINGFACE_PAPER_BASE_URL } from "@/features/huggingface/daily-papers/constants/huggingfaceDailyPapers";
 
 function ExternalActionButton({ href, children }) {
   return (
@@ -50,10 +22,9 @@ export default function HuggingFaceDailyPapersListItem({ paper }) {
       <h3 className="text-base font-semibold leading-snug text-slate-900">
         {paper.title ?? "Untitled"}
       </h3>
-      {paper.ai_summary ? (
-        <p className="text-sm leading-relaxed text-slate-600">{paper.ai_summary}</p>
+      {paper.summary ? (
+        <p className="line-clamp-2 text-sm leading-relaxed text-slate-600">{paper.summary}</p>
       ) : null}
-      <PaperKeywords keywords={paper.ai_keywords} />
       <div className="flex flex-wrap items-center gap-2 pt-1">
         <span className="text-sm font-medium text-slate-700">▲ {upvotes}</span>
         <ExternalActionButton href={paperUrl}>View paper</ExternalActionButton>

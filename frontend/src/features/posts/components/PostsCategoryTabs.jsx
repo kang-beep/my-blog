@@ -1,6 +1,6 @@
 import { POSTS_CATEGORY_ALL } from "@/features/posts/constants/postsList";
 
-const ALL_TAB_LABEL = "전체";
+const ALL_TAB_LABEL = "All";
 
 function CategoryTab({ label, isActive, onClick }) {
   return (
@@ -8,11 +8,7 @@ function CategoryTab({ label, isActive, onClick }) {
       type="button"
       onClick={onClick}
       aria-pressed={isActive}
-      className={
-        isActive
-          ? "shrink-0 rounded-full bg-indigo-600 px-3.5 py-1.5 text-sm font-medium text-white shadow-sm"
-          : "shrink-0 rounded-full bg-slate-100 px-3.5 py-1.5 text-sm font-medium text-slate-600 hover:bg-slate-200"
-      }
+      className={isActive ? "chip chip-active" : "chip"}
     >
       {label}
     </button>

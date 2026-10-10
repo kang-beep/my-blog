@@ -20,17 +20,20 @@ export function filterPostsByCategory(posts, category) {
 }
 
 export function filterPostsByTag(posts, tag) {
-  if (!tag) {
+  const normalizedTag = tag?.trim().toLowerCase();
+  if (!normalizedTag) {
     return posts;
   }
-  return posts.filter((post) => (post.tags ?? []).includes(tag));
+  return posts.filter((post) =>
+    (post.tags ?? []).some((postTag) => postTag?.trim().toLowerCase() === normalizedTag),
+  );
 }
 
 export function groupPostsByCategory(posts, categoryOrder = []) {
   const grouped = new Map();
 
   posts.forEach((post) => {
-    const category = post.category?.trim() || "미분류";
+    const category = post.category?.trim() || "Uncategorized";
     if (!grouped.has(category)) {
       grouped.set(category, []);
     }

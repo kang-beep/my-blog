@@ -12,11 +12,14 @@ posts.tags ──────> tag_edges (derived)
 profiles
 portfolio_projects
 admin_secrets
+github_trending_repos / huggingface_daily_papers ──> trend_ai_digests (Gemini)
 ```
 
 **Comments:** Supabase `comments` 테이블 없음 → [Giscus](https://giscus.app) (GitHub Discussions)
 
-**Admin secrets:** Notion / Giscus PAT 등. 원문은 RPC로만 읽고, 목록은 마스킹. 마이그레이션: [`migrations/20260321_admin_secrets.sql`](./migrations/20260321_admin_secrets.sql)
+**Admin secrets:** Notion / Giscus PAT / Gemini API key 등. 원문은 RPC로만 읽고, 목록은 마스킹. 마이그레이션: [`migrations/20260321_admin_secrets.sql`](./migrations/20260321_admin_secrets.sql)
+
+**Trend AI digests:** [`migrations/20261010_trend_ai_digests.sql`](./migrations/20261010_trend_ai_digests.sql) · 설계 [`../ai_summary/pipeline_design.md`](../ai_summary/pipeline_design.md)
 
 ## admin_secrets
 
@@ -27,7 +30,7 @@ admin_secrets
 | updated_at | timestamptz | NOT NULL, default `now()` |
 
 **RPCs (authenticated):** `list_admin_secrets()`, `upsert_admin_secret(key, value)`, `delete_admin_secret(key)`  
-**Known keys:** `notion_token`, `giscus_github_pat`
+**Known keys:** `notion_token`, `giscus_github_pat`, `gemini_api_key`
 
 ## categories
 
@@ -174,6 +177,35 @@ admin_secrets
 **Indexes:** `idx_gh_trending_fetched_date`, `idx_gh_trending_period`, unique `(url, period, fetched_date)`
 
 **Source:** GitHub Actions → GitHubTrendingRSS
+
+## trend_ai_digests
+
+Gemini로 생성한 소스·기간별 트렌드 요약. 브라우저 직접 호출 없음.
+
+| Column | Type | Constraints |
+|--------|------|-------------|
+| id | uuid | PK |
+| fetched_date | date | NOT NULL (feed와 동일 UTC 기준) |
+| source | text | `github` \| `huggingface` |
+| period | text | `daily` \| `weekly` \| `monthly` |
+| headline | text | NOT NULL |
+| summary | text | NOT NULL |
+| keywords | text[] | NOT NULL, default `'{}'` |
+| model | text | NOT NULL (예: `gemini-2.0-flash`) |
+| prompt_version | text | NOT NULL |
+| input_fingerprint | text | NOT NULL (입력 동일 시 skip) |
+| created_at | timestamptz | NOT NULL, default `now()` |
+| updated_at | timestamptz | NOT NULL, default `now()` |
+
+**Constraints:** `UNIQUE (fetched_date, source, period)`
+
+**Indexes:** `idx_trend_ai_digests_fetched_date (fetched_date DESC)`, `idx_trend_ai_digests_source_period (source, period)`
+
+**RLS:** anon/authenticated SELECT only · writes: `service_role`
+
+**Source:** `scripts/github-actions/summarize-github-trending-ai.mjs` (GH 먼저) · 키: `admin_secrets.gemini_api_key`
+
+**Migration:** [`migrations/20261010_trend_ai_digests.sql`](./migrations/20261010_trend_ai_digests.sql)
 
 ## Post delete (application)
 

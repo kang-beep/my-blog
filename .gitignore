@@ -26,3 +26,12 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
+
+# temporary files
+temp/
+temp/*
+.temp/
+.temp/*
+
+# local AI digest fingerprint/output cache
+scripts/github-actions/.digest-cache/

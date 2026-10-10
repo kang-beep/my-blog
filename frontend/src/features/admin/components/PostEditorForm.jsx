@@ -102,7 +102,7 @@ export default function PostEditorForm({
   const handleSubmit = async (event) => {
     event.preventDefault();
     if (isEditorContentEmpty(content)) {
-      setContentError("본문을 입력해 주세요.");
+      setContentError("Enter body content.");
       return;
     }
     setContentError("");
@@ -145,11 +145,11 @@ export default function PostEditorForm({
     setContentError("");
     if (warnings.length) {
       setImportNotice(
-        `Notion에서 가져왔습니다(비공개 draft). 일부 블록이 단순화되었을 수 있습니다: ${warnings.slice(0, 3).join(", ")}`,
+        `Imported from Notion (private draft). Some blocks may have been simplified: ${warnings.slice(0, 3).join(", ")}`,
       );
       return;
     }
-    setImportNotice("Notion에서 가져왔습니다. 상태는 비공개(draft)로 맞춰 두었습니다. 확인 후 저장하세요.");
+    setImportNotice("Imported from Notion. Status is set to private (draft). Review and save when ready.");
   };
 
   const selectedCategoryName =
@@ -179,7 +179,7 @@ export default function PostEditorForm({
     <>
     <form ref={formRef} onSubmit={handleSubmit} className="card space-y-3">
       <div className="flex items-start justify-between gap-3">
-        <h2 className="text-2xl font-semibold">{initialPost ? "글 수정" : "새 글 작성"}</h2>
+        <h2 className="text-2xl font-semibold">{initialPost ? "Edit post" : "New post"}</h2>
         <div className="flex shrink-0 flex-wrap gap-2">
           <button
             type="button"
@@ -187,7 +187,7 @@ export default function PostEditorForm({
             onClick={() => setNotionOpen(true)}
             disabled={isSubmitting}
           >
-            Notion에서 가져오기
+            Import from Notion
           </button>
           <button
             type="button"
@@ -195,7 +195,7 @@ export default function PostEditorForm({
             onClick={handleGoToList}
           >
             <span aria-hidden>📋</span>
-            목록으로
+            Back to list
           </button>
         </div>
       </div>
@@ -203,7 +203,7 @@ export default function PostEditorForm({
         <p className="rounded-lg bg-indigo-50 px-3 py-2 text-sm text-indigo-800">{importNotice}</p>
       ) : null}
       <div>
-        <label className="label" htmlFor="title">제목</label>
+        <label className="label" htmlFor="title">Title</label>
         <input
           className="input"
           id="title"
@@ -213,18 +213,18 @@ export default function PostEditorForm({
         />
       </div>
       <div>
-        <label className="label" htmlFor="excerpt">요약</label>
+        <label className="label" htmlFor="excerpt">Excerpt</label>
         <textarea
           className="input min-h-24 resize-y"
           id="excerpt"
           value={excerpt}
           onChange={(event) => setExcerpt(event.target.value)}
-          placeholder="목록에 표시할 소개글 (비우면 본문 앞부분이 자동으로 사용됩니다)"
+          placeholder="List blurb (leave empty to use the start of the body)"
         />
       </div>
       <div>
         <p className="label" id="post-content-label">
-          본문
+          Body
         </p>
         <div aria-labelledby="post-content-label">
           <RichTextEditor
@@ -237,7 +237,7 @@ export default function PostEditorForm({
         {contentError ? <p className="mt-1 text-sm text-rose-600">{contentError}</p> : null}
       </div>
       <div>
-        <label className="label" htmlFor="category-select">카테고리</label>
+        <label className="label" htmlFor="category-select">Category</label>
         <select
           id="category-select"
           className="input"
@@ -249,7 +249,7 @@ export default function PostEditorForm({
             setCategory(selected?.name ?? "");
           }}
         >
-          <option value="">선택 안 함 → {DEFAULT_POST_CATEGORY_NAME}</option>
+          <option value="">None → {DEFAULT_POST_CATEGORY_NAME}</option>
           {categories.map((item) => (
             <option key={item.id} value={item.id}>
               {item.name}
@@ -258,16 +258,16 @@ export default function PostEditorForm({
         </select>
         {selectedCategoryName ? (
           <p className="mt-1 text-sm text-slate-500">
-            선택됨: <span className="font-medium text-slate-700">{selectedCategoryName}</span>
+            Selected: <span className="font-medium text-slate-700">{selectedCategoryName}</span>
           </p>
         ) : (
           <p className="mt-1 text-sm text-slate-500">
-            선택하지 않으면 「{DEFAULT_POST_CATEGORY_NAME}」로 저장됩니다.
+            If none is selected, posts save as &quot;{DEFAULT_POST_CATEGORY_NAME}&quot;.
           </p>
         )}
       </div>
       <div>
-        <p className="label">공개 상태</p>
+        <p className="label">Visibility</p>
         <div className="flex flex-wrap gap-2">
           <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm has-[:checked]:border-indigo-300 has-[:checked]:bg-indigo-50">
             <input
@@ -277,7 +277,7 @@ export default function PostEditorForm({
               checked={status === POST_STATUS_PUBLISHED}
               onChange={() => setStatus(POST_STATUS_PUBLISHED)}
             />
-            공개
+            Public
           </label>
           <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-sm has-[:checked]:border-indigo-300 has-[:checked]:bg-indigo-50">
             <input
@@ -287,15 +287,15 @@ export default function PostEditorForm({
               checked={status === POST_STATUS_DRAFT}
               onChange={() => setStatus(POST_STATUS_DRAFT)}
             />
-            비공개
+            Private
           </label>
         </div>
         <p className="mt-1 text-xs text-slate-400">
-          비공개 글은 홈·목록·태그 네트워크에 표시되지 않습니다.
+          Private posts are hidden from home, lists, and the tag network.
         </p>
       </div>
       <div>
-        <label className="label" htmlFor="tags">태그(쉼표 구분)</label>
+        <label className="label" htmlFor="tags">Tags (comma-separated)</label>
         <input
           className="input"
           id="tags"
@@ -306,10 +306,10 @@ export default function PostEditorForm({
       </div>
       <div>
         <p className="label" id="thumbnail-label">
-          대표 이미지 (썸네일)
+          Cover image (thumbnail)
         </p>
         <p className="mb-2 text-xs text-slate-400">
-          글 목록에 표시됩니다. 비우면 본문의 첫 이미지가 자동으로 사용됩니다.
+          Shown in post lists. Leave empty to use the first image in the body.
         </p>
         <div
           className="relative h-24 w-24 overflow-hidden rounded-lg border border-slate-200 bg-slate-100"
@@ -318,12 +318,12 @@ export default function PostEditorForm({
           {hasThumbnail ? (
             <img
               src={thumbnailPreviewUrl}
-              alt="썸네일 미리보기"
+              alt="Thumbnail preview"
               className="h-full w-full object-cover"
             />
           ) : (
             <div className="flex h-full w-full items-center justify-center text-xs text-slate-400">
-              없음
+              None
             </div>
           )}
 
@@ -332,7 +332,7 @@ export default function PostEditorForm({
               type="button"
               className="absolute left-1 top-1 inline-flex h-6 w-6 items-center justify-center rounded-full bg-black/55 text-white hover:bg-black/70"
               onClick={handleClearThumbnail}
-              aria-label="썸네일 삭제"
+              aria-label="Remove thumbnail"
               disabled={isSubmitting}
             >
               <X size={14} strokeWidth={ICON_STROKE} aria-hidden />
@@ -343,7 +343,7 @@ export default function PostEditorForm({
             type="button"
             className="absolute bottom-1 right-1 inline-flex h-7 w-7 items-center justify-center rounded-full bg-black/55 text-white hover:bg-black/70"
             onClick={openImagePicker}
-            aria-label={hasThumbnail ? "썸네일 교체" : "썸네일 업로드"}
+            aria-label={hasThumbnail ? "Replace thumbnail" : "Upload thumbnail"}
             disabled={isSubmitting}
           >
             {hasThumbnail ? (
@@ -365,7 +365,7 @@ export default function PostEditorForm({
         </div>
       </div>
       <button className="btn btn-primary" type="submit" disabled={isSubmitting}>
-        {isSubmitting ? "저장 중..." : initialPost ? "수정 저장" : "글 등록"}
+        {isSubmitting ? "Saving..." : initialPost ? "Save changes" : "Publish post"}
       </button>
     </form>
     <NotionImportModal

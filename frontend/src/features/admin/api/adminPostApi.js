@@ -78,7 +78,7 @@ export async function fetchAdminPostById(postId) {
 
 export async function uploadPostImage(file, postId) {
   if (!postId) {
-    throw new Error("이미지 업로드에는 글 ID가 필요합니다.");
+    throw new Error("Post ID is required to upload images.");
   }
 
   const webpFile = await prepareImageForUpload(file);

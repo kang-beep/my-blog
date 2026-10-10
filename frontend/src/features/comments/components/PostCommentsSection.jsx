@@ -16,7 +16,7 @@ export default function PostCommentsSection({ postId, trailing, children }) {
 
   return (
     <section>
-      <div className="flex items-start justify-between gap-4 border-t border-slate-300 pt-2">
+      <div className="flex items-start justify-between gap-4 border-t border-slate-200 pt-2">
         <div className="flex min-w-0 flex-wrap items-center gap-2">{children}</div>
         <div className="flex shrink-0 items-start gap-3">
           {trailing}
@@ -33,7 +33,7 @@ export default function PostCommentsSection({ postId, trailing, children }) {
               aria-hidden
             />
             <span className="inline-flex items-center gap-0.5 text-xs text-slate-500">
-              {isOpen ? "숨기기" : "댓글"}
+              {isOpen ? "Hide" : "Comments"}
               <ChevronDown
                 size={12}
                 className={`text-slate-400 transition-transform ${isOpen ? "rotate-180" : ""}`}
@@ -44,8 +44,8 @@ export default function PostCommentsSection({ postId, trailing, children }) {
         </div>
       </div>
       {isOpen ? (
-        <div className="mt-2 border-t border-slate-300 pt-2">
-          <p className="mb-2 text-xs text-slate-500">GitHub 계정으로 댓글을 남길 수 있습니다.</p>
+        <div className="mt-2 border-t border-slate-200 pt-2">
+          <p className="mb-2 text-xs text-slate-500">Sign in with GitHub to leave a comment.</p>
           <GiscusComments postId={postId} />
         </div>
       ) : null}

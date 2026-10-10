@@ -99,7 +99,7 @@ export default function AdminPostEditor() {
         const item = await fetchAdminPostById(id);
         setPost(item);
       } catch (requestError) {
-        setError(requestError.message || "글을 불러오지 못했습니다.");
+        setError(requestError.message || "Could not load post.");
       } finally {
         setIsLoading(false);
       }
@@ -136,7 +136,7 @@ export default function AdminPostEditor() {
           ),
         );
         await refreshTagStats();
-        setToastMessage("글이 저장되었습니다.");
+        setToastMessage("Post saved.");
         return;
       }
 
@@ -153,7 +153,7 @@ export default function AdminPostEditor() {
         await refreshTagStats();
         navigate(getAdminPostEditPath(created.id), {
           replace: true,
-          state: { toastMessage: "글이 등록되었습니다." },
+          state: { toastMessage: "Post published." },
         });
         return;
       }
@@ -165,17 +165,17 @@ export default function AdminPostEditor() {
       await refreshTagStats();
       navigate(getAdminPostEditPath(nextPayload.id), {
         replace: true,
-        state: { toastMessage: "글이 등록되었습니다." },
+        state: { toastMessage: "Post published." },
       });
     } catch (requestError) {
-      setError(requestError.message || "글 저장에 실패했습니다.");
+      setError(requestError.message || "Could not save post.");
     } finally {
       setIsSubmitting(false);
     }
   };
 
   const handleDelete = async () => {
-    const shouldDelete = window.confirm("정말 이 글을 삭제하시겠습니까?");
+    const shouldDelete = window.confirm("Delete this post?");
     if (!shouldDelete) {
       return;
     }
@@ -186,7 +186,7 @@ export default function AdminPostEditor() {
       await refreshTagStats();
       navigate(ROUTES.ADMIN_POSTS);
     } catch (requestError) {
-      setError(requestError.message || "글 삭제에 실패했습니다.");
+      setError(requestError.message || "Could not delete post.");
     } finally {
       setIsDeleting(false);
     }
@@ -197,7 +197,7 @@ export default function AdminPostEditor() {
       <Toast message={toastMessage} visible={Boolean(toastMessage)} onClose={clearToast} />
 
       {error ? <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</p> : null}
-      {isLoading ? <p className="text-sm text-slate-500">글을 불러오는 중입니다...</p> : null}
+      {isLoading ? <p className="text-sm text-slate-500">Loading post...</p> : null}
 
       {!isLoading && (isEditMode ? post : true) ? (
         <>
@@ -215,7 +215,7 @@ export default function AdminPostEditor() {
               onClick={handleDelete}
               disabled={isDeleting || isSubmitting}
             >
-              {isDeleting ? "삭제 중..." : "글 삭제"}
+              {isDeleting ? "Deleting..." : "Delete post"}
             </button>
           ) : null}
         </>

@@ -37,7 +37,7 @@ export default function TagNetworkPanel({ nodes, edges, isLoading, error, onTagS
         <div className="posts-side-card-header">
           <div className="min-w-0">
             <h3 className="posts-side-card-title">Tag Network</h3>
-            <p className="posts-side-card-description">태그를 선택해 관련 글 보기.</p>
+            <p className="posts-side-card-description">Select a tag to see related posts.</p>
           </div>
 
           {canExpand ? (

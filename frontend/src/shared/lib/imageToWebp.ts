@@ -7,7 +7,7 @@ export const IMAGE_UPLOAD_MAX_DIMENSION = 1920;
 
 export async function prepareImageForUpload(file: File): Promise<File> {
   if (!file.type.startsWith("image/")) {
-    throw new Error("이미지 파일만 업로드할 수 있습니다.");
+    throw new Error("Only image files can be uploaded.");
   }
 
   const compressed = await imageCompression(file, {
@@ -30,7 +30,7 @@ export async function convertImageToWebp(file: File): Promise<File> {
 
     const context = canvas.getContext("2d");
     if (!context) {
-      throw new Error("Canvas context를 생성하지 못했습니다.");
+      throw new Error("Could not create canvas context.");
     }
 
     context.drawImage(image, 0, 0);
@@ -48,7 +48,7 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   return new Promise((resolve, reject) => {
     const image = new Image();
     image.onload = () => resolve(image);
-    image.onerror = () => reject(new Error("이미지를 불러오지 못했습니다."));
+    image.onerror = () => reject(new Error("Could not load image."));
     image.src = src;
   });
 }
@@ -58,7 +58,7 @@ function canvasToWebpBlob(canvas: HTMLCanvasElement): Promise<Blob> {
     canvas.toBlob(
       (blob) => {
         if (!blob) {
-          reject(new Error("WebP 변환에 실패했습니다."));
+          reject(new Error("WebP conversion failed."));
           return;
         }
         resolve(blob);

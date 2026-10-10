@@ -16,7 +16,7 @@ export function usePosts(filters = {}) {
         const items = await fetchPosts({ category, tag });
         setPosts(items);
       } catch (requestError) {
-        setError(requestError.message || "글 목록을 불러오지 못했습니다.");
+        setError(requestError.message || "Could not load posts.");
       } finally {
         setIsLoading(false);
       }

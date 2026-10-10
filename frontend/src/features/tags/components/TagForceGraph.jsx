@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import ForceGraph2D from "react-force-graph-2d";
 import { ROUTES } from "@/shared/constants/routes";
 import {
@@ -16,6 +16,24 @@ import {
   TAG_GRAPH_ZOOM_PADDING,
 } from "@/features/tags/constants/tagNetwork";
 import { buildTagGraphData } from "@/features/tags/utils/buildTagGraphData";
+
+const TAG_GRAPH_LABEL_HIT_EXTRA = 14;
+/** Screen-px movement under this counts as click-to-filter. */
+const TAG_NODE_CLICK_MAX_DRAG_PX = 24;
+const TAG_SELECT_DEDUP_MS = 400;
+
+function resolveTagFromNode(node) {
+  if (typeof node?.name === "string" && node.name.trim()) {
+    return node.name.trim();
+  }
+  if (typeof node?.id === "string" && node.id.trim()) {
+    return node.id.trim();
+  }
+  if (node?.id != null && typeof node.id !== "object") {
+    return String(node.id).trim();
+  }
+  return "";
+}
 
 function getGraphHeight(width) {
   const ratioHeight = Math.round(width * TAG_GRAPH_ASPECT_RATIO);
@@ -48,9 +66,19 @@ function resolveZoomPadding(nodeCount, fillContainer) {
 
 export default function TagForceGraph({ nodes, edges, fillContainer = false, onNodeClick }) {
   const navigate = useNavigate();
+  const location = useLocation();
   const containerRef = useRef(null);
   const graphRef = useRef(null);
+  const onNodeClickRef = useRef(onNodeClick);
+  const locationRef = useRef(location);
+  const pointerStartRef = useRef({ x: 0, y: 0 });
+  const pointerEndRef = useRef({ x: 0, y: 0 });
+  const trackingPointerRef = useRef(false);
+  const lastSelectedTagRef = useRef({ tag: "", at: 0 });
   const [dimensions, setDimensions] = useState({ width: 640, height: TAG_GRAPH_MIN_HEIGHT });
+
+  onNodeClickRef.current = onNodeClick;
+  locationRef.current = location;
 
   const graphData = useMemo(() => buildTagGraphData(nodes, edges), [nodes, edges]);
   const zoomPadding = resolveZoomPadding(graphData.nodes.length, fillContainer);
@@ -70,11 +98,50 @@ export default function TagForceGraph({ nodes, edges, fillContainer = false, onN
       });
     };
 
+    const isInsideGraph = (event) => {
+      const canvas = element.querySelector("canvas");
+      const target = event.target;
+      return target === element || target === canvas || element.contains(target);
+    };
+
+    const handlePointerDown = (event) => {
+      if (!isInsideGraph(event)) {
+        return;
+      }
+      const point = { x: event.clientX, y: event.clientY };
+      pointerStartRef.current = point;
+      pointerEndRef.current = point;
+      trackingPointerRef.current = true;
+    };
+
+    const handlePointerMove = (event) => {
+      if (!trackingPointerRef.current) {
+        return;
+      }
+      pointerEndRef.current = { x: event.clientX, y: event.clientY };
+    };
+
+    const handlePointerUp = (event) => {
+      if (!trackingPointerRef.current) {
+        return;
+      }
+      pointerEndRef.current = { x: event.clientX, y: event.clientY };
+      trackingPointerRef.current = false;
+    };
+
     updateSize();
     const observer = new ResizeObserver(updateSize);
     observer.observe(element);
-    return () => observer.disconnect();
-  }, [fillContainer]);
+    element.addEventListener("pointerdown", handlePointerDown);
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+    return () => {
+      observer.disconnect();
+      element.removeEventListener("pointerdown", handlePointerDown);
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+  }, [fillContainer, graphData.nodes.length]);
 
   useEffect(() => {
     const graph = graphRef.current;
@@ -92,12 +159,66 @@ export default function TagForceGraph({ nodes, edges, fillContainer = false, onN
     return () => window.clearTimeout(timer);
   }, [graphData, dimensions.width, dimensions.height, zoomPadding]);
 
-  const handleNodeClick = (node) => {
-    if (onNodeClick) {
-      onNodeClick(node.id);
+  const isClickGesture = () => {
+    const start = pointerStartRef.current;
+    const end = pointerEndRef.current;
+    return Math.hypot(end.x - start.x, end.y - start.y) <= TAG_NODE_CLICK_MAX_DRAG_PX;
+  };
+
+  const selectTagFromNode = (node) => {
+    const tag = resolveTagFromNode(node);
+    if (!tag) {
       return;
     }
-    navigate(`${ROUTES.POSTS}?tag=${encodeURIComponent(node.id)}`);
+
+    const now = Date.now();
+    if (lastSelectedTagRef.current.tag === tag && now - lastSelectedTagRef.current.at < TAG_SELECT_DEDUP_MS) {
+      return;
+    }
+    lastSelectedTagRef.current = { tag, at: now };
+
+    onNodeClickRef.current?.(tag);
+
+    const params = new URLSearchParams(locationRef.current.search);
+    params.set("tag", tag);
+    params.delete("page");
+    navigate({ pathname: ROUTES.POSTS, search: `?${params.toString()}` });
+  };
+
+  // Stable wrappers so react-kapsule always calls the latest logic via refs.
+  const handleNodeClickRef = useRef((node) => {
+    if (!isClickGesture()) {
+      return;
+    }
+    selectTagFromNode(node);
+  });
+  const handleNodeDragEndRef = useRef((node) => {
+    if (!isClickGesture()) {
+      return;
+    }
+    selectTagFromNode(node);
+  });
+
+  handleNodeClickRef.current = (node) => {
+    if (!isClickGesture()) {
+      return;
+    }
+    selectTagFromNode(node);
+  };
+  handleNodeDragEndRef.current = (node) => {
+    // force-graph drops onNodeClick after ~5px movement; recover those as clicks.
+    if (!isClickGesture()) {
+      return;
+    }
+    selectTagFromNode(node);
+  };
+
+  const handleNodeClick = (node) => {
+    handleNodeClickRef.current(node);
+  };
+
+  const handleNodeDragEnd = (node) => {
+    handleNodeDragEndRef.current(node);
   };
 
   if (graphData.nodes.length === 0) {
@@ -122,6 +243,8 @@ export default function TagForceGraph({ nodes, edges, fillContainer = false, onN
         nodeLabel={(node) => `#${node.name} (${node.val})`}
         nodeVal="val"
         maxZoom={TAG_GRAPH_MAX_ZOOM}
+        enableNodeDrag
+        nodeCanvasObjectMode={() => "replace"}
         linkWidth={(link) => Math.max(0.5, Math.sqrt(link.value ?? 1) * 0.65)}
         linkColor={() => "rgba(148, 163, 184, 0.55)"}
         cooldownTicks={120}
@@ -142,13 +265,18 @@ export default function TagForceGraph({ nodes, edges, fillContainer = false, onN
           ctx.fillText(`#${node.name}`, node.x, node.y + radius + fontSize * 0.95);
         }}
         nodePointerAreaPaint={(node, color, ctx) => {
-          const radius = getNodeRadius(node.val) + 4;
+          const radius = getNodeRadius(node.val) + 6;
           ctx.beginPath();
           ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
           ctx.fillStyle = color;
           ctx.fill();
+
+          const labelWidth = Math.max(radius * 2.8, 36);
+          const labelTop = node.y + radius - 2;
+          ctx.fillRect(node.x - labelWidth / 2, labelTop, labelWidth, TAG_GRAPH_LABEL_HIT_EXTRA);
         }}
         onNodeClick={handleNodeClick}
+        onNodeDragEnd={handleNodeDragEnd}
         onNodeHover={(node) => {
           if (containerRef.current) {
             containerRef.current.style.cursor = node ? "pointer" : "default";

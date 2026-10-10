@@ -84,7 +84,7 @@ export default function EditorToolbar({
 
   const setLink = () => {
     const previousUrl = editor.getAttributes("link").href as string | undefined;
-    const url = window.prompt("링크 URL을 입력하세요", previousUrl ?? "https://");
+    const url = window.prompt("Enter link URL", previousUrl ?? "https://");
 
     if (url === null) {
       return;
@@ -150,32 +150,32 @@ export default function EditorToolbar({
   return (
     <div className="sticky -top-5 z-30 flex flex-wrap gap-1 border-b border-slate-200 bg-slate-50/95 p-2 shadow-sm backdrop-blur-sm lg:-top-6">
       <ToolbarButton
-        label="굵게"
+        label="Bold"
         isActive={editor.isActive("bold")}
         onClick={() => editor.chain().focus().toggleBold().run()}
       >
         <Bold size={16} aria-hidden />
       </ToolbarButton>
       <ToolbarButton
-        label="기울임"
+        label="Italic"
         isActive={editor.isActive("italic")}
         onClick={() => editor.chain().focus().toggleItalic().run()}
       >
         <Italic size={16} aria-hidden />
       </ToolbarButton>
       <ToolbarButton
-        label="밑줄"
+        label="Underline"
         isActive={editor.isActive("underline")}
         onClick={() => editor.chain().focus().toggleUnderline().run()}
       >
         <Underline size={16} aria-hidden />
       </ToolbarButton>
       <label className="inline-flex h-8 items-center gap-1 rounded-md border border-transparent px-1 text-xs text-slate-600 hover:border-slate-200 hover:bg-white">
-        <span className="sr-only">글자 크기</span>
+        <span className="sr-only">Font size</span>
         <select
           className="h-7 min-w-[8.5rem] max-w-[11rem] bg-transparent text-xs text-slate-700 outline-none"
-          aria-label="글자 크기"
-          title="글자 크기"
+          aria-label="Font size"
+          title="Font size"
           value={editorState?.fontSize ?? ""}
           onChange={(event) => setFontSize(event.target.value)}
         >
@@ -187,76 +187,76 @@ export default function EditorToolbar({
         </select>
       </label>
       <ColorPickerDropdown
-        name="글자색"
+        name="Text color"
         colors={EDITOR_TEXT_COLOR_PRESETS}
         activeValue={editorState?.textColor ?? ""}
-        emptySwatchLabel="기본"
+        emptySwatchLabel="Default"
         onSelect={setTextColor}
       />
       <ToolbarButton
-        label="제목 2"
+        label="Heading 2"
         isActive={editor.isActive("heading", { level: 2 })}
         onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()}
       >
         <Heading2 size={16} aria-hidden />
       </ToolbarButton>
       <ToolbarButton
-        label="제목 3"
+        label="Heading 3"
         isActive={editor.isActive("heading", { level: 3 })}
         onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()}
       >
         <Heading3 size={16} aria-hidden />
       </ToolbarButton>
       <ToolbarButton
-        label="왼쪽 정렬"
+        label="Align left"
         isActive={editorState?.textAlign === "left"}
         onClick={() => editor.chain().focus().setTextAlign("left").run()}
       >
         <AlignLeft size={16} aria-hidden />
       </ToolbarButton>
       <ToolbarButton
-        label="가운데 정렬"
+        label="Align center"
         isActive={editorState?.textAlign === "center"}
         onClick={() => editor.chain().focus().setTextAlign("center").run()}
       >
         <AlignCenter size={16} aria-hidden />
       </ToolbarButton>
       <ToolbarButton
-        label="오른쪽 정렬"
+        label="Align right"
         isActive={editorState?.textAlign === "right"}
         onClick={() => editor.chain().focus().setTextAlign("right").run()}
       >
         <AlignRight size={16} aria-hidden />
       </ToolbarButton>
       <ToolbarButton
-        label="양쪽 정렬"
+        label="Justify"
         isActive={editorState?.textAlign === "justify"}
         onClick={() => editor.chain().focus().setTextAlign("justify").run()}
       >
         <AlignJustify size={16} aria-hidden />
       </ToolbarButton>
       <ToolbarButton
-        label="글머리 목록"
+        label="Bullet list"
         isActive={editor.isActive("bulletList")}
         onClick={() => editor.chain().focus().toggleBulletList().run()}
       >
         <List size={16} aria-hidden />
       </ToolbarButton>
       <ToolbarButton
-        label="번호 목록"
+        label="Numbered list"
         isActive={editor.isActive("orderedList")}
         onClick={() => editor.chain().focus().toggleOrderedList().run()}
       >
         <ListOrdered size={16} aria-hidden />
       </ToolbarButton>
-      <ToolbarButton label="링크" isActive={editor.isActive("link")} onClick={setLink}>
+      <ToolbarButton label="Link" isActive={editor.isActive("link")} onClick={setLink}>
         <Link2 size={16} aria-hidden />
       </ToolbarButton>
-      <ToolbarButton label="표 삽입" isActive={editorState?.isTableActive ?? false} onClick={insertTable}>
+      <ToolbarButton label="Insert table" isActive={editorState?.isTableActive ?? false} onClick={insertTable}>
         <Table size={16} aria-hidden />
       </ToolbarButton>
       <ToolbarButton
-        label="이미지 삽입"
+        label="Insert image"
         isActive={false}
         disabled={isUploading}
         onClick={() => fileInputRef.current?.click()}
@@ -266,41 +266,41 @@ export default function EditorToolbar({
       {editorState?.isTableActive ? (
         <>
           <span className="mx-1 hidden h-6 w-px bg-slate-200 sm:inline" aria-hidden />
-          <ToolbarTextButton label="행 추가" onClick={() => editor.chain().focus().addRowAfter().run()}>
-            +행
+          <ToolbarTextButton label="Add row" onClick={() => editor.chain().focus().addRowAfter().run()}>
+            +Row
           </ToolbarTextButton>
-          <ToolbarTextButton label="열 추가" onClick={() => editor.chain().focus().addColumnAfter().run()}>
-            +열
+          <ToolbarTextButton label="Add column" onClick={() => editor.chain().focus().addColumnAfter().run()}>
+            +Col
           </ToolbarTextButton>
-          <ToolbarTextButton label="행 삭제" onClick={() => editor.chain().focus().deleteRow().run()}>
-            -행
+          <ToolbarTextButton label="Delete row" onClick={() => editor.chain().focus().deleteRow().run()}>
+            -Row
           </ToolbarTextButton>
-          <ToolbarTextButton label="열 삭제" onClick={() => editor.chain().focus().deleteColumn().run()}>
-            -열
+          <ToolbarTextButton label="Delete column" onClick={() => editor.chain().focus().deleteColumn().run()}>
+            -Col
           </ToolbarTextButton>
           <ColorPickerDropdown
-            name="셀배경"
+            name="Cell background"
             colors={TABLE_CELL_BG_PRESETS}
             activeValue={editorState?.cellBackgroundColor ?? ""}
-            emptySwatchLabel="없음"
+            emptySwatchLabel="None"
             onSelect={setCellBackgroundColor}
           />
           <ToolbarButton
-            label="셀 상단 정렬"
+            label="Align cell top"
             isActive={editorState?.cellVerticalAlign === "top"}
             onClick={() => setCellVerticalAlign("top")}
           >
             <AlignVerticalJustifyStart size={16} aria-hidden />
           </ToolbarButton>
           <ToolbarButton
-            label="셀 세로 가운데 정렬"
+            label="Align cell middle"
             isActive={editorState?.cellVerticalAlign === "middle"}
             onClick={() => setCellVerticalAlign("middle")}
           >
             <AlignVerticalJustifyCenter size={16} aria-hidden />
           </ToolbarButton>
           <ToolbarButton
-            label="셀 하단 정렬"
+            label="Align cell bottom"
             isActive={editorState?.cellVerticalAlign === "bottom"}
             onClick={() => setCellVerticalAlign("bottom")}
           >
@@ -308,49 +308,49 @@ export default function EditorToolbar({
           </ToolbarButton>
           {editorState.canMergeCells ? (
             <ToolbarTextButton
-              label="선택 셀 합치기"
+              label="Merge selected cells"
               onClick={() => editor.chain().focus().mergeCells().run()}
             >
-              합치기
+              Merge
             </ToolbarTextButton>
           ) : null}
           {editorState.canSplitCell ? (
             <ToolbarTextButton
-              label="셀 나누기"
+              label="Split cell"
               onClick={() => editor.chain().focus().splitCell().run()}
             >
-              나누기
+              Split
             </ToolbarTextButton>
           ) : null}
           {editorState.canDeleteSelection ? (
             <ToolbarButton
-              label="선택 범위 행/열 삭제"
+              label="Delete selected rows/columns"
               isActive={false}
               onClick={() => editor.chain().focus().deleteSelectedTableRange().run()}
             >
               <Trash2 size={16} aria-hidden />
             </ToolbarButton>
           ) : null}
-          <ToolbarTextButton label="표 삭제" onClick={() => editor.chain().focus().deleteTable().run()}>
-            표삭제
+          <ToolbarTextButton label="Delete table" onClick={() => editor.chain().focus().deleteTable().run()}>
+            Del table
           </ToolbarTextButton>
         </>
       ) : null}
       {editorState?.isImageActive ? (
         <>
           <span className="mx-1 hidden h-6 w-px bg-slate-200 sm:inline" aria-hidden />
-          <span className="self-center px-1 text-xs text-slate-500">이미지 크기</span>
-          <ToolbarTextButton label="이미지 너비 50%" onClick={() => setImageWidth("50%")}>
+          <span className="self-center px-1 text-xs text-slate-500">Image size</span>
+          <ToolbarTextButton label="Image width 50%" onClick={() => setImageWidth("50%")}>
             50%
           </ToolbarTextButton>
-          <ToolbarTextButton label="이미지 너비 75%" onClick={() => setImageWidth("75%")}>
+          <ToolbarTextButton label="Image width 75%" onClick={() => setImageWidth("75%")}>
             75%
           </ToolbarTextButton>
-          <ToolbarTextButton label="이미지 너비 100%" onClick={() => setImageWidth("100%")}>
+          <ToolbarTextButton label="Image width 100%" onClick={() => setImageWidth("100%")}>
             100%
           </ToolbarTextButton>
-          <ToolbarTextButton label="이미지 원본 크기" onClick={() => setImageWidth(null)}>
-            원본
+          <ToolbarTextButton label="Original image size" onClick={() => setImageWidth(null)}>
+            Original
           </ToolbarTextButton>
         </>
       ) : null}

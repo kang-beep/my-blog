@@ -3,6 +3,7 @@ export const ROUTES = {
   HOME: "/",
   POSTS: "/posts",
   POST_DETAIL: "/posts/:id",
+  TRENDS: "/trends",
   PORTFOLIO: "/portfolio",
   ADMIN_LOGIN: "/admin-login",
   ADMIN: "/admin",

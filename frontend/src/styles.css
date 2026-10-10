@@ -10,19 +10,19 @@
   }
 
   h1 {
-    @apply text-3xl font-bold tracking-tight;
+    @apply text-3xl font-bold tracking-tight text-slate-900;
   }
 
   h2 {
-    @apply text-2xl font-semibold tracking-tight;
+    @apply text-2xl font-semibold tracking-tight text-slate-900;
   }
 
   h3 {
-    @apply text-xl font-semibold;
+    @apply text-xl font-semibold text-slate-900;
   }
 
   a {
-    @apply cursor-pointer text-indigo-600 hover:text-indigo-500;
+    @apply cursor-pointer text-indigo-600 no-underline hover:text-indigo-500;
   }
 
   button:not(:disabled) {
@@ -40,15 +40,47 @@
   }
 
   .btn {
-    @apply inline-flex items-center justify-center rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex h-9 items-center justify-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 no-underline transition-colors hover:bg-slate-50 hover:text-slate-900 disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .btn-primary {
-    @apply border-indigo-600 bg-indigo-600 text-white hover:bg-indigo-500;
+    @apply border-indigo-600 bg-indigo-600 text-white hover:border-indigo-500 hover:bg-indigo-500 hover:text-white;
+  }
+
+  .text-link {
+    @apply inline-flex items-center gap-1 text-sm font-medium text-indigo-600 no-underline transition-colors hover:text-indigo-500;
+  }
+
+  .type-page-title {
+    @apply m-0 text-3xl font-bold tracking-tight text-slate-900;
+  }
+
+  .type-section-title {
+    @apply m-0 text-xl font-bold tracking-tight text-slate-900;
+  }
+
+  .type-card-title {
+    @apply m-0 text-base font-semibold leading-snug text-slate-900;
+  }
+
+  .type-body {
+    @apply text-sm leading-relaxed text-slate-600;
+  }
+
+  .type-meta {
+    @apply text-xs text-slate-500;
+  }
+
+  .chip {
+    @apply inline-flex shrink-0 items-center justify-center rounded-full bg-slate-100 px-3.5 py-1.5 text-sm font-medium text-slate-600 transition-colors hover:bg-slate-200;
+  }
+
+  .chip-active {
+    @apply bg-indigo-600 text-white shadow-sm hover:bg-indigo-600 hover:text-white;
   }
 
   .input {
-    @apply w-full rounded-lg border border-slate-300 px-3 py-2 text-sm outline-none ring-0 placeholder:text-slate-400 focus:border-indigo-500;
+    @apply w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none ring-0 placeholder:text-slate-400 focus:border-indigo-500;
   }
 
   .label {
@@ -273,47 +305,63 @@
   }
 
   .page-back-link {
-    @apply inline-flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-sm font-medium text-slate-600 no-underline shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 hover:text-slate-900;
+    @apply inline-flex items-center gap-1.5 text-sm font-medium text-slate-600 no-underline transition-colors hover:text-slate-900;
+  }
+
+  .home-section {
+    @apply flex shrink-0 flex-col gap-3;
   }
 
   .home-section-header {
-    @apply flex flex-wrap items-end justify-between gap-3;
+    @apply flex shrink-0 flex-wrap items-center justify-between gap-x-3 gap-y-2;
+  }
+
+  .home-section-heading {
+    @apply min-w-0 space-y-1;
   }
 
   .home-section-title {
-    @apply text-2xl font-bold tracking-tight text-slate-900;
+    @apply m-0 text-xl font-bold tracking-tight text-slate-900;
   }
 
   .home-section-description {
-    @apply m-0 max-w-2xl text-sm leading-relaxed text-slate-500;
+    @apply m-0 text-sm leading-relaxed text-slate-500;
   }
 
   .home-section-action {
-    @apply inline-flex shrink-0 items-center gap-1 text-sm font-medium text-slate-600 no-underline transition-colors hover:text-slate-900;
+    @apply inline-flex shrink-0 items-center gap-1 text-sm font-medium text-indigo-600 no-underline transition-colors hover:text-indigo-500;
+  }
+
+  .home-section-body {
+    @apply min-w-0;
+  }
+
+  .home-section-ai {
+    @apply mt-2 border-t border-slate-200 pt-6;
   }
 
   .home-my-posts-list {
-    @apply m-0 flex list-none flex-col gap-3 p-0;
+    @apply m-0 flex list-none flex-col divide-y divide-slate-100 p-0;
   }
 
   .home-post-card {
-    @apply flex min-w-0 items-center gap-3 rounded-xl border border-slate-200 bg-white px-3 py-3 text-inherit no-underline shadow-sm transition-colors hover:border-slate-300 hover:bg-slate-50 sm:gap-4 sm:px-4;
+    @apply flex min-w-0 items-center gap-3 bg-transparent px-0 py-3.5 text-inherit no-underline transition-colors hover:bg-slate-50/70 sm:px-1;
   }
 
   .home-post-card-body {
-    @apply min-w-0 flex-1 space-y-1;
+    @apply flex min-w-0 flex-1 flex-col gap-1;
   }
 
   .home-post-card-meta {
-    @apply flex flex-wrap items-center gap-2 text-xs text-slate-500;
+    @apply flex flex-wrap items-center gap-1.5 text-xs text-slate-500;
   }
 
   .home-post-card-category {
-    @apply rounded-full bg-slate-100 px-2 py-0.5 text-xs font-medium text-slate-600;
+    @apply font-medium text-slate-500;
   }
 
   .home-post-card-title {
-    @apply m-0 text-base font-semibold leading-snug text-slate-900 transition-colors group-hover:text-indigo-600;
+    @apply m-0 text-base font-semibold leading-snug text-slate-900 transition-colors;
   }
 
   .home-post-card:hover .home-post-card-title {
@@ -321,15 +369,143 @@
   }
 
   .home-post-card-excerpt {
-    @apply m-0 text-xs leading-relaxed text-slate-500 sm:text-[0.8125rem];
+    @apply m-0 text-sm leading-relaxed text-slate-500;
   }
 
   .home-post-card-arrow {
-    @apply shrink-0 text-slate-400 transition-colors;
+    @apply shrink-0 text-slate-300 transition-colors;
   }
 
   .home-post-card:hover .home-post-card-arrow {
-    @apply text-slate-700;
+    @apply text-slate-500;
+  }
+
+  .home-ai-grid {
+    @apply grid grid-cols-1 gap-4 lg:grid-cols-2;
+  }
+
+  .home-ai-brief {
+    @apply border-l-2 pl-3;
+  }
+
+  .home-ai-brief-github {
+    @apply border-indigo-500;
+  }
+
+  .home-ai-brief-huggingface {
+    @apply border-amber-400;
+  }
+
+  .home-ai-brief-label {
+    @apply m-0 mb-1 text-[11px] font-semibold uppercase tracking-wide;
+  }
+
+  .home-ai-brief-github .home-ai-brief-label {
+    @apply text-indigo-600;
+  }
+
+  .home-ai-brief-huggingface .home-ai-brief-label {
+    @apply text-amber-600;
+  }
+
+  .home-ai-card-headline {
+    @apply m-0 line-clamp-2 text-base font-semibold leading-snug text-slate-800;
+  }
+
+  .home-ai-highlight-list {
+    @apply m-0 mt-3 flex list-none flex-col divide-y divide-slate-100 p-0;
+  }
+
+  .home-ai-highlight-row {
+    @apply flex min-w-0 items-center gap-2.5 py-2.5 text-inherit no-underline transition-colors hover:bg-slate-50;
+  }
+
+  .home-ai-highlight-body {
+    @apply min-w-0 flex-1 space-y-0.5;
+  }
+
+  .home-ai-highlight-title {
+    @apply m-0 text-base font-semibold leading-snug text-slate-900;
+  }
+
+  .home-ai-highlight-description {
+    @apply m-0 text-xs leading-snug text-slate-500;
+  }
+
+  .home-ai-highlight-aside {
+    @apply flex shrink-0 items-center gap-1;
+  }
+
+  .home-ai-highlight-metric {
+    @apply text-xs font-medium tabular-nums text-slate-500;
+  }
+
+  .home-ai-highlight-arrow {
+    @apply text-slate-300;
+  }
+
+  .home-ai-highlight-empty {
+    @apply m-0 py-1.5 text-xs text-slate-500;
+  }
+
+  .trends-page {
+    @apply max-lg:px-3;
+  }
+
+  .trends-page-header {
+    @apply flex flex-wrap items-end justify-between gap-3 border-b border-slate-300 pb-5;
+  }
+
+  .trends-page-title {
+    @apply m-0 text-3xl font-bold tracking-tight text-slate-900;
+  }
+
+  .trends-page-description {
+    @apply m-0 text-sm text-slate-500;
+  }
+
+  .trends-page-updated {
+    @apply m-0 shrink-0 text-xs text-slate-500;
+  }
+
+  .trends-section-heading {
+    @apply flex flex-wrap items-center gap-2;
+  }
+
+  .trends-section-title {
+    @apply m-0 text-xl font-bold tracking-tight text-slate-900;
+  }
+
+  .trends-section-divider {
+    @apply text-slate-300;
+  }
+
+  .trends-section-note {
+    @apply m-0 text-sm leading-relaxed text-slate-500;
+  }
+
+  .trends-briefs-grid {
+    @apply grid grid-cols-1 gap-5 lg:grid-cols-2;
+  }
+
+  .trend-brief-card-headline {
+    @apply m-0 text-base font-semibold leading-snug text-slate-900;
+  }
+
+  .trend-brief-card-summary {
+    @apply m-0 text-sm leading-relaxed text-slate-600;
+  }
+
+  .trend-brief-keywords {
+    @apply m-0 mt-1 flex list-none flex-wrap gap-2 p-0;
+  }
+
+  .trend-brief-keyword {
+    @apply inline-flex shrink-0 items-center justify-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-200;
+  }
+
+  .trends-browse-grid {
+    @apply grid grid-cols-1 gap-6 lg:grid-cols-2;
   }
 
   .page-card-title {
@@ -391,11 +567,15 @@
   }
 
   .post-detail-header {
-    @apply space-y-3 rounded-t-xl border-b border-slate-400 px-3 py-4 text-left sm:px-4 lg:px-5;
+    @apply space-y-3 border-b border-neutral-500 bg-neutral-600 px-4 py-4 text-left text-white sm:px-5;
+  }
+
+  .post-detail-header .page-card-label {
+    @apply text-neutral-300;
   }
 
   .post-detail-title {
-    @apply text-left text-xl font-bold leading-snug tracking-tight text-slate-900 sm:text-2xl lg:text-[1.65rem];
+    @apply text-left text-xl font-bold leading-snug tracking-tight text-white sm:text-2xl lg:text-[1.65rem];
   }
 
   .post-meta-inline {
@@ -403,27 +583,35 @@
   }
 
   .post-meta-inline-item {
-    @apply m-0 text-sm text-slate-700;
+    @apply m-0 text-sm text-neutral-200;
   }
 
   .post-meta-inline-label {
-    @apply font-semibold text-slate-500;
+    @apply font-semibold text-neutral-300;
   }
 
   .post-meta-inline-value {
-    @apply text-slate-800;
+    @apply text-white;
   }
 
   .post-meta-inline-button {
-    @apply inline border-0 bg-transparent p-0 font-medium text-slate-800 underline-offset-2 hover:underline;
+    @apply inline border-0 bg-transparent p-0 font-medium text-white underline-offset-2 hover:underline;
+  }
+
+  .post-detail-header .chip {
+    @apply border-white/20 bg-white/10 text-neutral-100 hover:border-white/30 hover:bg-white/15 hover:text-white;
+  }
+
+  .post-detail-tags {
+    @apply flex flex-wrap items-center gap-2;
   }
 
   .post-adjacent-nav {
-    @apply grid grid-cols-1 gap-3 border-t border-slate-300 pt-4 sm:grid-cols-2;
+    @apply grid grid-cols-1 gap-3 border-t border-slate-200 pt-4 sm:grid-cols-2;
   }
 
   .post-adjacent-slot {
-    @apply flex min-w-0 flex-col gap-1 rounded-xl border border-slate-300 bg-white px-3 py-3.5 sm:px-4;
+    @apply flex min-w-0 flex-col gap-1 rounded-xl border border-slate-200 bg-white px-3 py-3.5 sm:px-4;
   }
 
   .post-adjacent-slot-prev {
@@ -451,10 +639,14 @@
   }
 
   .home-page {
-    @apply max-lg:px-3;
+    @apply flex w-full flex-col gap-6 max-lg:px-3;
   }
 
   .posts-page {
+    @apply max-lg:px-3;
+  }
+
+  .portfolio-page {
     @apply max-lg:px-3;
   }
 
@@ -484,10 +676,6 @@
 
   .posts-main-panel {
     @apply min-w-0 space-y-4;
-  }
-
-  .posts-main-card {
-    @apply rounded-xl border border-slate-200 bg-white px-4 py-4 shadow-sm sm:px-5;
   }
 
   .posts-list {
@@ -539,19 +727,19 @@
   }
 
   .posts-side-card-header {
-    @apply flex items-start justify-between gap-2 border-b border-slate-100 px-4 py-3;
+    @apply flex items-start justify-between gap-2 border-b border-neutral-500 bg-neutral-600 px-4 py-3 text-white;
   }
 
   .posts-side-card-title {
-    @apply m-0 text-sm font-semibold text-slate-900;
+    @apply m-0 text-sm font-semibold text-white;
   }
 
   .posts-side-card-description {
-    @apply m-0 mt-0.5 text-xs text-slate-500;
+    @apply m-0 mt-0.5 text-xs text-neutral-200/80;
   }
 
   .posts-side-card-action {
-    @apply inline-flex shrink-0 items-center justify-center rounded-lg border border-slate-200 bg-white p-1.5 text-slate-600 hover:bg-slate-50 hover:text-slate-900;
+    @apply inline-flex shrink-0 items-center justify-center rounded-lg border border-white/20 bg-white/5 p-1.5 text-neutral-100 hover:border-white/30 hover:bg-white/10 hover:text-white;
   }
 
   .posts-side-card-body {
@@ -607,7 +795,7 @@
   }
 
   .home-feed-card {
-    @apply flex min-h-0 flex-col overflow-hidden rounded-xl;
+    @apply flex min-h-0 flex-col overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm;
   }
 
   .home-feed-card-header {
@@ -615,15 +803,19 @@
   }
 
   .home-feed-card-header-title {
-    @apply flex flex-wrap items-center gap-2 text-xl font-semibold text-white;
+    @apply flex flex-wrap items-center gap-2 text-base font-semibold text-white;
   }
 
   .home-feed-card-header-description {
-    @apply mt-1 text-sm text-neutral-200/80;
+    @apply mt-1 text-xs text-neutral-200/80;
   }
 
   .home-feed-card-header-action {
     @apply inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-white/20 bg-white/5 px-3 py-2 text-sm font-medium text-neutral-100 no-underline hover:border-white/30 hover:bg-white/10 hover:text-white;
+  }
+
+  .home-feed-card-header-text-link {
+    @apply inline-flex shrink-0 items-center gap-1 text-sm font-medium text-neutral-200 no-underline transition-colors hover:text-white;
   }
 
   .home-feed-card-toolbar {
@@ -640,6 +832,10 @@
 
   .home-feed-card-body {
     @apply max-h-[32rem] min-h-0 overflow-y-auto px-4 py-4 sm:px-6 sm:py-5;
+  }
+
+  .home-feed-card-body-static {
+    @apply max-h-none overflow-visible;
   }
 
   .home-tag-posts-grid {

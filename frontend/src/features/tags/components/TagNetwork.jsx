@@ -9,7 +9,7 @@ export default function TagNetwork({ latestPosts = [], latestPostsLoading = fals
   const { nodes, isLoading, error } = useTagRanking();
 
   return (
-    <section className="home-feed-card border border-slate-400 bg-white shadow-sm">
+    <section className="home-feed-card">
       <div className="home-tag-posts-grid">
         <div className="home-tag-posts-panel">
           <div className="home-tag-posts-panel-header">

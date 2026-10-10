@@ -14,7 +14,7 @@ export function resolvePostCategoryFields(categories, categoryId) {
 
   const fallback = findCategoryByName(categories, DEFAULT_POST_CATEGORY_NAME);
   if (!fallback) {
-    throw new Error(`"${DEFAULT_POST_CATEGORY_NAME}" 카테고리가 없습니다. 잠시 후 다시 시도해 주세요.`);
+    throw new Error(`The "${DEFAULT_POST_CATEGORY_NAME}" category is missing. Please try again shortly.`);
   }
 
   return { category_id: fallback.id, category: fallback.name };

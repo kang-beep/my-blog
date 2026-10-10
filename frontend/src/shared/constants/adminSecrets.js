@@ -8,19 +8,19 @@ export const ADMIN_SECRET_FIELDS = [
   {
     key: ADMIN_SECRET_KEYS.NOTION_TOKEN,
     label: "Notion Integration Token",
-    help: "Notion Internal Integration Secret. 가져올 페이지에 Integration이 Connections로 연결되어 있어야 합니다.",
-    placeholder: "ntn_... 또는 secret_...",
+    help: "Notion Internal Integration Secret. Connect the integration to each page you import via Connections.",
+    placeholder: "ntn_... or secret_...",
   },
   {
     key: ADMIN_SECRET_KEYS.GISCUS_GITHUB_PAT,
     label: "Giscus GitHub PAT",
-    help: "Discussions read/write용 fine-grained PAT. 글 삭제 시 Discussion 제거에 사용됩니다.",
-    placeholder: "github_pat_... 또는 ghp_...",
+    help: "Fine-grained PAT with Discussions read/write. Used to remove discussions when deleting posts.",
+    placeholder: "github_pat_... or ghp_...",
   },
   {
     key: ADMIN_SECRET_KEYS.GEMINI_API_KEY,
     label: "Gemini API Key",
-    help: "Google AI Studio / Gemini API 키. Edge Function 등 서버 측에서 사용됩니다.",
+    help: "Google AI Studio / Gemini API key. Used on the server (e.g. Edge Functions).",
     placeholder: "AIza...",
   },
 ];

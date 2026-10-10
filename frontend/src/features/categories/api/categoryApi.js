@@ -48,7 +48,7 @@ export async function createCategory(name) {
 export async function updateCategory(id, name) {
   const trimmedName = name.trim();
   if (!trimmedName) {
-    throw new Error("카테고리 이름을 입력해 주세요.");
+    throw new Error("Enter a category name.");
   }
 
   const { data, error } = await supabase
@@ -83,7 +83,7 @@ export async function deleteCategory(id) {
     ?? (await ensureDefaultCategory());
 
   if (id === defaultCategory.id) {
-    throw new Error(`"${DEFAULT_POST_CATEGORY_NAME}" 카테고리는 삭제할 수 없습니다.`);
+    throw new Error(`The "${DEFAULT_POST_CATEGORY_NAME}" category cannot be deleted.`);
   }
 
   const { error: unlinkError } = await supabase

@@ -5,7 +5,7 @@ import { STORAGE_BUCKETS } from "@/shared/constants/storage";
 
 export async function uploadEditorImage(file: File, postId: string): Promise<string> {
   if (!postId) {
-    throw new Error("본문 이미지 업로드에는 글 ID가 필요합니다.");
+    throw new Error("Post ID is required to upload body images.");
   }
 
   const webpFile = await prepareImageForUpload(file);

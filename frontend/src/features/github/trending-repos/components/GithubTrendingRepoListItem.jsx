@@ -18,7 +18,7 @@ export default function GithubTrendingRepoListItem({ repo }) {
         {repo.title ?? "Untitled"}
       </h3>
       {repo.description ? (
-        <p className="text-sm leading-relaxed text-slate-600">{repo.description}</p>
+        <p className="line-clamp-2 text-sm leading-relaxed text-slate-600">{repo.description}</p>
       ) : null}
       <div className="pt-1">
         <ExternalActionButton href={repo.url}>View repo</ExternalActionButton>

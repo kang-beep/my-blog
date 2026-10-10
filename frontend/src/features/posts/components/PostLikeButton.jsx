@@ -38,7 +38,7 @@ export default function PostLikeButton({ postId, initialLikeCount = 0, variant =
         const liked = await fetchHasLiked(postId, visitorKey);
         setHasLiked(liked);
       } catch (requestError) {
-        setError(requestError.message || "좋아요 정보를 불러오지 못했습니다.");
+        setError(requestError.message || "Could not load like count.");
       } finally {
         setIsLoading(false);
       }
@@ -82,7 +82,7 @@ export default function PostLikeButton({ postId, initialLikeCount = 0, variant =
 
       setLikeCount((prev) => prev + 1);
     } catch (requestError) {
-      setError(requestError.message || "좋아요 처리에 실패했습니다.");
+      setError(requestError.message || "Could not update like.");
     } finally {
       setIsSubmitting(false);
     }
@@ -102,7 +102,7 @@ export default function PostLikeButton({ postId, initialLikeCount = 0, variant =
         onClick={() => void handleToggleLike()}
         disabled={isLoading || isSubmitting}
         aria-pressed={hasLiked}
-        aria-label={hasLiked ? `좋아요 취소, ${likeCount}개` : `좋아요, ${likeCount}개`}
+        aria-label={hasLiked ? `Unlike, ${likeCount} likes` : `Like, ${likeCount} likes`}
       >
         <Heart
           size={isCompact ? POST_ACTION_ICON_SIZE : 18}
@@ -113,9 +113,9 @@ export default function PostLikeButton({ postId, initialLikeCount = 0, variant =
         {isCompact ? (
           <span className="text-xs tabular-nums text-slate-500">{likeCount}</span>
         ) : isSubmitting ? (
-          "처리 중..."
+          "Working..."
         ) : (
-          `좋아요 ${likeCount}`
+          `Like ${likeCount}`
         )}
       </button>
       {error ? <p className="text-sm text-rose-600">{error}</p> : null}

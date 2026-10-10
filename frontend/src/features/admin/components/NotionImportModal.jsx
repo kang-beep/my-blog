@@ -69,7 +69,7 @@ function PageTreeNode({
             type="button"
             className="inline-flex h-7 w-7 shrink-0 items-center justify-center rounded text-slate-500 hover:bg-slate-200"
             onClick={() => onToggle(node.id)}
-            aria-label={isExpanded ? "접기" : "펼치기"}
+            aria-label={isExpanded ? "Collapse" : "Expand"}
           >
             {isExpanded ? (
               <ChevronDown size={ICON_SIZE} strokeWidth={ICON_STROKE} aria-hidden />
@@ -89,11 +89,11 @@ function PageTreeNode({
           <span className="block truncate font-medium text-slate-800">{node.title}</span>
           {node.lastEditedTime ? (
             <span className="mt-0.5 block text-xs text-slate-400">
-              수정 {new Date(node.lastEditedTime).toLocaleString("ko-KR")}
+              Edited {new Date(node.lastEditedTime).toLocaleString("en-US", { timeZone: "Asia/Seoul" })}
             </span>
           ) : null}
           {isImporting ? (
-            <span className="mt-1 block text-xs text-indigo-600">가져오는 중...</span>
+            <span className="mt-1 block text-xs text-indigo-600">Importing...</span>
           ) : null}
         </button>
       </div>
@@ -145,7 +145,7 @@ export default function NotionImportModal({ open, onClose, onImport }) {
         }
       } catch (requestError) {
         if (!cancelled) {
-          setError(requestError.message || "Notion 목록을 불러오지 못했습니다.");
+          setError(requestError.message || "Could not load Notion pages.");
           setPages([]);
         }
       } finally {
@@ -260,7 +260,7 @@ export default function NotionImportModal({ open, onClose, onImport }) {
       });
       onClose?.();
     } catch (requestError) {
-      setError(requestError.message || "페이지를 가져오지 못했습니다.");
+      setError(requestError.message || "Could not import page.");
     } finally {
       setIsImportingId(null);
     }
@@ -281,21 +281,21 @@ export default function NotionImportModal({ open, onClose, onImport }) {
         <div className="flex items-start justify-between gap-3 border-b border-slate-200 px-4 py-3">
           <div>
             <h3 id="notion-import-title" className="text-lg font-semibold">
-              Notion에서 가져오기
+              Import from Notion
             </h3>
             <p className="mt-1 text-xs text-slate-500">
-              접근 가능한 페이지를 트리로 표시합니다. 펼침은 추가 API 없이 로컬에서만 동작하고,
-              본문은 페이지를 선택할 때만 가져옵니다.
+              Shows accessible pages as a tree. Expanding works locally without extra API calls;
+              body content loads only when you select a page.
             </p>
           </div>
           <button type="button" className="btn" onClick={onClose}>
-            닫기
+            Close
           </button>
         </div>
 
         <div className="space-y-2 border-b border-slate-100 px-4 py-3">
           <label className="block text-xs font-medium text-slate-600" htmlFor="notion-root-filter">
-            루트 필터
+            Root filter
           </label>
           <select
             id="notion-root-filter"
@@ -303,7 +303,7 @@ export default function NotionImportModal({ open, onClose, onImport }) {
             value={rootFilterId}
             onChange={(event) => setRootFilterId(event.target.value)}
           >
-            <option value="">전체 트리</option>
+            <option value="">Full tree</option>
             {rootOptions.map((root) => (
               <option key={root.id} value={root.id}>
                 {root.title}
@@ -312,25 +312,25 @@ export default function NotionImportModal({ open, onClose, onImport }) {
           </select>
 
           <label className="block text-xs font-medium text-slate-600" htmlFor="notion-title-filter">
-            제목 필터
+            Title filter
           </label>
           <input
             id="notion-title-filter"
             className="input"
             value={filterText}
             onChange={(event) => setFilterText(event.target.value)}
-            placeholder="제목으로 걸러내기 (로컬 필터)"
+            placeholder="Filter by title (local only)"
           />
 
           <div className="flex flex-wrap gap-2">
             <button type="button" className="btn" onClick={handleExpandAllVisible}>
-              보이는 항목 모두 펼치기
+              Expand all visible
             </button>
             <button type="button" className="btn" onClick={handleCollapseAll}>
-              모두 접기
+              Collapse all
             </button>
             <span className="self-center text-xs text-slate-400">
-              {isLoading ? "불러오는 중..." : `${visibleCount}개 표시 / 전체 ${pages.length}개`}
+              {isLoading ? "Loading..." : `${visibleCount} shown / ${pages.length} total`}
             </span>
           </div>
         </div>
@@ -339,7 +339,7 @@ export default function NotionImportModal({ open, onClose, onImport }) {
           {error ? <p className="mb-2 px-1 text-sm text-rose-600">{error}</p> : null}
           {warningText ? <p className="mb-2 px-1 text-sm text-amber-700">{warningText}</p> : null}
           {!isLoading && visibleTree.length === 0 ? (
-            <p className="px-1 text-sm text-slate-500">표시할 페이지가 없습니다.</p>
+            <p className="px-1 text-sm text-slate-500">No pages to show.</p>
           ) : null}
           <ul>
             {visibleTree.map((node) => (

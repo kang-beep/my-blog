@@ -52,7 +52,7 @@ export default function GithubTrendingReposList() {
     ? `Updated · ${formatDateTimeKst(feedMeta.syncedAt)} KST`
     : "Top repos · RSS order";
   return (
-    <section className="home-feed-card flex flex-col border border-slate-400 bg-white shadow-sm">
+    <section className="home-feed-card flex flex-col">
       <div className="home-feed-card-header">
         <div>
           <div className="flex flex-wrap items-center gap-2">

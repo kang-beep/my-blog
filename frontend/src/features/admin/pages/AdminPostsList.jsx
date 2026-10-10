@@ -38,7 +38,7 @@ export default function AdminPostsList() {
       setPosts(items);
       setCategories(categoryItems);
     } catch (requestError) {
-      setError(requestError.message || "글 목록을 불러오지 못했습니다.");
+      setError(requestError.message || "Could not load posts.");
     } finally {
       setIsLoading(false);
     }
@@ -164,9 +164,9 @@ export default function AdminPostsList() {
 
       <section className="border border-slate-200 bg-white shadow-sm">
         <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 px-4 py-4 sm:px-6">
-          <h1 className="text-xl font-semibold text-slate-900">포스트</h1>
+          <h1 className="text-xl font-semibold text-slate-900">Posts</h1>
           <Link className="btn btn-primary shrink-0" to={ROUTES.ADMIN_POSTS_NEW}>
-            + 글 추가
+            + New post
           </Link>
         </div>
 
@@ -188,24 +188,24 @@ export default function AdminPostsList() {
               type="search"
               value={searchQuery}
               onChange={(event) => handleSearchChange(event.target.value)}
-              placeholder="제목, 카테고리, 태그 검색"
-              aria-label="글 검색"
+              placeholder="Search title, category, tags"
+              aria-label="Search posts"
             />
           </label>
 
-          {isLoading ? <p className="text-sm text-slate-500">글 목록을 불러오는 중입니다...</p> : null}
+          {isLoading ? <p className="text-sm text-slate-500">Loading posts...</p> : null}
           {error ? <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</p> : null}
 
           {!isLoading && !error && filteredPosts.length === 0 ? (
             <p className="rounded-lg bg-slate-50 px-3 py-8 text-center text-sm text-slate-500">
-              {hasActiveFilter ? "조건에 맞는 글이 없습니다." : "등록된 글이 없습니다."}
+              {hasActiveFilter ? "No posts match your filters." : "No posts yet."}
             </p>
           ) : null}
 
           {!isLoading && !error && paginatedPosts.length > 0 ? (
             <>
               <p className="text-xs text-slate-500 sm:text-sm">
-                {totalCount}개
+                {totalCount} posts
                 {category ? (
                   <>
                     {" "}

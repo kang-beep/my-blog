@@ -7,7 +7,7 @@ async function fetchRowsForDate(fetchedDate, period) {
   const { data, error } = await supabase
     .from(HUGGINGFACE_DAILY_PAPERS_TABLE)
     .select(
-      "id, paper_id, title, ai_summary, ai_keywords, upvotes, github_repo, period, fetched_date, created_at",
+      "id, paper_id, title, summary, upvotes, github_repo, period, fetched_date, created_at",
     )
     .eq("fetched_date", fetchedDate)
     .eq("period", period)
@@ -17,10 +17,7 @@ async function fetchRowsForDate(fetchedDate, period) {
     throw new Error(error.message);
   }
 
-  return (data ?? []).map((row) => ({
-    ...row,
-    ai_keywords: Array.isArray(row.ai_keywords) ? row.ai_keywords : [],
-  }));
+  return data ?? [];
 }
 
 export async function fetchHuggingFaceDailyPapers(period = "daily") {

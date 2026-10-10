@@ -50,9 +50,9 @@ export default function AdminProfile() {
       });
       await loadProfile();
       setAvatarFile(null);
-      setSuccess("프로필이 저장되었습니다.");
+      setSuccess("Profile saved.");
     } catch (requestError) {
-      setError(requestError.message || "프로필 저장에 실패했습니다.");
+      setError(requestError.message || "Could not save profile.");
     } finally {
       setIsSaving(false);
     }
@@ -60,13 +60,13 @@ export default function AdminProfile() {
 
   return (
     <section className="space-y-4">
-      <h2 className="text-2xl font-semibold">프로필 수정</h2>
+      <h2 className="text-2xl font-semibold">Edit profile</h2>
       {error ? <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</p> : null}
       {success ? <p className="rounded-lg bg-emerald-50 px-3 py-2 text-sm text-emerald-700">{success}</p> : null}
 
       <form onSubmit={handleSubmit} className="card space-y-3">
         <div>
-          <label className="label" htmlFor="display-name">이름</label>
+          <label className="label" htmlFor="display-name">Name</label>
           <input
             id="display-name"
             className="input"
@@ -75,7 +75,7 @@ export default function AdminProfile() {
           />
         </div>
         <div>
-          <label className="label" htmlFor="headline">한 줄 소개</label>
+          <label className="label" htmlFor="headline">Headline</label>
           <input
             id="headline"
             className="input"
@@ -84,11 +84,11 @@ export default function AdminProfile() {
           />
         </div>
         <div>
-          <label className="label" htmlFor="avatar">프로필 이미지</label>
+          <label className="label" htmlFor="avatar">Profile image</label>
           {profile?.avatar_url ? (
             <img
               src={profile.avatar_url}
-              alt="현재 프로필"
+              alt="Current profile"
               className="mb-2 h-20 w-20 rounded-full object-cover"
             />
           ) : null}
@@ -111,7 +111,7 @@ export default function AdminProfile() {
           />
         </div>
         <div>
-          <label className="label" htmlFor="email">이메일</label>
+          <label className="label" htmlFor="email">Email</label>
           <input
             id="email"
             className="input"
@@ -122,7 +122,7 @@ export default function AdminProfile() {
           />
         </div>
         <button className="btn btn-primary" type="submit" disabled={isSaving}>
-          {isSaving ? "저장 중..." : "프로필 저장"}
+          {isSaving ? "Saving..." : "Save profile"}
         </button>
       </form>
     </section>

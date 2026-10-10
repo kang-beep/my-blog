@@ -9,7 +9,7 @@ export default function ProtectedRoute({ children }) {
   const isAuthInitialized = useAuthStore((state) => state.isAuthInitialized);
 
   if (!isAuthInitialized) {
-    return <p>인증 상태를 확인하는 중입니다...</p>;
+    return <p>Checking authentication...</p>;
   }
 
   if (!isAuthenticated) {

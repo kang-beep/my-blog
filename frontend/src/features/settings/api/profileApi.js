@@ -34,7 +34,7 @@ export async function upsertProfile(payload) {
 export async function uploadProfileImage(file) {
   const { data: sessionData } = await supabase.auth.getSession();
   if (!sessionData.session) {
-    throw new Error("이미지 업로드는 로그인 후에 가능합니다.");
+    throw new Error("Sign in to upload images.");
   }
 
   const extension = getImageExtension(file.name);

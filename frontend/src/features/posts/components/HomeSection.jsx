@@ -1,14 +1,22 @@
-export default function HomeSection({ title, description, action = null, children }) {
+export default function HomeSection({
+  title,
+  description,
+  action = null,
+  className = "",
+  children,
+}) {
+  const sectionClassName = ["home-section", className].filter(Boolean).join(" ");
+
   return (
-    <section className="home-section space-y-4">
+    <section className={sectionClassName}>
       <div className="home-section-header">
-        <div className="min-w-0 space-y-1">
+        <div className="home-section-heading">
           <h2 className="home-section-title">{title}</h2>
           {description ? <p className="home-section-description">{description}</p> : null}
         </div>
         {action}
       </div>
-      {children}
+      <div className="home-section-body">{children}</div>
     </section>
   );
 }

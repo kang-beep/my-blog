@@ -13,6 +13,7 @@ import AdminPostEditor from "@/features/admin/pages/AdminPostEditor";
 import AdminPortfolio from "@/features/admin/pages/AdminPortfolio";
 import AdminSettings from "@/features/admin/pages/AdminSettings";
 import Portfolio from "@/features/portfolio/pages/Portfolio";
+import Trends from "@/features/trends/pages/Trends";
 
 export default function AppRouter() {
   return (
@@ -20,6 +21,7 @@ export default function AppRouter() {
       <Route path={ROUTES.HOME} element={<Home />} />
       <Route path={ROUTES.POSTS} element={<Posts />} />
       <Route path={ROUTES.POST_DETAIL} element={<PostDetail />} />
+      <Route path={ROUTES.TRENDS} element={<Trends />} />
       <Route path={ROUTES.PORTFOLIO} element={<Portfolio />} />
       <Route path={ROUTES.ADMIN_LOGIN} element={<Login />} />
       <Route

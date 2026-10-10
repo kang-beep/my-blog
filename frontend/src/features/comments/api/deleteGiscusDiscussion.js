@@ -27,10 +27,10 @@ async function formatFunctionInvokeError(error) {
 
   const status = error.context?.status;
   if (status === 401) {
-    return "Unauthorized (401). 관리자 로그인 상태와 Edge Function JWT 검증 설정을 확인하세요.";
+    return "Unauthorized (401). Check admin sign-in and Edge Function JWT verification settings.";
   }
   if (status === 404) {
-    return `Edge Function "${DELETE_GISCUS_DISCUSSION_FUNCTION}" not found (404). Supabase에 배포됐는지 확인하세요.`;
+    return `Edge Function "${DELETE_GISCUS_DISCUSSION_FUNCTION}" not found (404). Confirm it is deployed on Supabase.`;
   }
   if (status) {
     return `${error.message || "Edge Function request failed."} (HTTP ${status})`;
@@ -38,10 +38,10 @@ async function formatFunctionInvokeError(error) {
 
   if (error.message?.includes("Failed to send a request")) {
     return [
-      "Edge Function에 연결하지 못했습니다.",
-      "확인: 함수 dynamic-handler 배포 여부,",
-      "Dashboard JWT verify OFF(또는 legacy secret 일치),",
-      "프로젝트 일시정지·네트워크 차단.",
+      "Could not reach the Edge Function.",
+      "Check: dynamic-handler deployed,",
+      "Dashboard JWT verify OFF (or legacy secret match),",
+      "project paused or network blocked.",
     ].join(" ");
   }
 

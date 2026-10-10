@@ -232,6 +232,30 @@ create index if not exists idx_gh_trending_period
 create unique index if not exists idx_gh_trending_url_period_fetched_date
   on public.github_trending_repos (url, period, fetched_date);
 
+-- ─── Trend AI digests (Gemini summaries per source/period) ─
+
+create table if not exists public.trend_ai_digests (
+  id uuid primary key default gen_random_uuid(),
+  fetched_date date not null,
+  source text not null check (source in ('github', 'huggingface')),
+  period text not null check (period in ('daily', 'weekly', 'monthly')),
+  headline text not null,
+  summary text not null,
+  keywords text[] not null default '{}',
+  model text not null,
+  prompt_version text not null,
+  input_fingerprint text not null,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (fetched_date, source, period)
+);
+
+create index if not exists idx_trend_ai_digests_fetched_date
+  on public.trend_ai_digests (fetched_date desc);
+
+create index if not exists idx_trend_ai_digests_source_period
+  on public.trend_ai_digests (source, period);
+
 -- ─── Admin secrets (Notion / Giscus PAT, etc.) ────────────
 
 create table if not exists public.admin_secrets (
@@ -338,8 +362,10 @@ grant execute on function public.refresh_tag_stats() to authenticated;
 
 grant select on table public.huggingface_daily_papers to anon, authenticated;
 grant select on table public.github_trending_repos to anon, authenticated;
+grant select on table public.trend_ai_digests to anon, authenticated;
 grant all on table public.huggingface_daily_papers to service_role;
 grant all on table public.github_trending_repos to service_role;
+grant all on table public.trend_ai_digests to service_role;
 
 revoke all on table public.admin_secrets from anon, authenticated, public;
 grant all on table public.admin_secrets to service_role;
@@ -366,6 +392,7 @@ alter table public.tag_stats enable row level security;
 alter table public.tag_edges enable row level security;
 alter table public.huggingface_daily_papers enable row level security;
 alter table public.github_trending_repos enable row level security;
+alter table public.trend_ai_digests enable row level security;
 
 -- categories
 drop policy if exists "categories_select_public" on public.categories;
@@ -478,6 +505,10 @@ create policy "hf_papers_select_public"
 drop policy if exists "gh_trending_select_public" on public.github_trending_repos;
 create policy "gh_trending_select_public"
   on public.github_trending_repos for select using (true);
+
+drop policy if exists "trend_ai_digests_select_public" on public.trend_ai_digests;
+create policy "trend_ai_digests_select_public"
+  on public.trend_ai_digests for select using (true);
 
 -- ─── Storage (create buckets in Dashboard first) ───────
 -- Buckets: avatars, posts-images, portfolio-images

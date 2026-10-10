@@ -6,7 +6,7 @@ export function formatDate(dateInput) {
     return "";
   }
 
-  return date.toLocaleDateString("ko-KR", {
+  return date.toLocaleDateString("en-US", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
@@ -23,7 +23,7 @@ export function formatDateTime(dateInput) {
     return "";
   }
 
-  return date.toLocaleString("ko-KR", {
+  return date.toLocaleString("en-US", {
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
@@ -44,7 +44,7 @@ export function formatDateTimeKst(dateInput) {
     return "";
   }
 
-  return date.toLocaleString("ko-KR", {
+  return date.toLocaleString("en-US", {
     timeZone: "Asia/Seoul",
     year: "numeric",
     month: "2-digit",

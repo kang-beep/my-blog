@@ -22,7 +22,7 @@ export function getImageExtension(fileName) {
 
 export function formatStorageError(error) {
   if (!error) {
-    return "Storage 업로드에 실패했습니다.";
+    return "Storage upload failed.";
   }
   const parts = [error.message];
   if (error.statusCode) {

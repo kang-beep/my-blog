@@ -4,7 +4,7 @@ import { Search, X } from "lucide-react";
 import { useSearchParams } from "react-router-dom";
 import PostsCategoryTabs from "@/features/posts/components/PostsCategoryTabs";
 import PostsListItem from "@/features/posts/components/PostsListItem";
-import { POSTS_CATEGORY_ALL, POSTS_PAGE } from "@/features/posts/constants/postsList";
+import { POSTS_CATEGORY_ALL } from "@/features/posts/constants/postsList";
 import { fetchCategories, fetchPosts } from "@/features/posts/api/postApi";
 import {
   filterPostsByCategory,
@@ -17,9 +17,6 @@ import TagRankingPanel from "@/features/tags/components/TagRankingPanel";
 import { useTagRanking } from "@/features/tags/hooks/useTagRanking";
 import { useTags } from "@/features/tags/hooks/useTags";
 import Pagination from "@/shared/ui/Pagination";
-import PageBackLink from "@/shared/ui/PageBackLink";
-import { ROUTES } from "@/shared/constants/routes";
-
 export default function Posts() {
   const [searchParams, setSearchParams] = useSearchParams();
   const category = searchParams.get("category") || POSTS_CATEGORY_ALL;
@@ -71,15 +68,17 @@ export default function Posts() {
   );
 
   const updateSearchParams = (updates) => {
-    const next = new URLSearchParams(searchParams);
-    for (const [key, value] of Object.entries(updates)) {
-      if (!value) {
-        next.delete(key);
-      } else {
-        next.set(key, value);
+    setSearchParams((current) => {
+      const next = new URLSearchParams(current);
+      for (const [key, value] of Object.entries(updates)) {
+        if (!value) {
+          next.delete(key);
+        } else {
+          next.set(key, value);
+        }
       }
-    }
-    setSearchParams(next);
+      return next;
+    });
   };
 
   const selectCategory = (nextCategory) => {
@@ -90,7 +89,11 @@ export default function Posts() {
   };
 
   const selectTag = (nextTag) => {
-    updateSearchParams({ tag: nextTag, page: "" });
+    const normalizedTag = typeof nextTag === "string" ? nextTag.trim() : "";
+    if (!normalizedTag) {
+      return;
+    }
+    updateSearchParams({ tag: normalizedTag, page: "" });
   };
 
   const selectPage = (nextPage) => {
@@ -120,15 +123,6 @@ export default function Posts() {
 
   return (
     <div className="posts-page space-y-4">
-      <PageBackLink to={ROUTES.HOME} label="Home" />
-
-      <header className="posts-page-header">
-        <div className="min-w-0 space-y-1">
-          <h1 className="posts-page-title">{POSTS_PAGE.title}</h1>
-          <p className="posts-page-description">{POSTS_PAGE.description}</p>
-        </div>
-      </header>
-
       <PostsCategoryTabs
         categories={tabCategories}
         selectedCategory={category}
@@ -154,7 +148,7 @@ export default function Posts() {
           </span>
           <button
             type="button"
-            className="inline-flex items-center gap-0.5 text-indigo-600 hover:text-indigo-500"
+            className="text-link gap-0.5"
             onClick={() => clearUrlFilter("tag")}
           >
             <X size={14} aria-hidden />
@@ -164,43 +158,48 @@ export default function Posts() {
       ) : null}
 
       <div className="posts-page-layout">
-        <section className="posts-main-panel posts-main-card" aria-label="Posts list">
-          {isLoading ? <p className="text-sm text-slate-500">Loading posts...</p> : null}
-          {error ? <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</p> : null}
-
-          {!isLoading && !error && filteredPosts.length === 0 ? (
-            <p className="rounded-lg bg-slate-50 px-3 py-8 text-center text-sm text-slate-500">
-              {hasActiveFilter ? "No posts match your filters." : "No posts yet."}
-            </p>
-          ) : null}
-
-          {!isLoading && !error && paginatedPosts.length > 0 ? (
-            <>
-              <p className="text-xs text-slate-500 sm:text-sm">
-                {totalCount} post{totalCount === 1 ? "" : "s"}
-                {category ? (
-                  <>
-                    {" "}
-                    in <span className="font-medium text-slate-700">{category}</span>
-                  </>
-                ) : null}
+        <section className="home-feed-card posts-main-panel" aria-label="Posts list">
+          <header className="home-feed-card-header">
+            <div className="min-w-0">
+              <h2 className="home-feed-card-header-title">
+                {category || "Posts"}
+              </h2>
+              <p className="home-feed-card-header-description">
+                {isLoading
+                  ? "Loading..."
+                  : `${totalCount} post${totalCount === 1 ? "" : "s"}`}
               </p>
+            </div>
+          </header>
 
-              <ul className="posts-list">
-                {paginatedPosts.map((post) => (
-                  <PostsListItem key={post.id} post={post} />
-                ))}
-              </ul>
+          <div className="home-feed-card-body home-feed-card-body-static space-y-4">
+            {isLoading ? <p className="text-sm text-slate-500">Loading posts...</p> : null}
+            {error ? <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{error}</p> : null}
 
-              <div className="pt-2">
-                <Pagination
-                  currentPage={currentPage}
-                  totalPages={totalPages}
-                  onPageChange={selectPage}
-                />
-              </div>
-            </>
-          ) : null}
+            {!isLoading && !error && filteredPosts.length === 0 ? (
+              <p className="rounded-lg bg-slate-50 px-3 py-8 text-center text-sm text-slate-500">
+                {hasActiveFilter ? "No posts match your filters." : "No posts yet."}
+              </p>
+            ) : null}
+
+            {!isLoading && !error && paginatedPosts.length > 0 ? (
+              <>
+                <ul className="posts-list">
+                  {paginatedPosts.map((post) => (
+                    <PostsListItem key={post.id} post={post} />
+                  ))}
+                </ul>
+
+                <div className="pt-2">
+                  <Pagination
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={selectPage}
+                  />
+                </div>
+              </>
+            ) : null}
+          </div>
         </section>
 
         <aside className="posts-side-column" aria-label="Tag insights">

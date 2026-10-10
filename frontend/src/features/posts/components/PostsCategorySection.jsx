@@ -17,7 +17,7 @@ export default function PostsCategorySection({ category, posts, defaultOpen = tr
           <Folder size={16} className="shrink-0 text-slate-400" aria-hidden />
           <span className="min-w-0">
             <span className="block text-[11px] font-medium uppercase tracking-wide text-slate-400">
-              카테고리
+              Categories
             </span>
             <span className="flex items-baseline gap-2">
               <span className="font-semibold text-slate-900">{category}</span>

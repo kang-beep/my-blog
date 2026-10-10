@@ -11,7 +11,7 @@ function formatUpdatedAt(value) {
     return null;
   }
   try {
-    return new Date(value).toLocaleString("ko-KR");
+    return new Date(value).toLocaleString("en-US");
   } catch {
     return value;
   }
@@ -29,17 +29,17 @@ function SecretField({ field, meta, onSaved, onDeleted }) {
     setError("");
     setSuccess("");
     if (!draft.trim()) {
-      setError("값을 입력해 주세요.");
+      setError("Enter a value.");
       return;
     }
     setIsSaving(true);
     try {
       await upsertAdminSecret(field.key, draft.trim());
       setDraft("");
-      setSuccess("저장되었습니다.");
+      setSuccess("Saved.");
       await onSaved?.();
     } catch (requestError) {
-      setError(requestError.message || "저장에 실패했습니다.");
+      setError(requestError.message || "Save failed.");
     } finally {
       setIsSaving(false);
     }
@@ -49,7 +49,7 @@ function SecretField({ field, meta, onSaved, onDeleted }) {
     if (!meta?.is_set) {
       return;
     }
-    const confirmed = window.confirm(`「${field.label}」을(를) 삭제할까요?`);
+    const confirmed = window.confirm(`Delete "${field.label}"?`);
     if (!confirmed) {
       return;
     }
@@ -59,10 +59,10 @@ function SecretField({ field, meta, onSaved, onDeleted }) {
     try {
       await deleteAdminSecret(field.key);
       setDraft("");
-      setSuccess("삭제되었습니다.");
+      setSuccess("Deleted.");
       await onDeleted?.();
     } catch (requestError) {
-      setError(requestError.message || "삭제에 실패했습니다.");
+      setError(requestError.message || "Delete failed.");
     } finally {
       setIsDeleting(false);
     }
@@ -77,7 +77,7 @@ function SecretField({ field, meta, onSaved, onDeleted }) {
 
       {meta?.is_set ? (
         <p className="rounded-lg bg-slate-50 px-3 py-2 text-sm text-slate-700">
-          설정됨: <span className="font-mono">{meta.masked_value}</span>
+          Set: <span className="font-mono">{meta.masked_value}</span>
           {meta.updated_at ? (
             <span className="ml-2 text-slate-400">
               · {formatUpdatedAt(meta.updated_at)}
@@ -86,13 +86,13 @@ function SecretField({ field, meta, onSaved, onDeleted }) {
         </p>
       ) : (
         <p className="rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800">
-          아직 설정되지 않았습니다.
+          Not configured yet.
         </p>
       )}
 
       <div>
         <label className="label" htmlFor={`secret-${field.key}`}>
-          {meta?.is_set ? "새 값으로 덮어쓰기" : "값 입력"}
+          {meta?.is_set ? "Replace with new value" : "Enter value"}
         </label>
         <input
           id={`secret-${field.key}`}
@@ -110,7 +110,7 @@ function SecretField({ field, meta, onSaved, onDeleted }) {
 
       <div className="flex flex-wrap gap-2">
         <button className="btn btn-primary" type="submit" disabled={isSaving || isDeleting}>
-          {isSaving ? "저장 중..." : "저장"}
+          {isSaving ? "Saving..." : "Save"}
         </button>
         {meta?.is_set ? (
           <button
@@ -119,7 +119,7 @@ function SecretField({ field, meta, onSaved, onDeleted }) {
             onClick={handleDelete}
             disabled={isSaving || isDeleting}
           >
-            {isDeleting ? "삭제 중..." : "삭제"}
+            {isDeleting ? "Deleting..." : "Delete"}
           </button>
         ) : null}
       </div>
@@ -147,7 +147,7 @@ export default function AdminSettings() {
       const data = await listAdminSecrets();
       setRows(data);
     } catch (requestError) {
-      setLoadError(requestError.message || "시크릿 목록을 불러오지 못했습니다.");
+      setLoadError(requestError.message || "Could not load secrets.");
     } finally {
       setIsLoading(false);
     }
@@ -160,16 +160,16 @@ export default function AdminSettings() {
   return (
     <section className="space-y-4">
       <div>
-        <h2 className="text-2xl font-semibold">설정</h2>
+        <h2 className="text-2xl font-semibold">Settings</h2>
         <p className="mt-1 text-sm text-slate-500">
-          관리자 전용 시크릿입니다. 저장된 값은 마스킹만 표시되며, 새 값으로 덮어쓰거나 삭제할 수 있습니다.
+          Admin-only secrets. Stored values are shown masked; you can overwrite or delete them.
         </p>
       </div>
 
       {loadError ? (
         <p className="rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-600">{loadError}</p>
       ) : null}
-      {isLoading ? <p className="text-sm text-slate-500">불러오는 중...</p> : null}
+      {isLoading ? <p className="text-sm text-slate-500">Loading...</p> : null}
 
       <div className="space-y-4">
         {ADMIN_SECRET_FIELDS.map((field) => (

@@ -30,7 +30,7 @@ export default function RichTextEditor({
   onChange,
   postId,
   disabled = false,
-  placeholder = "본문을 입력하세요. 이미지는 붙여넣기(Ctrl+V), 드래그 앤 드롭, 툴바 버튼으로 삽입할 수 있습니다.",
+  placeholder = "Write the body here. Insert images via paste (Ctrl+V), drag and drop, or the toolbar.",
 }: RichTextEditorProps) {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadError, setUploadError] = useState("");
@@ -51,7 +51,7 @@ export default function RichTextEditor({
     }
 
     if (!currentPostId) {
-      setUploadError("글 ID가 없어 이미지를 업로드할 수 없습니다.");
+      setUploadError("Cannot upload images without a post ID.");
       return;
     }
 
@@ -62,7 +62,7 @@ export default function RichTextEditor({
       const url = await uploadEditorImage(file, currentPostId);
       currentEditor.chain().focus().setImage({ src: url, alt: file.name }).run();
     } catch (error) {
-      const message = error instanceof Error ? error.message : "이미지 업로드에 실패했습니다.";
+      const message = error instanceof Error ? error.message : "Image upload failed.";
       setUploadError(message);
     } finally {
       setIsUploading(false);
@@ -201,7 +201,7 @@ export default function RichTextEditor({
       />
       <EditorContent editor={editor} />
       {editor ? <TableContextMenu editor={editor} /> : null}
-      {isUploading ? <p className="border-t border-slate-100 px-3 py-2 text-xs text-slate-500">이미지 업로드 중...</p> : null}
+      {isUploading ? <p className="border-t border-slate-100 px-3 py-2 text-xs text-slate-500">Uploading image...</p> : null}
       {uploadError ? <p className="border-t border-slate-100 px-3 py-2 text-xs text-rose-600">{uploadError}</p> : null}
     </div>
   );
