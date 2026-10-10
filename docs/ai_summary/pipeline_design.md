@@ -89,12 +89,14 @@ RLS:
 | PERIOD | `all` (기본) \| `daily` \| `weekly` \| `monthly` |
 | FORCE_REFRESH | `true`면 fingerprint skip 무시 |
 
-### 예정
+### Actions 연결
 
-- Feed sync 성공 후 `workflow_call`로 digest job
+- Workflow: `.github/workflows/fetch_github_trending.yml`
+- Job: `sync` 성공 후 `digest` (`needs: sync`)
 - 키: service_role → `admin_secrets.gemini_api_key`
-- 결과: `trend_ai_digests` upsert
-- HF용 `summarize-huggingface-*-ai.mjs` 추가
+- 결과: `trend_ai_digests` upsert (fingerprint match 시 Gemini skip)
+
+예정: HF용 `summarize-huggingface-*-ai.mjs` 추가
 
 실패 시: digest job만 fail. feed sync 결과는 유지.
 
@@ -110,7 +112,7 @@ RLS:
 
 구현: `scripts/github-actions/lib/trendAiGithub.mjs` (`buildGithubPrompt`)
 
-모델 기본: `gemini-2.0-flash` (`GEMINI_MODEL`로 오버라이드)
+모델 기본: `gemini-flash-latest` (`GEMINI_MODEL`로 오버라이드)
 
 ---
 
@@ -132,9 +134,9 @@ RLS:
 | 1 | SQL `trend_ai_digests` + RLS | ✅ 레포 반영 / ⏳ Supabase 적용 |
 | 2 | GH summarize 스크립트 + fingerprint | ✅ |
 | 3 | 스크립트 → DB upsert + DB fingerprint | ✅ |
-| 4 | GH Actions workflow 연결 | ❌ |
+| 4 | GH Actions workflow 연결 | ✅ |
 | 5 | HF digest | ❌ |
-| 6 | FE mock → SELECT | ❌ |
+| 6 | FE mock → SELECT | ✅ (GH; HF empty until digest exists) |
 
 ---
 

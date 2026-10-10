@@ -14,7 +14,7 @@ GitHub Trending / Hugging Face Papers 캐시를 Gemini로 요약해 Home·Trends
 | GH 요약 스크립트 (`summarize-github-trending-ai.mjs`) | ✅ daily/weekly/monthly + fingerprint skip |
 | GH → DB upsert (`trend_ai_digests`) | ✅ 완료 |
 | HF 요약 파이프라인 | ❌ 미착수 |
-| Actions workflow 연결 | ❌ 미착수 |
+| Actions workflow 연결 | ✅ `fetch_github_trending.yml` digest job (sync 성공 후) |
 | Home / Trends UI → 실데이터 | ❌ mock 유지 |
 
 ## 목표 (확정)

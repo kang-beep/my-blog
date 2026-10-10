@@ -68,3 +68,25 @@ jobs:
           PERIOD: ${{ inputs.period || 'all' }}
           SKIP_DELETE: ${{ inputs.skip_delete }}
         run: node scripts/github-actions/sync-github-trending-repos.mjs
+
+  # Runs only after sync succeeds. Fingerprint skip avoids Gemini when inputs unchanged.
+  digest:
+    name: Summarize GitHub trending (Gemini)
+    needs: sync
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Upsert AI digests (skip Gemini on fingerprint match)
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          PERIOD: ${{ inputs.period || 'all' }}
+        run: npm run summarize:gh-trending
