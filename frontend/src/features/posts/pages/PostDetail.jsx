@@ -44,7 +44,7 @@ export default function PostDetail() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState("");
   const [headings, setHeadings] = useState([]);
-  const activeHeadingId = useActiveHeadingId(headings);
+  const [activeHeadingId, setActiveHeadingId] = useActiveHeadingId(headings);
 
   const handleHeadingsChange = useCallback((nextHeadings) => {
     setHeadings(nextHeadings);
@@ -92,11 +92,7 @@ export default function PostDetail() {
       ) : null}
 
       {!isLoading && post ? (
-        <div
-          className={
-            headings.length > 0 ? "post-detail-layout" : "post-detail-layout post-detail-layout-no-toc"
-          }
-        >
+        <div className="post-detail-layout">
           <div className="post-detail-main space-y-3">
             <PageBackLink to={ROUTES.POSTS} label="Posts" />
 
@@ -154,11 +150,13 @@ export default function PostDetail() {
             </article>
           </div>
 
-          {headings.length > 0 ? (
-            <aside className="post-detail-toc-aside">
-              <PostOnThisPage headings={headings} activeId={activeHeadingId} />
-            </aside>
-          ) : null}
+          <aside className="post-detail-toc-aside">
+            <PostOnThisPage
+              headings={headings}
+              activeId={activeHeadingId}
+              onSelectHeading={setActiveHeadingId}
+            />
+          </aside>
         </div>
       ) : null}
 

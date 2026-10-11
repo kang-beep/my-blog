@@ -1,6 +1,7 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 
-const TOC_ROOT_MARGIN = "-12% 0px -72% 0px";
+const ACTIVE_OFFSET_PX = 96;
+const CLICK_SCROLL_LOCK_MS = 1000;
 
 function getScrollRoot(element) {
   let current = element?.parentElement ?? null;
@@ -16,9 +17,42 @@ function getScrollRoot(element) {
   return null;
 }
 
+function resolveActiveHeadingId(ids) {
+  const elements = ids
+    .map((id) => document.getElementById(id))
+    .filter((element) => element instanceof HTMLElement);
+  if (elements.length === 0) {
+    return "";
+  }
+
+  const scrollRoot = getScrollRoot(elements[0]);
+  const rootTop = scrollRoot ? scrollRoot.getBoundingClientRect().top : 0;
+  const marker = rootTop + ACTIVE_OFFSET_PX;
+
+  let activeId = elements[0].id;
+  for (const element of elements) {
+    if (element.getBoundingClientRect().top <= marker) {
+      activeId = element.id;
+      continue;
+    }
+    break;
+  }
+
+  return activeId;
+}
+
 export function useActiveHeadingId(headings) {
   const [activeId, setActiveId] = useState("");
-  const headingKey = headings.map((item) => item.id).join("|");
+  const lockUntilRef = useRef(0);
+  const headingKey = headings.map((item) => item.id).filter(Boolean).join("|");
+
+  const selectHeading = useCallback((id) => {
+    if (!id) {
+      return;
+    }
+    lockUntilRef.current = Date.now() + CLICK_SCROLL_LOCK_MS;
+    setActiveId(id);
+  }, []);
 
   useEffect(() => {
     if (!headingKey) {
@@ -27,41 +61,31 @@ export function useActiveHeadingId(headings) {
     }
 
     const ids = headingKey.split("|");
-    const elements = ids.map((id) => document.getElementById(id)).filter(Boolean);
-    if (elements.length === 0) {
+    const first = document.getElementById(ids[0]);
+    if (!first) {
       setActiveId("");
       return undefined;
     }
 
-    const visibleIds = new Set();
-    const root = getScrollRoot(elements[0]);
+    const scrollRoot = getScrollRoot(first);
+    const scrollTarget = scrollRoot ?? window;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            visibleIds.add(entry.target.id);
-          } else {
-            visibleIds.delete(entry.target.id);
-          }
-        }
+    const updateActive = () => {
+      if (Date.now() < lockUntilRef.current) {
+        return;
+      }
+      setActiveId(resolveActiveHeadingId(ids));
+    };
 
-        const nextActive = ids.find((id) => visibleIds.has(id));
-        if (nextActive) {
-          setActiveId(nextActive);
-        }
-      },
-      { root, rootMargin: TOC_ROOT_MARGIN, threshold: [0, 0.25, 1] },
-    );
+    updateActive();
+    scrollTarget.addEventListener("scroll", updateActive, { passive: true });
+    window.addEventListener("resize", updateActive);
 
-    for (const element of elements) {
-      observer.observe(element);
-    }
-
-    setActiveId(elements[0].id);
-
-    return () => observer.disconnect();
+    return () => {
+      scrollTarget.removeEventListener("scroll", updateActive);
+      window.removeEventListener("resize", updateActive);
+    };
   }, [headingKey]);
 
-  return activeId;
+  return [activeId, selectHeading];
 }

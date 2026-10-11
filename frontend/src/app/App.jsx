@@ -38,7 +38,7 @@ export default function App() {
       <main
         className={`min-h-0 min-w-0 flex-1 bg-white ${
           isPostDetailPage
-            ? "overflow-y-auto px-4 py-4 sm:px-6 lg:px-12 xl:px-16 lg:py-6"
+            ? "overflow-y-auto py-4 pl-4 pr-0 sm:pl-6 sm:pr-0 lg:py-6 lg:pl-12 lg:pr-0 xl:pl-16 xl:pr-0"
             : "overflow-y-auto px-4 py-5 lg:px-8 lg:py-6"
         }`}
       >

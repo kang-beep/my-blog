@@ -2,14 +2,19 @@ import { useEffect, useRef } from "react";
 import { SHORT_POST_CONTENT_PADDING_CLASS } from "@/features/posts/constants/postDetail";
 import { useIsShortPostContent } from "@/features/posts/hooks/useIsShortPostContent";
 import { preparePostContentTablesHtml } from "@/features/posts/utils/applyPostContentTableLayout";
-import { ensureAndCollectPostHeadings } from "@/features/posts/utils/collectPostHeadings";
+import {
+  ensureAndCollectPostHeadings,
+  preparePostContentHeadingsHtml,
+} from "@/features/posts/utils/collectPostHeadings";
 import { isHtmlContent, sanitizePostHtml } from "@/shared/lib/sanitizeHtml";
 import "@/features/admin/components/RichTextEditor/editor.css";
 
 const BODY_TEXT_CLASS = "text-[0.95rem] leading-relaxed text-slate-800 lg:text-base";
 
 function buildPostContentHtml(content) {
-  return preparePostContentTablesHtml(sanitizePostHtml(content));
+  const sanitized = sanitizePostHtml(content);
+  const withTables = preparePostContentTablesHtml(sanitized);
+  return preparePostContentHeadingsHtml(withTables);
 }
 
 export default function PostDetailBody({ content, onHeadingsChange }) {

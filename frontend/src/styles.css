@@ -571,29 +571,43 @@
     @apply w-full;
   }
 
+  /* With TOC: reserve a right rail so links never clip outside main.
+     Post still uses up to 56rem / 64rem; leftover space goes to the left.
+     Without TOC: keep the article visually centered. */
   .post-detail-layout {
-    @apply grid grid-cols-1 gap-8;
-    @apply xl:grid-cols-[minmax(0,1fr)_minmax(0,46rem)_13rem_minmax(0,1fr)] xl:gap-x-8 xl:gap-y-3;
+    @apply grid w-full grid-cols-1 gap-8;
+    @apply xl:grid-cols-[minmax(0,1fr)_minmax(0,56rem)_12.5rem] xl:gap-x-4;
+    @apply 2xl:grid-cols-[minmax(0,1fr)_minmax(0,64rem)_12.5rem];
   }
 
   .post-detail-layout-no-toc {
-    @apply xl:grid-cols-[minmax(0,1fr)_minmax(0,46rem)_minmax(0,1fr)];
+    @apply grid w-full grid-cols-1 gap-8;
+    @apply xl:grid-cols-[minmax(0,1fr)_minmax(0,56rem)_minmax(0,1fr)] xl:gap-x-6;
+    @apply 2xl:grid-cols-[minmax(0,1fr)_minmax(0,64rem)_minmax(0,1fr)];
   }
 
   .post-detail-main {
-    @apply mx-auto min-w-0 w-full max-w-3xl xl:col-start-2 xl:mx-0 xl:max-w-none;
+    @apply mx-auto min-w-0 w-full max-w-3xl lg:max-w-4xl xl:col-start-2 xl:mx-0 xl:max-w-none;
   }
 
   .post-detail-toc-aside {
-    @apply min-w-0 xl:col-start-3 xl:row-start-1 xl:sticky xl:top-6 xl:self-start;
+    @apply min-w-0 xl:col-start-3 xl:row-start-1 xl:w-full xl:justify-self-end xl:self-start xl:sticky xl:top-6 xl:pr-2;
+  }
+
+  .post-detail-toc-aside:has(.post-toc-empty) {
+    @apply max-xl:hidden;
   }
 
   .post-toc {
-    @apply px-0 py-0;
+    @apply min-w-0 px-0 py-0;
   }
 
   .post-toc-title {
     @apply m-0 mb-2 text-xs font-semibold uppercase tracking-[0.12em] text-slate-500;
+  }
+
+  .post-toc-empty {
+    @apply m-0 border-l border-slate-300 py-1.5 pl-3 text-sm leading-snug text-slate-400;
   }
 
   .post-toc-list {
@@ -601,8 +615,9 @@
   }
 
   .post-toc-link {
-    @apply block w-full border-l-2 border-transparent py-1.5 pl-3 pr-1 text-left text-sm leading-snug text-slate-500 transition-colors hover:text-slate-900;
+    @apply block w-full break-words border-l-2 border-transparent py-1.5 pl-3 pr-1 text-left text-sm leading-snug text-slate-500 transition-colors hover:text-slate-900;
     margin-left: -1px;
+    overflow-wrap: anywhere;
   }
 
   .post-toc-link-h3 {
