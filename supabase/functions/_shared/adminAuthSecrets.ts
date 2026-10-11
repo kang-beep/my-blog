@@ -3,9 +3,11 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 const SECRET_KEY_NOTION = "notion_token";
 const SECRET_KEY_GISCUS_PAT = "giscus_github_pat";
 const SECRET_KEY_GEMINI = "gemini_api_key";
+const SECRET_KEY_GEMINI_OUTPUT_LANGUAGE = "gemini_output_language";
 const ENV_FALLBACK_GISCUS = "my-blog-giscus-tokens";
+const DEFAULT_GEMINI_OUTPUT_LANGUAGE = "en";
 
-function createServiceClient() {
+export function createServiceClient() {
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
   const serviceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY");
   if (!supabaseUrl || !serviceRoleKey) {
@@ -64,6 +66,36 @@ export async function getGeminiApiKey(): Promise<string> {
   throw new Error(
     "gemini_api_key is not set. Save it in Admin → Settings.",
   );
+}
+
+export function normalizeGeminiOutputLanguage(value: unknown): "en" | "ko" {
+  const normalized = String(value ?? "").trim().toLowerCase();
+  if (normalized === "ko") {
+    return "ko";
+  }
+  return DEFAULT_GEMINI_OUTPUT_LANGUAGE;
+}
+
+export async function getGeminiOutputLanguage(): Promise<"en" | "ko"> {
+  const fromDb = await readSecretFromDb(SECRET_KEY_GEMINI_OUTPUT_LANGUAGE);
+  return normalizeGeminiOutputLanguage(fromDb);
+}
+
+export async function saveGeminiOutputLanguage(language: "en" | "ko"): Promise<"en" | "ko"> {
+  const normalized = normalizeGeminiOutputLanguage(language);
+  const supabase = createServiceClient();
+  const { error } = await supabase.from("admin_secrets").upsert(
+    {
+      key: SECRET_KEY_GEMINI_OUTPUT_LANGUAGE,
+      value: normalized,
+      updated_at: new Date().toISOString(),
+    },
+    { onConflict: "key" },
+  );
+  if (error) {
+    throw new Error(`Failed to save output language: ${error.message}`);
+  }
+  return normalized;
 }
 
 export async function requireAuthedUser(req: Request) {

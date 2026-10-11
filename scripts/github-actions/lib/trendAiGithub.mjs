@@ -38,11 +38,22 @@ export function buildGithubDigestInput(rows) {
 }
 
 /**
- * Fingerprint of digest inputs only (repos + prompt version).
+ * Fingerprint of digest inputs (repos + prompt version + output language).
  * Model is intentionally excluded so gemini-flash-latest / pinned flash
  * aliases do not force a Gemini re-call when trending data is unchanged.
  */
-export function fingerprintGithubInput(inputRows, { promptVersion }) {
+export function fingerprintGithubInput(inputRows, { promptVersion, language }) {
+  const normalized = inputRows.map((row) => [row.title, row.description]);
+  const payload = JSON.stringify({
+    promptVersion,
+    language: language || "en",
+    rows: normalized,
+  });
+  return createHash("sha256").update(payload).digest("hex");
+}
+
+/** Fingerprints before language was included in the hash. */
+export function fingerprintGithubInputWithoutLanguage(inputRows, { promptVersion }) {
   const normalized = inputRows.map((row) => [row.title, row.description]);
   const payload = JSON.stringify({
     promptVersion,
@@ -84,10 +95,17 @@ export function writeLocalDigestCache(meta, digest) {
   writeFileSync(outputPath(meta), `${JSON.stringify(digest, null, 2)}\n`, "utf8");
 }
 
-export function buildGithubPrompt({ period, fetchedDate, inputRows }) {
+function languageInstruction(language) {
+  if (language === "ko") {
+    return "Language: Korean only. Write headline, summary, and keywords in Korean.";
+  }
+  return "Language: English only. Write headline, summary, and keywords in English.";
+}
+
+export function buildGithubPrompt({ period, fetchedDate, inputRows, language = "en" }) {
   const systemText = [
     "You are a tech trend editor for a developer blog.",
-    "Language: English only.",
+    languageInstruction(language),
     "Analyze the GitHub trending repositories for the given period.",
     "Do not invent repos that are not in the list.",
     "No hype or marketing tone.",
@@ -98,6 +116,7 @@ export function buildGithubPrompt({ period, fetchedDate, inputRows }) {
     `Source: github`,
     `Period: ${period}`,
     `Fetched date (UTC): ${fetchedDate}`,
+    `Output language: ${language}`,
     `Repo count: ${inputRows.length}`,
     `Repos JSON:`,
     JSON.stringify(inputRows, null, 2),

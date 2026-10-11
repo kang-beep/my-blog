@@ -1,10 +1,17 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   deleteAdminSecret,
+  getGeminiOutputLanguage,
   listAdminSecrets,
+  saveGeminiOutputLanguage,
   upsertAdminSecret,
 } from "@/features/admin/api/adminSecretsApi";
-import { ADMIN_SECRET_FIELDS } from "@/shared/constants/adminSecrets";
+import { regenerateTrendAiDigestsNow } from "@/features/admin/api/regenerateTrendAiDigestsApi";
+import {
+  ADMIN_SECRET_FIELDS,
+  GEMINI_API_KEY_FIELD,
+  GEMINI_OUTPUT_LANGUAGE_OPTIONS,
+} from "@/shared/constants/adminSecrets";
 
 function formatUpdatedAt(value) {
   if (!value) {
@@ -69,9 +76,9 @@ function SecretField({ field, meta, onSaved, onDeleted }) {
   };
 
   return (
-    <form onSubmit={handleSave} className="card space-y-3">
+    <form onSubmit={handleSave} className="space-y-3">
       <div>
-        <h3 className="text-lg font-semibold">{field.label}</h3>
+        <h3 className="text-base font-semibold text-slate-900">{field.label}</h3>
         <p className="mt-1 text-sm text-slate-500">{field.help}</p>
       </div>
 
@@ -127,6 +134,212 @@ function SecretField({ field, meta, onSaved, onDeleted }) {
   );
 }
 
+function LanguageReplaceModal({ language, isBusy, onYes, onNo, onClose }) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <button
+        type="button"
+        className="absolute inset-0 bg-black/40"
+        aria-label="Close dialog"
+        disabled={isBusy}
+        onClick={onClose}
+      />
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="language-replace-title"
+        className="relative z-10 w-full max-w-md rounded-xl border border-slate-200 bg-white p-5 shadow-lg"
+      >
+        <h3 id="language-replace-title" className="text-lg font-semibold text-slate-900">
+          Replace AI summaries now?
+        </h3>
+        <p className="mt-2 text-sm text-slate-600">
+          AI로 생성한 응답 정보를 지금 교체할까요? Yes면 현재 트렌드 목록으로 Gemini에 다시
+          물어보고 <span className="font-mono">{language}</span> 로 덮어씁니다. No면 언어만
+          저장하고, 다음 자동 작업 때 바뀝니다.
+        </p>
+        <div className="mt-5 flex flex-wrap justify-end gap-2">
+          <button className="btn" type="button" disabled={isBusy} onClick={onNo}>
+            No
+          </button>
+          <button className="btn btn-primary" type="button" disabled={isBusy} onClick={onYes}>
+            {isBusy ? "Working..." : "Yes"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function GeminiSettingsCard({ apiKeyMeta, onReload }) {
+  const [language, setLanguage] = useState("en");
+  const [savedLanguage, setSavedLanguage] = useState("en");
+  const [languageError, setLanguageError] = useState("");
+  const [languageSuccess, setLanguageSuccess] = useState("");
+  const [isLoadingLanguage, setIsLoadingLanguage] = useState(true);
+  const [isSavingLanguage, setIsSavingLanguage] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  useEffect(() => {
+    const loadLanguage = async () => {
+      setIsLoadingLanguage(true);
+      setLanguageError("");
+      try {
+        const value = await getGeminiOutputLanguage();
+        setLanguage(value);
+        setSavedLanguage(value);
+      } catch (requestError) {
+        setLanguageError(requestError.message || "Could not load language setting.");
+      } finally {
+        setIsLoadingLanguage(false);
+      }
+    };
+
+    void loadLanguage();
+  }, []);
+
+  const persistLanguageOnly = async () => {
+    const saved = await saveGeminiOutputLanguage(language);
+    setLanguage(saved);
+    setSavedLanguage(saved);
+    setLanguageSuccess("Language saved. AI text will update on the next automatic run.");
+  };
+
+  const persistLanguageAndRegenerate = async () => {
+    const data = await regenerateTrendAiDigestsNow(language);
+    const saved = data?.language || language;
+    setLanguage(saved);
+    setSavedLanguage(saved);
+    const summary = Array.isArray(data?.results)
+      ? data.results.map((item) => `${item.period}=${item.status}`).join(", ")
+      : "done";
+    setLanguageSuccess(`Language saved and AI text replaced (${summary}).`);
+  };
+
+  const handleSaveLanguageClick = () => {
+    setLanguageError("");
+    setLanguageSuccess("");
+    if (language === savedLanguage) {
+      setLanguageSuccess("Language is already saved.");
+      return;
+    }
+    setIsModalOpen(true);
+  };
+
+  const handleModalNo = async () => {
+    setIsSavingLanguage(true);
+    setLanguageError("");
+    try {
+      await persistLanguageOnly();
+      setIsModalOpen(false);
+    } catch (requestError) {
+      setLanguageError(requestError.message || "Could not save language.");
+    } finally {
+      setIsSavingLanguage(false);
+    }
+  };
+
+  const handleModalYes = async () => {
+    setIsSavingLanguage(true);
+    setLanguageError("");
+    try {
+      await persistLanguageAndRegenerate();
+      setIsModalOpen(false);
+      await onReload?.();
+    } catch (requestError) {
+      setLanguageError(requestError.message || "Could not replace AI text now.");
+    } finally {
+      setIsSavingLanguage(false);
+    }
+  };
+
+  return (
+    <div className="card h-fit w-full max-w-3xl space-y-4 overflow-hidden">
+      <div>
+        <h3 className="text-lg font-semibold">Gemini</h3>
+        <p className="mt-1 text-sm text-slate-500">
+          API key and output language for trend AI digests (GitHub Actions).
+        </p>
+      </div>
+
+      <SecretField
+        field={GEMINI_API_KEY_FIELD}
+        meta={apiKeyMeta}
+        onSaved={onReload}
+        onDeleted={onReload}
+      />
+
+      <div className="space-y-3 border-t border-slate-100 pt-4">
+        <div>
+          <h4 className="text-base font-semibold text-slate-900">Output language</h4>
+          <p className="mt-1 text-sm text-slate-500">
+            Language for AI digest headline, summary, and keywords. Default is en.
+          </p>
+        </div>
+
+        {isLoadingLanguage ? (
+          <p className="text-sm text-slate-500">Loading language...</p>
+        ) : (
+          <div className="flex flex-wrap gap-2" role="group" aria-label="Gemini output language">
+            {GEMINI_OUTPUT_LANGUAGE_OPTIONS.map((option) => {
+              const isActive = language === option.value;
+              return (
+                <button
+                  key={option.value}
+                  type="button"
+                  aria-pressed={isActive}
+                  className={
+                    isActive
+                      ? "btn border-slate-900 bg-slate-900 text-white hover:border-slate-800 hover:bg-slate-800 hover:text-white"
+                      : "btn"
+                  }
+                  onClick={() => {
+                    setLanguage(option.value);
+                    setLanguageError("");
+                    setLanguageSuccess("");
+                  }}
+                >
+                  {option.label}
+                </button>
+              );
+            })}
+          </div>
+        )}
+
+        {languageError ? <p className="text-sm text-rose-600">{languageError}</p> : null}
+        {languageSuccess ? <p className="text-sm text-emerald-700">{languageSuccess}</p> : null}
+
+        <button
+          className="btn btn-primary"
+          type="button"
+          disabled={isLoadingLanguage || isSavingLanguage}
+          onClick={handleSaveLanguageClick}
+        >
+          {isSavingLanguage ? "Working..." : "Save language"}
+        </button>
+      </div>
+
+      {isModalOpen ? (
+        <LanguageReplaceModal
+          language={language}
+          isBusy={isSavingLanguage}
+          onYes={() => {
+            void handleModalYes();
+          }}
+          onNo={() => {
+            void handleModalNo();
+          }}
+          onClose={() => {
+            if (!isSavingLanguage) {
+              setIsModalOpen(false);
+            }
+          }}
+        />
+      ) : null}
+    </div>
+  );
+}
+
 export default function AdminSettings() {
   const [rows, setRows] = useState([]);
   const [loadError, setLoadError] = useState("");
@@ -171,16 +384,22 @@ export default function AdminSettings() {
       ) : null}
       {isLoading ? <p className="text-sm text-slate-500">Loading...</p> : null}
 
-      <div className="space-y-4">
+      <div className="flex max-w-3xl flex-col gap-4">
         {ADMIN_SECRET_FIELDS.map((field) => (
-          <SecretField
-            key={field.key}
-            field={field}
-            meta={metaByKey.get(field.key) ?? null}
-            onSaved={reload}
-            onDeleted={reload}
-          />
+          <div key={field.key} className="card h-fit overflow-hidden">
+            <SecretField
+              field={field}
+              meta={metaByKey.get(field.key) ?? null}
+              onSaved={reload}
+              onDeleted={reload}
+            />
+          </div>
         ))}
+
+        <GeminiSettingsCard
+          apiKeyMeta={metaByKey.get(GEMINI_API_KEY_FIELD.key) ?? null}
+          onReload={reload}
+        />
       </div>
     </section>
   );

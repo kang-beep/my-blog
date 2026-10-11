@@ -11,6 +11,7 @@
 - fingerprint 동일 → **Gemini API 호출 skip**
 - GitHub 입력: period별 **전체** `title` + `description`
 - 키: Admin Settings → `admin_secrets.gemini_api_key` (또는 env `GEMINI_API_KEY`)
+- 출력 언어: Admin Settings → Gemini → `admin_secrets.gemini_output_language` (`en` \| `ko`, 기본 `en`)
 - 로컬 캐시(개발용): `scripts/github-actions/.digest-cache/` (gitignore)
 
 ---

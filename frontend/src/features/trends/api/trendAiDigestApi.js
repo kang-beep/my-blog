@@ -63,10 +63,36 @@ export async function fetchHomeTrendAiDigests() {
 }
 
 export async function fetchTrendsPageAiDigests() {
-  const [github, huggingface] = await Promise.all([
-    fetchLatestTrendAiDigest(TREND_AI_SOURCES.GITHUB, TREND_AI_PERIODS.MONTHLY),
-    fetchLatestTrendAiDigest(TREND_AI_SOURCES.HUGGINGFACE, TREND_AI_PERIODS.MONTHLY),
-  ]);
+  const periods = [
+    TREND_AI_PERIODS.DAILY,
+    TREND_AI_PERIODS.WEEKLY,
+    TREND_AI_PERIODS.MONTHLY,
+  ];
+
+  const pairs = await Promise.all(
+    periods.flatMap((period) => [
+      fetchLatestTrendAiDigest(TREND_AI_SOURCES.GITHUB, period).then((digest) => ({
+        source: TREND_AI_SOURCES.GITHUB,
+        period,
+        digest,
+      })),
+      fetchLatestTrendAiDigest(TREND_AI_SOURCES.HUGGINGFACE, period).then((digest) => ({
+        source: TREND_AI_SOURCES.HUGGINGFACE,
+        period,
+        digest,
+      })),
+    ]),
+  );
+
+  const github = {};
+  const huggingface = {};
+  for (const item of pairs) {
+    if (item.source === TREND_AI_SOURCES.GITHUB) {
+      github[item.period] = item.digest;
+    } else {
+      huggingface[item.period] = item.digest;
+    }
+  }
 
   return { github, huggingface };
 }

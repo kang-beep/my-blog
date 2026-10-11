@@ -5,6 +5,7 @@ import {
 } from "./lib/githubTrendingRss.mjs";
 import {
   createServiceSupabaseClient,
+  deleteRowsForPeriod,
   getUtcDateString,
   replaceRowsForDate,
 } from "./lib/supabase.mjs";
@@ -75,6 +76,10 @@ async function syncPeriod(supabase, period, fetchedDate) {
 
   assertPlainTextDescriptions(rows, period);
 
+  if (rows.length === 0) {
+    throw new Error(`RSS ${period}: parsed 0 rows`);
+  }
+
   console.log(`RSS ${period}: parsed ${rows.length} rows → inserting all (no limit).`);
 
   const { replaced } = await replaceRowsForDate(
@@ -117,7 +122,13 @@ async function main() {
       await syncPeriod(supabase, period, fetchedDate);
     } catch (error) {
       failures.push(`${period}: ${error.message}`);
-      console.error(`Skipped ${period}: ${error.message}`);
+      console.error(`Failed ${period}: ${error.message}`);
+      try {
+        await deleteRowsForPeriod(supabase, TABLE_NAME, period);
+        console.error(`Wiped ${TABLE_NAME} period=${period} so UI shows unavailable`);
+      } catch (wipeError) {
+        console.error(`Wipe failed for ${period}: ${wipeError.message}`);
+      }
     }
   }
 

@@ -2,7 +2,20 @@ export const ADMIN_SECRET_KEYS = {
   NOTION_TOKEN: "notion_token",
   GISCUS_GITHUB_PAT: "giscus_github_pat",
   GEMINI_API_KEY: "gemini_api_key",
+  GEMINI_OUTPUT_LANGUAGE: "gemini_output_language",
 };
+
+export const GEMINI_OUTPUT_LANGUAGES = {
+  EN: "en",
+  KO: "ko",
+};
+
+export const DEFAULT_GEMINI_OUTPUT_LANGUAGE = GEMINI_OUTPUT_LANGUAGES.EN;
+
+export const GEMINI_OUTPUT_LANGUAGE_OPTIONS = [
+  { value: GEMINI_OUTPUT_LANGUAGES.EN, label: "en" },
+  { value: GEMINI_OUTPUT_LANGUAGES.KO, label: "ko" },
+];
 
 export const ADMIN_SECRET_FIELDS = [
   {
@@ -17,10 +30,11 @@ export const ADMIN_SECRET_FIELDS = [
     help: "Fine-grained PAT with Discussions read/write. Used to remove discussions when deleting posts.",
     placeholder: "github_pat_... or ghp_...",
   },
-  {
-    key: ADMIN_SECRET_KEYS.GEMINI_API_KEY,
-    label: "Gemini API Key",
-    help: "Google AI Studio / Gemini API key. Used on the server (e.g. Edge Functions).",
-    placeholder: "AIza...",
-  },
 ];
+
+export const GEMINI_API_KEY_FIELD = {
+  key: ADMIN_SECRET_KEYS.GEMINI_API_KEY,
+  label: "API Key",
+  help: "Google AI Studio / Gemini API key. Used by GitHub Actions digest jobs (via service role).",
+  placeholder: "AIza...",
+};

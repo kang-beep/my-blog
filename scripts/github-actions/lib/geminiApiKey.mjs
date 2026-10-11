@@ -1,4 +1,6 @@
 const GEMINI_SECRET_KEY = "gemini_api_key";
+const GEMINI_OUTPUT_LANGUAGE_KEY = "gemini_output_language";
+export const DEFAULT_GEMINI_OUTPUT_LANGUAGE = "en";
 
 /**
  * Load Gemini API key from (first match wins):
@@ -35,6 +37,45 @@ export async function loadGeminiApiKey(supabase) {
   }
 
   return key;
+}
+
+/**
+ * Load digest output language (`en` | `ko`).
+ * 1. process.env.GEMINI_OUTPUT_LANGUAGE
+ * 2. admin_secrets.gemini_output_language
+ * 3. default `en`
+ */
+export async function loadGeminiOutputLanguage(supabase) {
+  const fromEnv = normalizeLanguage(process.env.GEMINI_OUTPUT_LANGUAGE);
+  if (fromEnv) {
+    return fromEnv;
+  }
+
+  if (!supabase) {
+    return DEFAULT_GEMINI_OUTPUT_LANGUAGE;
+  }
+
+  const { data, error } = await supabase
+    .from("admin_secrets")
+    .select("value")
+    .eq("key", GEMINI_OUTPUT_LANGUAGE_KEY)
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(
+      `Failed to read admin_secrets.${GEMINI_OUTPUT_LANGUAGE_KEY}: ${error.message}`,
+    );
+  }
+
+  return normalizeLanguage(data?.value) || DEFAULT_GEMINI_OUTPUT_LANGUAGE;
+}
+
+function normalizeLanguage(value) {
+  const normalized = String(value ?? "").trim().toLowerCase();
+  if (normalized === "en" || normalized === "ko") {
+    return normalized;
+  }
+  return null;
 }
 
 function isUsableKey(key) {

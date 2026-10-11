@@ -290,7 +290,10 @@ as $$
   select
     s.key,
     true as is_set,
-    public.mask_admin_secret(s.value) as masked_value,
+    case
+      when s.key = any (array['gemini_output_language']::text[]) then s.value
+      else public.mask_admin_secret(s.value)
+    end as masked_value,
     s.updated_at
   from public.admin_secrets s
   order by s.key;
@@ -335,6 +338,34 @@ begin
 end;
 $$;
 
+create or replace function public.get_admin_setting(p_key text)
+returns text
+language plpgsql
+security definer
+set search_path = public
+as $$
+declare
+  allowed constant text[] := array['gemini_output_language'];
+  stored text;
+begin
+  if auth.uid() is null then
+    raise exception 'Unauthorized';
+  end if;
+  if p_key is null or length(trim(p_key)) = 0 then
+    raise exception 'key is required';
+  end if;
+  if not (trim(p_key) = any (allowed)) then
+    raise exception 'Setting key is not readable: %', trim(p_key);
+  end if;
+
+  select s.value into stored
+  from public.admin_secrets s
+  where s.key = trim(p_key);
+
+  return stored;
+end;
+$$;
+
 -- ─── GRANT ───────────────────────────────────────────────
 
 grant usage on schema public to anon, authenticated, service_role;
@@ -373,6 +404,7 @@ grant execute on function public.mask_admin_secret(text) to authenticated, servi
 grant execute on function public.list_admin_secrets() to authenticated;
 grant execute on function public.upsert_admin_secret(text, text) to authenticated;
 grant execute on function public.delete_admin_secret(text) to authenticated;
+grant execute on function public.get_admin_setting(text) to authenticated;
 
 -- ─── RLS ─────────────────────────────────────────────────
 

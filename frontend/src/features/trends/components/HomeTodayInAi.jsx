@@ -53,7 +53,7 @@ export default function HomeTodayInAi() {
           fetchHomeTrendAiDigests(),
         ]);
 
-        if (!githubResult.isStale && githubResult.repos.length > 0) {
+        if (githubResult.repos.length > 0) {
           setGithubHighlights(mapGithubHighlights(githubResult.repos));
           setGithubUpdatedLabel(resolveUpdatedLabel(githubResult.syncedAt));
         } else {
@@ -61,7 +61,7 @@ export default function HomeTodayInAi() {
           setGithubUpdatedLabel("—");
         }
 
-        if (!huggingfaceResult.isStale && huggingfaceResult.papers.length > 0) {
+        if (huggingfaceResult.papers.length > 0) {
           setHuggingfaceHighlights(mapHuggingFaceHighlights(huggingfaceResult.papers));
           setHuggingfaceUpdatedLabel(resolveUpdatedLabel(huggingfaceResult.syncedAt));
         } else {

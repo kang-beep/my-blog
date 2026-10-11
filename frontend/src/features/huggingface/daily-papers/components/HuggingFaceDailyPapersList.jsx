@@ -13,8 +13,12 @@ import ExternalFeedUnavailable from "@/shared/ui/ExternalFeedUnavailable";
 import HomeFeedBadge from "@/shared/ui/HomeFeedBadge";
 import { formatDateTimeKst } from "@/shared/utils/date";
 
-export default function HuggingFaceDailyPapersList() {
-  const [selectedPeriod, setSelectedPeriod] = useState("daily");
+export default function HuggingFaceDailyPapersList({
+  period = null,
+  showPeriodTabs = true,
+}) {
+  const [internalPeriod, setInternalPeriod] = useState("daily");
+  const selectedPeriod = period ?? internalPeriod;
   const [papers, setPapers] = useState([]);
   const [feedMeta, setFeedMeta] = useState({ syncedAt: "" });
   const [isLoading, setIsLoading] = useState(true);
@@ -26,8 +30,8 @@ export default function HuggingFaceDailyPapersList() {
       setIsUnavailable(false);
 
       try {
-        const { papers: items, syncedAt, isStale } = await fetchHuggingFaceDailyPapers(selectedPeriod);
-        if (isStale || items.length === 0) {
+        const { papers: items, syncedAt } = await fetchHuggingFaceDailyPapers(selectedPeriod);
+        if (items.length === 0) {
           setPapers([]);
           setFeedMeta({ syncedAt: "" });
           setIsUnavailable(true);
@@ -75,26 +79,30 @@ export default function HuggingFaceDailyPapersList() {
         </a>
       </div>
 
-      <div className="home-feed-card-toolbar">
-        <div className="flex flex-wrap gap-2 py-3" role="tablist" aria-label="Hugging Face papers period">
-          {HUGGINGFACE_PAPER_PERIODS.map((period) => {
-            const isActive = selectedPeriod === period;
+      {showPeriodTabs ? (
+        <div className="home-feed-card-toolbar">
+          <div className="flex flex-wrap gap-2 py-3" role="tablist" aria-label="Hugging Face papers period">
+            {HUGGINGFACE_PAPER_PERIODS.map((periodOption) => {
+              const isActive = selectedPeriod === periodOption;
 
-            return (
-              <button
-                key={period}
-                type="button"
-                role="tab"
-                aria-selected={isActive}
-                className={isActive ? "home-feed-card-tab home-feed-card-tab-active" : "home-feed-card-tab"}
-                onClick={() => setSelectedPeriod(period)}
-              >
-                {HUGGINGFACE_PAPER_PERIOD_LABELS[period]}
-              </button>
-            );
-          })}
+              return (
+                <button
+                  key={periodOption}
+                  type="button"
+                  role="tab"
+                  aria-selected={isActive}
+                  className={
+                    isActive ? "home-feed-card-tab home-feed-card-tab-active" : "home-feed-card-tab"
+                  }
+                  onClick={() => setInternalPeriod(periodOption)}
+                >
+                  {HUGGINGFACE_PAPER_PERIOD_LABELS[periodOption]}
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      ) : null}
 
       <div className="home-feed-card-body" aria-busy={isLoading} aria-live="polite">
         {isLoading ? (

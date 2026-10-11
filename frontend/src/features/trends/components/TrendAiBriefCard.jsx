@@ -11,11 +11,28 @@ function SourceIcon({ source }) {
   );
 }
 
-export default function TrendAiBriefCard({ source, digest = null, isLoading = false }) {
+function periodToLabel(period) {
+  if (period === "weekly") {
+    return "Weekly";
+  }
+  if (period === "daily") {
+    return "Daily";
+  }
+  if (period === "monthly") {
+    return "Monthly";
+  }
+  return "—";
+}
+
+export default function TrendAiBriefCard({
+  source,
+  period = null,
+  digest = null,
+  isLoading = false,
+}) {
   const resolvedSource = digest?.source ?? source;
   const sourceLabel = resolvedSource === "github" ? "GitHub" : "Hugging Face";
-  const periodLabel =
-    digest?.period === "weekly" ? "Weekly" : digest?.period === "daily" ? "Daily" : "Monthly";
+  const periodLabel = periodToLabel(digest?.period ?? period);
 
   return (
     <article className="home-feed-card">

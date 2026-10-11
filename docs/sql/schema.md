@@ -29,8 +29,8 @@ github_trending_repos / huggingface_daily_papers ──> trend_ai_digests (Gemin
 | value | text | NOT NULL |
 | updated_at | timestamptz | NOT NULL, default `now()` |
 
-**RPCs (authenticated):** `list_admin_secrets()`, `upsert_admin_secret(key, value)`, `delete_admin_secret(key)`  
-**Known keys:** `notion_token`, `giscus_github_pat`, `gemini_api_key`
+**RPCs (authenticated):** `list_admin_secrets()` (API keys masked; `gemini_output_language` plain), `upsert_admin_secret(key, value)`, `delete_admin_secret(key)`, `get_admin_setting(key)`  
+**Known keys:** `notion_token`, `giscus_github_pat`, `gemini_api_key`, `gemini_output_language` (`en` \| `ko`)
 
 ## categories
 

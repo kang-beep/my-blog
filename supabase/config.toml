@@ -6,3 +6,9 @@ verify_jwt = false
 
 [functions.notion-import]
 verify_jwt = false
+
+[functions.regenerate-trend-ai-digests]
+verify_jwt = false
+[functions.persist-post-images]
+verify_jwt = false
+

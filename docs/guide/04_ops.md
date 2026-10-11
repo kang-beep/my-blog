@@ -26,12 +26,14 @@
 | 함수 | 배포 슬러그 | 용도 |
 |------|-------------|------|
 | Giscus discussion 삭제 | **`dynamic-handler`** | 글 삭제 시 GitHub Discussion 제거 |
+| 트렌드 AI 요약 즉시 재생성 | **`regenerate-trend-ai-digests`** | Admin Settings에서 언어 변경 후 Yes 시 Gemini 재호출 |
 
-소스: `supabase/functions/delete-giscus-discussion/index.ts`  
+소스: `supabase/functions/delete-giscus-discussion/index.ts`, `supabase/functions/regenerate-trend-ai-digests/index.ts`  
 배포·Secret·JWT: **[`06_post_delete_and_giscus.md`](./06_post_delete_and_giscus.md)**
 
 ```bash
 supabase functions deploy dynamic-handler --project-ref tznrmatarsyyptddnaee
+supabase functions deploy regenerate-trend-ai-digests --project-ref tznrmatarsyyptddnaee
 ```
 
 Secret (Dashboard): `my-blog-giscus-tokens` = GitHub fine-grained PAT (Discussions read/write on `kang-beep/my-blog`).

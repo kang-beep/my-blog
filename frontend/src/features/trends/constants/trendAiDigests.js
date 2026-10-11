@@ -10,3 +10,9 @@ export const TREND_AI_PERIODS = {
   WEEKLY: "weekly",
   MONTHLY: "monthly",
 };
+
+export const TREND_AI_PERIOD_OPTIONS = [
+  { value: TREND_AI_PERIODS.DAILY, label: "Daily" },
+  { value: TREND_AI_PERIODS.WEEKLY, label: "Weekly" },
+  { value: TREND_AI_PERIODS.MONTHLY, label: "Monthly" },
+];

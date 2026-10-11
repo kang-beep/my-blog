@@ -11,11 +11,16 @@
  *   SUPABASE_URL, SUPABASE_SECRET_KEY  (required)
  *   PERIOD=all|daily|weekly|monthly   (default: all)
  *   GEMINI_API_KEY                    (optional; else admin_secrets.gemini_api_key)
+ *   GEMINI_OUTPUT_LANGUAGE            (optional; else admin_secrets.gemini_output_language; default en)
  *   GEMINI_MODEL                      (optional; default gemini-flash-latest)
  *   FORCE_REFRESH=true                (optional; ignore fingerprint skip)
  */
 import { createServiceSupabaseClient } from "./lib/supabase.mjs";
-import { loadGeminiApiKey } from "./lib/geminiApiKey.mjs";
+import {
+  DEFAULT_GEMINI_OUTPUT_LANGUAGE,
+  loadGeminiApiKey,
+  loadGeminiOutputLanguage,
+} from "./lib/geminiApiKey.mjs";
 import { generateJsonWithGemini, getGeminiModelName } from "./lib/geminiClient.mjs";
 import {
   PROMPT_VERSION,
@@ -26,6 +31,7 @@ import {
   fetchGithubReposForPeriod,
   fingerprintGithubInput,
   fingerprintGithubInputLegacy,
+  fingerprintGithubInputWithoutLanguage,
   normalizeDigestResult,
   outputPath,
   readLocalDigestCache,
@@ -43,10 +49,10 @@ function hasUsableDigest(existing) {
 }
 
 /**
- * Match current fingerprint, or legacy fingerprints that included `model`.
+ * Match current fingerprint, or legacy fingerprints (pre-language / model-in-hash).
  * Returns which fingerprint matched so callers can migrate DB rows without Gemini.
  */
-function matchDigestFingerprint(existing, inputRows, inputFingerprint, model) {
+function matchDigestFingerprint(existing, inputRows, inputFingerprint, model, language) {
   if (!hasUsableDigest(existing)) {
     return null;
   }
@@ -54,10 +60,21 @@ function matchDigestFingerprint(existing, inputRows, inputFingerprint, model) {
     return { kind: "current", fingerprint: inputFingerprint };
   }
 
+  const promptVersion = existing.prompt_version || PROMPT_VERSION;
+
+  if (language === DEFAULT_GEMINI_OUTPUT_LANGUAGE) {
+    const withoutLanguage = fingerprintGithubInputWithoutLanguage(inputRows, {
+      promptVersion,
+    });
+    if (existing.input_fingerprint === withoutLanguage) {
+      return { kind: "legacy", fingerprint: inputFingerprint };
+    }
+  }
+
   const legacyModels = [...new Set([existing.model, model, "gemini-3.8-flash"].filter(Boolean))];
   for (const legacyModel of legacyModels) {
     const legacyFingerprint = fingerprintGithubInputLegacy(inputRows, {
-      promptVersion: existing.prompt_version || PROMPT_VERSION,
+      promptVersion,
       model: legacyModel,
     });
     if (existing.input_fingerprint === legacyFingerprint) {
@@ -68,7 +85,7 @@ function matchDigestFingerprint(existing, inputRows, inputFingerprint, model) {
   return null;
 }
 
-async function summarizePeriod({ supabase, apiKey, model, period }) {
+async function summarizePeriod({ supabase, apiKey, model, language, period }) {
   const { fetchedDate, rows } = await fetchGithubReposForPeriod(supabase, period);
   if (!fetchedDate || rows.length === 0) {
     console.log(`[${period}] No rows in DB — skip`);
@@ -78,6 +95,7 @@ async function summarizePeriod({ supabase, apiKey, model, period }) {
   const inputRows = buildGithubDigestInput(rows);
   const inputFingerprint = fingerprintGithubInput(inputRows, {
     promptVersion: PROMPT_VERSION,
+    language,
   });
 
   const meta = { source: "github", period, fetchedDate };
@@ -86,7 +104,7 @@ async function summarizePeriod({ supabase, apiKey, model, period }) {
 
   const dbMatch = shouldForceRefresh()
     ? null
-    : matchDigestFingerprint(existingDb, inputRows, inputFingerprint, model);
+    : matchDigestFingerprint(existingDb, inputRows, inputFingerprint, model, language);
 
   if (dbMatch) {
     if (dbMatch.kind === "legacy") {
@@ -114,7 +132,7 @@ async function summarizePeriod({ supabase, apiKey, model, period }) {
 
   const localMatch = shouldForceRefresh()
     ? null
-    : matchDigestFingerprint(cachedLocal, inputRows, inputFingerprint, model);
+    : matchDigestFingerprint(cachedLocal, inputRows, inputFingerprint, model, language);
 
   if (localMatch) {
     console.log(
@@ -136,13 +154,14 @@ async function summarizePeriod({ supabase, apiKey, model, period }) {
   }
 
   console.log(
-    `[${period}] fingerprint changed — calling Gemini (${rows.length} repos, ${fetchedDate})`,
+    `[${period}] fingerprint changed — calling Gemini (${rows.length} repos, ${fetchedDate}, lang=${language})`,
   );
 
   const { systemText, userText } = buildGithubPrompt({
     period,
     fetchedDate,
     inputRows,
+    language,
   });
 
   const { data, model: usedModel } = await generateJsonWithGemini({
@@ -180,13 +199,16 @@ async function main() {
   const model = getGeminiModelName();
   const supabase = createServiceSupabaseClient();
   const apiKey = await loadGeminiApiKey(supabase);
+  const language = await loadGeminiOutputLanguage(supabase);
 
-  console.log(`GitHub AI digest — periods: ${periods.join(", ")}, model: ${model}`);
+  console.log(
+    `GitHub AI digest — periods: ${periods.join(", ")}, model: ${model}, language: ${language}`,
+  );
 
   const results = [];
   for (const period of periods) {
     try {
-      results.push(await summarizePeriod({ supabase, apiKey, model, period }));
+      results.push(await summarizePeriod({ supabase, apiKey, model, language, period }));
     } catch (error) {
       console.error(`[${period}] FAILED:`, error.message);
       results.push({ period, status: "error", error: error.message });

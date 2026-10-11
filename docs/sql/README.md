@@ -27,7 +27,7 @@ Supabase 초기 설정용 SQL입니다.
 - 태그 네트워크: `tag_stats`, `tag_edges`, `refresh_tag_stats()`
 - 홈 외부 피드 캐시: `huggingface_daily_papers`, `github_trending_repos`
 - 트렌드 AI 요약: `trend_ai_digests` (마이그레이션: `migrations/20261010_trend_ai_digests.sql`)
-- 관리자 시크릿: `admin_secrets` + list/upsert/delete RPC
+- 관리자 시크릿: `admin_secrets` + list/upsert/delete RPC + `get_admin_setting` (plain allowlist)
 - RLS / GRANT (anon·authenticated·service_role)
 - Storage 객체 정책 (버킷 3개)
 

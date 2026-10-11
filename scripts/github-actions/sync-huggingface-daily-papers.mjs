@@ -1,5 +1,6 @@
 import {
   createServiceSupabaseClient,
+  deleteRowsForPeriod,
   getUtcDateString,
   replaceRowsForDate,
 } from "./lib/supabase.mjs";
@@ -114,8 +115,7 @@ async function syncPeriod(supabase, period, fetchedDate) {
   console.log(`HF ${period}: API ${entries.length} → insert ${rows.length}`);
 
   if (rows.length === 0) {
-    console.warn(`HF ${period}: empty payload, skip replace to keep existing rows.`);
-    return;
+    throw new Error(`HF ${period}: empty payload`);
   }
 
   const { replaced } = await replaceRowsForDate(
@@ -158,7 +158,13 @@ async function main() {
       await syncPeriod(supabase, period, fetchedDate);
     } catch (error) {
       failures.push(`${period}: ${error.message}`);
-      console.error(`Skipped ${period}: ${error.message}`);
+      console.error(`Failed ${period}: ${error.message}`);
+      try {
+        await deleteRowsForPeriod(supabase, TABLE_NAME, period);
+        console.error(`Wiped ${TABLE_NAME} period=${period} so UI shows unavailable`);
+      } catch (wipeError) {
+        console.error(`Wipe failed for ${period}: ${wipeError.message}`);
+      }
     }
   }
 
