@@ -590,12 +590,21 @@
     @apply mx-auto min-w-0 w-full max-w-3xl lg:max-w-4xl xl:col-start-2 xl:mx-0 xl:max-w-none;
   }
 
-  .post-detail-toc-aside {
-    @apply min-w-0 xl:col-start-3 xl:row-start-1 xl:w-full xl:justify-self-end xl:self-start xl:sticky xl:top-6 xl:pr-2;
+  /* No mobile TOC: keep a little top space under the header */
+  .post-detail-main:not(:has(.post-toc-mobile)) {
+    @apply max-xl:pt-4;
   }
 
-  .post-detail-toc-aside:has(.post-toc-empty) {
-    @apply max-xl:hidden;
+  .post-detail-toc-aside {
+    @apply hidden min-w-0 xl:col-start-3 xl:row-start-1 xl:block xl:w-full xl:justify-self-end xl:self-start xl:sticky xl:top-6 xl:pr-2;
+  }
+
+  .post-detail-toc-aside .post-toc {
+    max-height: calc(100dvh - 5rem);
+    overflow-x: hidden;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    padding-right: 0.25rem;
   }
 
   .post-toc {
@@ -612,6 +621,26 @@
 
   .post-toc-list {
     @apply m-0 list-none space-y-0.5 border-l border-slate-300 p-0;
+  }
+
+  .post-toc-mobile {
+    @apply sticky top-0 z-30 -mx-4 border-b border-slate-200 bg-white sm:-mx-6 xl:hidden;
+  }
+
+  .post-toc-mobile-toggle {
+    @apply flex w-full items-center justify-between gap-2 px-4 py-2.5 text-left text-sm font-medium text-slate-700 sm:px-6;
+  }
+
+  .post-toc-mobile-chevron {
+    @apply shrink-0 text-slate-500 transition-transform;
+  }
+
+  .post-toc-mobile-chevron.is-open {
+    @apply rotate-180;
+  }
+
+  .post-toc-mobile-panel {
+    @apply max-h-[min(50dvh,22rem)] overflow-y-auto overscroll-contain border-t border-slate-100 px-4 pb-3 pt-2 sm:px-6;
   }
 
   .post-toc-link {

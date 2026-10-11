@@ -48,6 +48,8 @@ const POST_CONTENT_ALLOWED_ATTR = [
   "data-height",
   "data-background-color",
   "data-vertical-align",
+  "data-type",
+  "data-latex",
 ];
 
 export function sanitizePostHtml(html: string): string {

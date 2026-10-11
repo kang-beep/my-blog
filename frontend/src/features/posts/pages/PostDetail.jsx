@@ -8,6 +8,7 @@ import PostDetailBody from "@/features/posts/components/PostDetailBody";
 import PostLikeButton from "@/features/posts/components/PostLikeButton";
 import PostMetaDates from "@/features/posts/components/PostMetaDates";
 import PostOnThisPage from "@/features/posts/components/PostOnThisPage";
+import PostTocMobileBar from "@/features/posts/components/PostTocMobileBar";
 import { useActiveHeadingId } from "@/features/posts/hooks/useActiveHeadingId";
 import TagBadge from "@/shared/ui/TagBadge";
 import PageBackLink from "@/shared/ui/PageBackLink";
@@ -94,6 +95,11 @@ export default function PostDetail() {
       {!isLoading && post ? (
         <div className="post-detail-layout">
           <div className="post-detail-main space-y-3">
+            <PostTocMobileBar
+              headings={headings}
+              activeId={activeHeadingId}
+              onSelectHeading={setActiveHeadingId}
+            />
             <PageBackLink to={ROUTES.POSTS} label="Posts" />
 
             <article className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">

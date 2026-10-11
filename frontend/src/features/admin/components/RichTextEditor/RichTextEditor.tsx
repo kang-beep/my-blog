@@ -21,6 +21,7 @@ import {
   DEFAULT_TABLE_COLS,
   DEFAULT_TABLE_ROWS,
 } from "@/features/admin/components/RichTextEditor/tableConstants";
+import { MathDisplay, MathInline } from "@/features/admin/components/RichTextEditor/mathNodes";
 import type { RichTextEditorProps } from "@/features/admin/components/RichTextEditor/types";
 import { uploadEditorImage } from "@/shared/lib/uploadEditorImage";
 import "@/features/admin/components/RichTextEditor/editor.css";
@@ -112,6 +113,8 @@ export default function RichTextEditor({
       TableSeResize,
       TableBlockMove,
       TableSelectionDelete,
+      MathInline,
+      MathDisplay,
       Placeholder.configure({ placeholder }),
     ],
     content: value || "",

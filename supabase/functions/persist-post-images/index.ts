@@ -9,6 +9,8 @@ import {
 const POSTS_BUCKET = "posts-images";
 const MAX_IMAGE_BYTES = 12 * 1024 * 1024;
 const IMG_SRC_PATTERN = /<img\b[^>]*?\bsrc\s*=\s*(["'])(.*?)\1/gi;
+const DOWNLOAD_USER_AGENT =
+  "Mozilla/5.0 (compatible; my-blog-persist-images/1.0; +https://github.com/kang-beep/my-blog)";
 
 function createServiceClient() {
   const supabaseUrl = Deno.env.get("SUPABASE_URL");
@@ -19,6 +21,15 @@ function createServiceClient() {
   return createClient(supabaseUrl, serviceRoleKey);
 }
 
+function decodeHtmlEntities(value: string): string {
+  return value
+    .replaceAll("&amp;", "&")
+    .replaceAll("&quot;", '"')
+    .replaceAll("&#39;", "'")
+    .replaceAll("&lt;", "<")
+    .replaceAll("&gt;", ">");
+}
+
 function isOwnedPostImageUrl(src: string, supabaseUrl: string): boolean {
   return src.startsWith(`${supabaseUrl}/storage/v1/object/public/${POSTS_BUCKET}/`);
 }
@@ -26,8 +37,12 @@ function isOwnedPostImageUrl(src: string, supabaseUrl: string): boolean {
 function collectExternalImageSrcs(html: string, supabaseUrl: string): string[] {
   const srcs = new Set<string>();
   for (const match of html.matchAll(IMG_SRC_PATTERN)) {
-    const src = match[2]?.trim();
-    if (!src || !/^https?:\/\//i.test(src)) {
+    const raw = match[2]?.trim();
+    if (!raw) {
+      continue;
+    }
+    const src = decodeHtmlEntities(raw);
+    if (!/^https?:\/\//i.test(src)) {
       continue;
     }
     if (isOwnedPostImageUrl(src, supabaseUrl)) {
@@ -46,13 +61,16 @@ function extensionForContentType(contentType: string): string {
   return "bin";
 }
 
-async function uploadExternalImage(
-  supabase: ReturnType<typeof createServiceClient>,
-  postId: string,
+async function downloadImageBytes(
   src: string,
-  folder: "content" | "root",
-): Promise<string> {
-  const response = await fetch(src);
+): Promise<{ bytes: Uint8Array; contentType: string }> {
+  const response = await fetch(src, {
+    redirect: "follow",
+    headers: {
+      "User-Agent": DOWNLOAD_USER_AGENT,
+      Accept: "image/avif,image/webp,image/apng,image/*,*/*;q=0.8",
+    },
+  });
   if (!response.ok) {
     throw new Error(`Failed to download image (${response.status})`);
   }
@@ -67,6 +85,16 @@ async function uploadExternalImage(
 
   const contentType = response.headers.get("content-type")?.split(";")[0]?.trim() ||
     "application/octet-stream";
+  return { bytes, contentType };
+}
+
+async function uploadExternalImage(
+  supabase: ReturnType<typeof createServiceClient>,
+  postId: string,
+  src: string,
+  folder: "content" | "root",
+): Promise<string> {
+  const { bytes, contentType } = await downloadImageBytes(src);
   const extension = extensionForContentType(contentType);
   const fileName = `${crypto.randomUUID()}.${extension}`;
   const filePath = folder === "content" ? `${postId}/content/${fileName}` : `${postId}/${fileName}`;
@@ -87,8 +115,18 @@ function replaceAllSrcs(html: string, replacements: Map<string, string>): string
   let next = html;
   for (const [from, to] of replacements) {
     next = next.split(from).join(to);
+    next = next.split(from.replaceAll("&", "&amp;")).join(to);
   }
   return next;
+}
+
+function shortSrc(src: string): string {
+  try {
+    const url = new URL(src);
+    return `${url.hostname}${url.pathname.slice(0, 48)}`;
+  } catch {
+    return src.slice(0, 64);
+  }
 }
 
 Deno.serve(async (req) => {
@@ -108,7 +146,8 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const postId = typeof body?.postId === "string" ? body.postId.trim() : "";
     const contentHtml = typeof body?.contentHtml === "string" ? body.contentHtml : "";
-    const imageUrl = typeof body?.imageUrl === "string" ? body.imageUrl.trim() : "";
+    const imageUrlRaw = typeof body?.imageUrl === "string" ? body.imageUrl.trim() : "";
+    const imageUrl = decodeHtmlEntities(imageUrlRaw);
 
     if (!postId) {
       return jsonResponse({ error: "postId is required" }, 400);
@@ -121,11 +160,17 @@ Deno.serve(async (req) => {
 
     const supabase = createServiceClient();
     const replacements = new Map<string, string>();
+    const warnings: string[] = [];
     const externalSrcs = collectExternalImageSrcs(contentHtml, supabaseUrl);
 
     for (const src of externalSrcs) {
-      const publicUrl = await uploadExternalImage(supabase, postId, src, "content");
-      replacements.set(src, publicUrl);
+      try {
+        const publicUrl = await uploadExternalImage(supabase, postId, src, "content");
+        replacements.set(src, publicUrl);
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "Unknown error";
+        warnings.push(`${shortSrc(src)}: ${message}`);
+      }
     }
 
     let nextImageUrl = imageUrl || null;
@@ -136,7 +181,12 @@ Deno.serve(async (req) => {
         /^https?:\/\//i.test(imageUrl) &&
         !isOwnedPostImageUrl(imageUrl, supabaseUrl)
       ) {
-        nextImageUrl = await uploadExternalImage(supabase, postId, imageUrl, "root");
+        try {
+          nextImageUrl = await uploadExternalImage(supabase, postId, imageUrl, "root");
+        } catch (error) {
+          const message = error instanceof Error ? error.message : "Unknown error";
+          warnings.push(`cover ${shortSrc(imageUrl)}: ${message}`);
+        }
       }
     }
 
@@ -144,6 +194,7 @@ Deno.serve(async (req) => {
       contentHtml: replaceAllSrcs(contentHtml, replacements),
       imageUrl: nextImageUrl,
       persistedCount: replacements.size,
+      warnings,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Unknown error";

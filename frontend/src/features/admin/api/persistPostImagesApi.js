@@ -43,5 +43,8 @@ export async function persistExternalPostImages({
     imageUrl: typeof data?.imageUrl === "string" && data.imageUrl
       ? data.imageUrl
       : imageUrl,
+    warnings: Array.isArray(data?.warnings)
+      ? data.warnings.filter((item) => typeof item === "string")
+      : [],
   };
 }

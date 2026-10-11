@@ -7,13 +7,16 @@ import {
   preparePostContentHeadingsHtml,
 } from "@/features/posts/utils/collectPostHeadings";
 import { isHtmlContent, sanitizePostHtml } from "@/shared/lib/sanitizeHtml";
+import { preparePostContentMathHtml, renderPostMath } from "@/shared/lib/renderPostMath";
 import "@/features/admin/components/RichTextEditor/editor.css";
+import "katex/dist/katex.min.css";
 
 const BODY_TEXT_CLASS = "text-[0.95rem] leading-relaxed text-slate-800 lg:text-base";
 
 function buildPostContentHtml(content) {
   const sanitized = sanitizePostHtml(content);
-  const withTables = preparePostContentTablesHtml(sanitized);
+  const withMath = preparePostContentMathHtml(sanitized);
+  const withTables = preparePostContentTablesHtml(withMath);
   return preparePostContentHeadingsHtml(withTables);
 }
 
@@ -30,8 +33,10 @@ export default function PostDetailBody({ content, onHeadingsChange }) {
       return;
     }
 
+    // Safety net if HTML prep was skipped (non-HTML path / older markup).
+    renderPostMath(root);
     onHeadingsChange?.(ensureAndCollectPostHeadings(root));
-  }, [content, onHeadingsChange]);
+  }, [content, onHeadingsChange, htmlContent]);
 
   return (
     <div className={wrapperClassName}>

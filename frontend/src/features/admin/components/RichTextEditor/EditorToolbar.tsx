@@ -16,6 +16,9 @@ import {
   Link2,
   List,
   ListOrdered,
+  Quote,
+  Sigma,
+  SquareSigma,
   Table,
   Trash2,
   Underline,
@@ -96,6 +99,21 @@ export default function EditorToolbar({
     }
 
     editor.chain().focus().extendMarkRange("link").setLink({ href: url.trim() }).run();
+  };
+
+  const insertLatex = (asBlock: boolean) => {
+    const latex = window.prompt(
+      asBlock ? "Block LaTeX expression" : "Inline LaTeX expression",
+      "E = mc^2",
+    );
+    if (latex === null || !latex.trim()) {
+      return;
+    }
+
+    const content = asBlock
+      ? { type: "mathDisplay", attrs: { latex: latex.trim() } }
+      : { type: "mathInline", attrs: { latex: latex.trim() } };
+    editor.chain().focus().insertContent(content).run();
   };
 
   const setImageWidth = (width: string | null) => {
@@ -249,8 +267,29 @@ export default function EditorToolbar({
       >
         <ListOrdered size={16} aria-hidden />
       </ToolbarButton>
+      <ToolbarButton
+        label="Quote"
+        isActive={editor.isActive("blockquote")}
+        onClick={() => editor.chain().focus().toggleBlockquote().run()}
+      >
+        <Quote size={16} aria-hidden />
+      </ToolbarButton>
       <ToolbarButton label="Link" isActive={editor.isActive("link")} onClick={setLink}>
         <Link2 size={16} aria-hidden />
+      </ToolbarButton>
+      <ToolbarButton
+        label="Inline LaTeX"
+        isActive={editor.isActive("mathInline")}
+        onClick={() => insertLatex(false)}
+      >
+        <Sigma size={16} aria-hidden />
+      </ToolbarButton>
+      <ToolbarButton
+        label="Block LaTeX"
+        isActive={editor.isActive("mathDisplay")}
+        onClick={() => insertLatex(true)}
+      >
+        <SquareSigma size={16} aria-hidden />
       </ToolbarButton>
       <ToolbarButton label="Insert table" isActive={editorState?.isTableActive ?? false} onClick={insertTable}>
         <Table size={16} aria-hidden />

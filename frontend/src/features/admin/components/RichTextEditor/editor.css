@@ -215,6 +215,17 @@
   word-break: break-word;
 }
 
+/* KaTeX uses one span per glyph; cell wrap rules must not apply inside it. */
+.post-content td .katex,
+.post-content td .katex *,
+.post-content th .katex,
+.post-content th .katex * {
+  max-width: none;
+  overflow-wrap: normal;
+  white-space: nowrap;
+  word-break: normal;
+}
+
 .post-content td ul,
 .post-content td ol,
 .post-content th ul,
@@ -342,7 +353,7 @@
   font-weight: 600;
   line-height: 1.3;
   margin: 1.25rem 0 0.5rem;
-  scroll-margin-top: 5rem;
+  scroll-margin-top: 0.75rem;
 }
 
 .post-content h3 {
@@ -350,7 +361,15 @@
   font-weight: 600;
   line-height: 1.35;
   margin: 1rem 0 0.5rem;
-  scroll-margin-top: 5rem;
+  scroll-margin-top: 0.75rem;
+}
+
+@media (max-width: 1279px) {
+  .post-content h2,
+  .post-content h3 {
+    /* Sticky mobile On this page bar (~2.75rem) + padding */
+    scroll-margin-top: 3.5rem;
+  }
 }
 
 .post-content p {
@@ -399,4 +418,74 @@
 
 .post-content u {
   text-decoration: underline;
+}
+
+.rich-text-editor .tiptap blockquote,
+.post-content blockquote {
+  border-left: 3px solid rgb(148 163 184);
+  color: rgb(51 65 85);
+  margin: 0.85rem 0;
+  padding: 0.15rem 0 0.15rem 0.85rem;
+}
+
+.rich-text-editor .tiptap blockquote p,
+.post-content blockquote p {
+  margin: 0.35rem 0;
+}
+
+.rich-text-editor .math-inline,
+.post-content .math-inline,
+.rich-text-editor [data-type="math-inline"],
+.post-content [data-type="math-inline"] {
+  display: inline-block;
+  margin: 0 0.15em;
+  max-width: 100%;
+  vertical-align: middle;
+}
+
+.rich-text-editor .math-display,
+.post-content .math-display,
+.rich-text-editor [data-type="math-display"],
+.post-content [data-type="math-display"] {
+  display: block;
+  margin: 1rem 0;
+  max-width: 100%;
+  overflow-x: auto;
+  text-align: center;
+}
+
+.rich-text-editor .ProseMirror-selectednode.math-inline,
+.rich-text-editor .ProseMirror-selectednode.math-display,
+.rich-text-editor .ProseMirror-selectednode[data-type="math-inline"],
+.rich-text-editor .ProseMirror-selectednode[data-type="math-display"] {
+  outline: 2px solid rgb(99 102 241);
+  outline-offset: 2px;
+}
+
+.rich-text-editor td .katex,
+.rich-text-editor th .katex,
+.post-content td .katex,
+.post-content th .katex {
+  display: inline-block;
+  font-size: 1em;
+  max-width: none;
+}
+
+.rich-text-editor td .katex-display,
+.rich-text-editor th .katex-display,
+.post-content td .katex-display,
+.post-content th .katex-display {
+  margin: 0.35rem 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.rich-text-editor td [data-type="math-inline"],
+.rich-text-editor th [data-type="math-inline"],
+.post-content td [data-type="math-inline"],
+.post-content th [data-type="math-inline"] {
+  max-width: 100%;
+  overflow-x: auto;
+  overflow-wrap: normal;
+  word-break: normal;
 }

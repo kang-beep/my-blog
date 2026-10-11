@@ -4,8 +4,10 @@ const NOTION_VERSION = "2022-06-28";
 const MAX_BLOCK_DEPTH = 6;
 
 type NotionRichText = {
+  type?: string;
   plain_text?: string;
   href?: string | null;
+  equation?: { expression?: string };
   annotations?: {
     bold?: boolean;
     italic?: boolean;
@@ -37,12 +39,26 @@ function plainTextFromRichText(items: NotionRichText[] | undefined): string {
   return items.map((item) => item.plain_text ?? "").join("");
 }
 
+function equationToHtml(latex: string, display: boolean): string {
+  const safe = escapeHtml(latex);
+  // Keep text content so DOMPurify / TipTap table parsers do not drop empty nodes.
+  if (display) {
+    return `<div data-type="math-display" data-latex="${safe}">${safe}</div>`;
+  }
+  return `<span data-type="math-inline" data-latex="${safe}">${safe}</span>`;
+}
+
 function richTextToHtml(items: NotionRichText[] | undefined): string {
   if (!items?.length) {
     return "";
   }
   return items
     .map((item) => {
+      const equationLatex = item.equation?.expression ?? "";
+      if (item.type === "equation" || equationLatex) {
+        return equationToHtml(equationLatex || item.plain_text || "", false);
+      }
+
       let html = escapeHtml(item.plain_text ?? "");
       const a = item.annotations;
       if (a?.code) html = `<code>${html}</code>`;
@@ -332,6 +348,11 @@ async function blockToHtml(
     }
     case "divider":
       return "<hr />";
+    case "equation": {
+      const latex =
+        (block.equation as { expression?: string } | undefined)?.expression ?? "";
+      return `${equationToHtml(latex, true)}${childrenHtml}`;
+    }
     case "image": {
       const image = block.image as {
         type?: string;

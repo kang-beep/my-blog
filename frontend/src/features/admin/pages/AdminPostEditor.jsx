@@ -121,6 +121,10 @@ export default function AdminPostEditor() {
         content: persisted.contentHtml,
         image_url: persisted.imageUrl,
       };
+      const persistWarning =
+        persisted.warnings?.length > 0
+          ? ` Some images could not be copied (${persisted.warnings.length}). Re-import from Notion while links are fresh.`
+          : "";
 
       if (isEditMode) {
         let imageUrl = nextPayload.image_url ?? null;
@@ -136,7 +140,7 @@ export default function AdminPostEditor() {
           ),
         );
         await refreshTagStats();
-        setToastMessage("Post saved.");
+        setToastMessage(`Post saved.${persistWarning}`);
         return;
       }
 
@@ -153,7 +157,7 @@ export default function AdminPostEditor() {
         await refreshTagStats();
         navigate(getAdminPostEditPath(created.id), {
           replace: true,
-          state: { toastMessage: "Post published." },
+          state: { toastMessage: `Post published.${persistWarning}` },
         });
         return;
       }
@@ -165,7 +169,7 @@ export default function AdminPostEditor() {
       await refreshTagStats();
       navigate(getAdminPostEditPath(nextPayload.id), {
         replace: true,
-        state: { toastMessage: "Post published." },
+        state: { toastMessage: `Post published.${persistWarning}` },
       });
     } catch (requestError) {
       setError(requestError.message || "Could not save post.");

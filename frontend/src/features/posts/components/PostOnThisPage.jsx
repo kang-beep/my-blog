@@ -1,20 +1,14 @@
-function scrollToHeading(id) {
-  const target = document.getElementById(id);
-  if (!target) {
-    return;
-  }
-
-  target.scrollIntoView({ behavior: "smooth", block: "start" });
-}
+import { scrollToPostHeading } from "@/features/posts/utils/scrollToPostHeading";
 
 export default function PostOnThisPage({
   headings = [],
   activeId = "",
   onSelectHeading,
+  hideTitle = false,
 }) {
   return (
     <nav className="post-toc" aria-label="On this page">
-      <p className="post-toc-title">On this page</p>
+      {hideTitle ? null : <p className="post-toc-title">On this page</p>}
       {headings.length === 0 ? (
         <p className="post-toc-empty">No title</p>
       ) : (
@@ -35,7 +29,10 @@ export default function PostOnThisPage({
                   }
                   onClick={() => {
                     onSelectHeading?.(heading.id);
-                    scrollToHeading(heading.id);
+                    // Wait a frame so mobile TOC panel can collapse before measuring offset.
+                    requestAnimationFrame(() => {
+                      scrollToPostHeading(heading.id);
+                    });
                   }}
                 >
                   {heading.text}
