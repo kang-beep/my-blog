@@ -6,7 +6,7 @@
 
 - digest는 **소스별만** (`github` / `huggingface`). **combined 없음**
 - GitHub digest: **daily / weekly / monthly** 각각
-- HF digest: 추후 — 상위 20~30 + `title` + `(ai_summary || truncated summary)` + `upvotes`
+- HF digest: daily/weekly/monthly 모두 **upvote Top 5** + `title` + `summary` (`ai_summary` 미사용)
 - Trends AI Briefs 카피: **Monthly** 쪽으로 정리 예정
 - fingerprint 동일 → **Gemini API 호출 skip**
 - GitHub 입력: period별 **전체** `title` + `description`
@@ -136,7 +136,7 @@ RLS:
 | 2 | GH summarize 스크립트 + fingerprint | ✅ |
 | 3 | 스크립트 → DB upsert + DB fingerprint | ✅ |
 | 4 | GH Actions workflow 연결 | ✅ |
-| 5 | HF digest | ❌ |
+| 5 | HF digest (upvote Top 5) | ✅ |
 | 6 | FE mock → SELECT | ✅ (GH; HF empty until digest exists) |
 
 ---

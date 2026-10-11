@@ -36,6 +36,9 @@ supabase functions deploy dynamic-handler --project-ref tznrmatarsyyptddnaee
 supabase functions deploy regenerate-trend-ai-digests --project-ref tznrmatarsyyptddnaee
 ```
 
+HF AI digest: sync 후 `npm run summarize:hf-papers` (upvote Top 5, daily/weekly/monthly).
+
+
 Secret (Dashboard): `my-blog-giscus-tokens` = GitHub fine-grained PAT (Discussions read/write on `kang-beep/my-blog`).
 
 ## GitHub Actions — Supabase ping

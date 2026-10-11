@@ -1,17 +1,22 @@
 import { useEffect, useRef } from "react";
 import { SHORT_POST_CONTENT_PADDING_CLASS } from "@/features/posts/constants/postDetail";
 import { useIsShortPostContent } from "@/features/posts/hooks/useIsShortPostContent";
-import { applyPostContentTableLayout } from "@/features/posts/utils/applyPostContentTableLayout";
+import { preparePostContentTablesHtml } from "@/features/posts/utils/applyPostContentTableLayout";
 import { ensureAndCollectPostHeadings } from "@/features/posts/utils/collectPostHeadings";
 import { isHtmlContent, sanitizePostHtml } from "@/shared/lib/sanitizeHtml";
 import "@/features/admin/components/RichTextEditor/editor.css";
 
 const BODY_TEXT_CLASS = "text-[0.95rem] leading-relaxed text-slate-800 lg:text-base";
 
+function buildPostContentHtml(content) {
+  return preparePostContentTablesHtml(sanitizePostHtml(content));
+}
+
 export default function PostDetailBody({ content, onHeadingsChange }) {
   const contentRef = useRef(null);
   const isShort = useIsShortPostContent(contentRef, content);
   const wrapperClassName = isShort ? SHORT_POST_CONTENT_PADDING_CLASS : "";
+  const htmlContent = isHtmlContent(content) ? buildPostContentHtml(content) : "";
 
   useEffect(() => {
     const root = contentRef.current;
@@ -20,17 +25,16 @@ export default function PostDetailBody({ content, onHeadingsChange }) {
       return;
     }
 
-    applyPostContentTableLayout(root);
     onHeadingsChange?.(ensureAndCollectPostHeadings(root));
   }, [content, onHeadingsChange]);
 
   return (
     <div className={wrapperClassName}>
-      {isHtmlContent(content) ? (
+      {htmlContent ? (
         <div
           ref={contentRef}
           className={`post-content ${BODY_TEXT_CLASS}`}
-          dangerouslySetInnerHTML={{ __html: sanitizePostHtml(content) }}
+          dangerouslySetInnerHTML={{ __html: htmlContent }}
         />
       ) : (
         <div ref={contentRef} className={`whitespace-pre-wrap ${BODY_TEXT_CLASS}`}>

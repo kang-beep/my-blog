@@ -19,6 +19,7 @@ const POST_CONTENT_ALLOWED_TAGS = [
   "code",
   "pre",
   "span",
+  "div",
   "table",
   "thead",
   "tbody",

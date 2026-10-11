@@ -396,8 +396,12 @@
     @apply border-amber-400;
   }
 
+  .home-ai-brief-label-row {
+    @apply mb-1 flex items-center justify-between gap-2;
+  }
+
   .home-ai-brief-label {
-    @apply m-0 mb-1 text-[11px] font-semibold uppercase tracking-wide;
+    @apply m-0 text-[11px] font-semibold uppercase tracking-wide;
   }
 
   .home-ai-brief-github .home-ai-brief-label {
@@ -504,8 +508,35 @@
     @apply space-y-2 border-b border-slate-100 bg-slate-50 px-4 py-4 sm:px-6;
   }
 
+  .trend-source-ai-label-row {
+    @apply flex items-center justify-between gap-2;
+  }
+
   .trend-source-ai-label {
     @apply m-0 text-xs font-medium uppercase tracking-[0.08em] text-slate-500;
+  }
+
+  .trend-ai-help {
+    @apply relative inline-flex shrink-0;
+  }
+
+  .trend-ai-help-trigger {
+    @apply inline-flex size-5 items-center justify-center rounded-full text-slate-400 transition-colors hover:bg-slate-200/80 hover:text-slate-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-400;
+  }
+
+  .trend-ai-help-bubble {
+    @apply pointer-events-none invisible absolute right-0 top-[calc(100%+0.4rem)] z-20 w-56 rounded-md bg-slate-800 px-2.5 py-2 text-left text-[11px] font-normal normal-case leading-snug tracking-normal text-white opacity-0 shadow-md transition-opacity;
+  }
+
+  .trend-ai-help-bubble::before {
+    content: "";
+    @apply absolute right-1.5 top-[-4px] size-2 rotate-45 bg-slate-800;
+  }
+
+  .trend-ai-help:hover .trend-ai-help-bubble,
+  .trend-ai-help:focus-within .trend-ai-help-bubble,
+  .trend-ai-help-bubble.is-open {
+    @apply visible opacity-100;
   }
 
   .trend-brief-card-headline {

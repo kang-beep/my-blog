@@ -39,6 +39,8 @@ export default function HomeTodayInAi() {
   const [huggingfaceHighlights, setHuggingfaceHighlights] = useState([]);
   const [githubHeadline, setGithubHeadline] = useState("");
   const [huggingfaceHeadline, setHuggingfaceHeadline] = useState("");
+  const [githubModel, setGithubModel] = useState("");
+  const [huggingfaceModel, setHuggingfaceModel] = useState("");
   const [githubUpdatedLabel, setGithubUpdatedLabel] = useState("—");
   const [huggingfaceUpdatedLabel, setHuggingfaceUpdatedLabel] = useState("—");
   const [isLoading, setIsLoading] = useState(true);
@@ -71,11 +73,15 @@ export default function HomeTodayInAi() {
 
         setGithubHeadline(digests.github?.headline ?? "");
         setHuggingfaceHeadline(digests.huggingface?.headline ?? "");
+        setGithubModel(digests.github?.model ?? "");
+        setHuggingfaceModel(digests.huggingface?.model ?? "");
       } catch {
         setGithubHighlights([]);
         setHuggingfaceHighlights([]);
         setGithubHeadline("");
         setHuggingfaceHeadline("");
+        setGithubModel("");
+        setHuggingfaceModel("");
       } finally {
         setIsLoading(false);
       }
@@ -90,6 +96,7 @@ export default function HomeTodayInAi() {
         source="github"
         title="GitHub Trending Today"
         headline={githubHeadline}
+        model={githubModel}
         updatedLabel={githubUpdatedLabel}
         highlights={githubHighlights}
         isLoading={isLoading}
@@ -98,6 +105,7 @@ export default function HomeTodayInAi() {
         source="huggingface"
         title="Hugging Face Papers Today"
         headline={huggingfaceHeadline}
+        model={huggingfaceModel}
         updatedLabel={huggingfaceUpdatedLabel}
         highlights={huggingfaceHighlights}
         isLoading={isLoading}

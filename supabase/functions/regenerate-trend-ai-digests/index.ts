@@ -9,6 +9,7 @@ import {
   saveGeminiOutputLanguage,
 } from "../_shared/adminAuthSecrets.ts";
 import { regenerateGithubDigestsForLanguage } from "../_shared/githubTrendDigest.ts";
+import { regenerateHuggingfaceDigestsForLanguage } from "../_shared/huggingfaceTrendDigest.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -31,17 +32,20 @@ Deno.serve(async (req) => {
 
     const apiKey = await getGeminiApiKey();
     const supabase = createServiceClient();
-    const results = await regenerateGithubDigestsForLanguage({
-      supabase,
-      apiKey,
-      language,
-    });
 
+    const [githubResults, huggingfaceResults] = await Promise.all([
+      regenerateGithubDigestsForLanguage({ supabase, apiKey, language }),
+      regenerateHuggingfaceDigestsForLanguage({ supabase, apiKey, language }),
+    ]);
+
+    const results = [...githubResults, ...huggingfaceResults];
     const failed = results.filter((item) => item.status === "error");
-    if (failed.length === results.length) {
+    const actionable = results.filter((item) => item.status !== "empty");
+
+    if (actionable.length > 0 && failed.length === actionable.length) {
       return jsonResponse(
         {
-          error: "All periods failed to regenerate.",
+          error: "All digest regenerations failed.",
           language,
           results,
         },

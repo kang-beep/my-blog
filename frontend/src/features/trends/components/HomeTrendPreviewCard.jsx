@@ -1,4 +1,5 @@
 import { ChevronRight } from "lucide-react";
+import TrendAiBriefHelpTip from "@/features/trends/components/TrendAiBriefHelpTip";
 import GithubMarkIcon from "@/shared/ui/GithubMarkIcon";
 
 function SourceIcon({ source }) {
@@ -16,6 +17,7 @@ export default function HomeTrendPreviewCard({
   source,
   title,
   headline,
+  model = "",
   updatedLabel,
   highlights = [],
   isLoading = false,
@@ -42,7 +44,10 @@ export default function HomeTrendPreviewCard({
             source === "github" ? "home-ai-brief home-ai-brief-github" : "home-ai-brief home-ai-brief-huggingface"
           }
         >
-          <p className="home-ai-brief-label">AI Brief</p>
+          <div className="home-ai-brief-label-row">
+            <p className="home-ai-brief-label">AI Brief</p>
+            <TrendAiBriefHelpTip source={source} model={model} />
+          </div>
           <p className="home-ai-card-headline">
             {isLoading
               ? "Loading..."

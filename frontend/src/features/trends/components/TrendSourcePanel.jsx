@@ -17,6 +17,7 @@ import {
   HUGGINGFACE_PAPER_PERIODS,
 } from "@/features/huggingface/daily-papers/constants/huggingfaceDailyPapers";
 import { HOME_FEED_BADGE_EXTERNAL } from "@/features/posts/constants/home";
+import TrendAiBriefHelpTip from "@/features/trends/components/TrendAiBriefHelpTip";
 import { TREND_AI_SOURCES } from "@/features/trends/constants/trendAiDigests";
 import ExternalFeedUnavailable from "@/shared/ui/ExternalFeedUnavailable";
 import GithubMarkIcon from "@/shared/ui/GithubMarkIcon";
@@ -161,7 +162,10 @@ export default function TrendSourcePanel({
       </div>
 
       <div className="trend-source-ai-block">
-        <p className="trend-source-ai-label">{aiUpdatedLabel}</p>
+        <div className="trend-source-ai-label-row">
+          <p className="trend-source-ai-label">{aiUpdatedLabel}</p>
+          <TrendAiBriefHelpTip source={source} model={digest?.model ?? ""} />
+        </div>
         {isDigestLoading ? <p className="trend-brief-card-summary">Loading...</p> : null}
         {!isDigestLoading && !digest ? (
           <p className="trend-brief-card-summary">No AI brief yet for this period.</p>

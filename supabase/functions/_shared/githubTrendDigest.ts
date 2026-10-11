@@ -2,7 +2,7 @@ import { createClient } from "npm:@supabase/supabase-js@2";
 
 export const GITHUB_TRENDING_TABLE = "github_trending_repos";
 export const TREND_AI_DIGESTS_TABLE = "trend_ai_digests";
-export const PROMPT_VERSION = "github-v1";
+export const PROMPT_VERSION = "github-v2";
 export const PERIODS = ["daily", "weekly", "monthly"] as const;
 export const DEFAULT_GEMINI_MODEL = "gemini-flash-latest";
 const GEMINI_API_BASE = "https://generativelanguage.googleapis.com/v1beta";
@@ -57,6 +57,26 @@ function languageInstruction(language: OutputLanguage): string {
   return "Language: English only. Write headline, summary, and keywords in English.";
 }
 
+export function periodLeadInstruction(period: Period, language: OutputLanguage = "en"): string {
+  if (language === "ko") {
+    if (period === "weekly") {
+      return 'Headline MUST start with "이번 주" (e.g. "이번 주 …"). Summary should also read as this week.';
+    }
+    if (period === "monthly") {
+      return 'Headline MUST start with "이번 달" (e.g. "이번 달 …"). Summary should also read as this month.';
+    }
+    return 'Headline MUST start with "오늘의" (e.g. "오늘의 …"). Summary should also read as today.';
+  }
+
+  if (period === "weekly") {
+    return 'Headline MUST start with "This week" (e.g. "This week, …"). Summary should also read as this week.';
+  }
+  if (period === "monthly") {
+    return 'Headline MUST start with "This month" (e.g. "This month, …"). Summary should also read as this month.';
+  }
+  return 'Headline MUST start with "Today\'s" (e.g. "Today\'s …"). Summary should also read as today.';
+}
+
 export function buildGithubPrompt({
   period,
   fetchedDate,
@@ -71,6 +91,7 @@ export function buildGithubPrompt({
   const systemText = [
     "You are a tech trend editor for a developer blog.",
     languageInstruction(language),
+    periodLeadInstruction(period, language),
     "Analyze the GitHub trending repositories for the given period.",
     "Do not invent repos that are not in the list.",
     "No hype or marketing tone.",
@@ -247,13 +268,13 @@ export async function regenerateGithubDigestsForLanguage({
   apiKey: string;
   language: OutputLanguage;
 }) {
-  const results: Array<{ period: Period; status: string; detail?: string }> = [];
+  const results: Array<{ source: string; period: Period; status: string; detail?: string }> = [];
 
   for (const period of PERIODS) {
     try {
       const { fetchedDate, rows } = await fetchGithubReposForPeriod(supabase, period);
       if (!fetchedDate || rows.length === 0) {
-        results.push({ period, status: "empty" });
+        results.push({ source: "github", period, status: "empty" });
         continue;
       }
 
@@ -285,10 +306,10 @@ export async function regenerateGithubDigestsForLanguage({
         prompt_version: PROMPT_VERSION,
         input_fingerprint: inputFingerprint,
       });
-      results.push({ period, status: "generated" });
+      results.push({ source: "github", period, status: "generated" });
     } catch (error) {
       const message = error instanceof Error ? error.message : String(error);
-      results.push({ period, status: "error", detail: message });
+      results.push({ source: "github", period, status: "error", detail: message });
     }
   }
 

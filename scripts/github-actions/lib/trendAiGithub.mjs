@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 
 export const GITHUB_TRENDING_TABLE = "github_trending_repos";
 export const TREND_AI_DIGESTS_TABLE = "trend_ai_digests";
-export const PROMPT_VERSION = "github-v1";
+export const PROMPT_VERSION = "github-v2";
 export const PERIODS = ["daily", "weekly", "monthly"];
 
 const SCRIPT_DIR = dirname(fileURLToPath(import.meta.url));
@@ -102,10 +102,32 @@ function languageInstruction(language) {
   return "Language: English only. Write headline, summary, and keywords in English.";
 }
 
+/** Require period framing at the start of headline (and naturally in summary). */
+export function periodLeadInstruction(period, language = "en") {
+  if (language === "ko") {
+    if (period === "weekly") {
+      return 'Headline MUST start with "이번 주" (e.g. "이번 주 …"). Summary should also read as this week.';
+    }
+    if (period === "monthly") {
+      return 'Headline MUST start with "이번 달" (e.g. "이번 달 …"). Summary should also read as this month.';
+    }
+    return 'Headline MUST start with "오늘의" (e.g. "오늘의 …"). Summary should also read as today.';
+  }
+
+  if (period === "weekly") {
+    return 'Headline MUST start with "This week" (e.g. "This week, …"). Summary should also read as this week.';
+  }
+  if (period === "monthly") {
+    return 'Headline MUST start with "This month" (e.g. "This month, …"). Summary should also read as this month.';
+  }
+  return 'Headline MUST start with "Today\'s" (e.g. "Today\'s …"). Summary should also read as today.';
+}
+
 export function buildGithubPrompt({ period, fetchedDate, inputRows, language = "en" }) {
   const systemText = [
     "You are a tech trend editor for a developer blog.",
     languageInstruction(language),
+    periodLeadInstruction(period, language),
     "Analyze the GitHub trending repositories for the given period.",
     "Do not invent repos that are not in the list.",
     "No hype or marketing tone.",

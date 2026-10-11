@@ -1,7 +1,8 @@
 /**
- * Align post-content tables with editor layout:
- * - restore width from <colgroup> when missing (legacy height-only style)
- * - apply data-height → height + --table-row-height
+ * Fit post-content tables to the article width:
+ * - drop editor min-width / pixel width that force horizontal overflow
+ * - keep column ratios via percentage col widths
+ * - allow row height to grow when cell text wraps
  */
 export function applyPostContentTableLayout(root: HTMLElement): void {
   root.querySelectorAll("table").forEach((element) => {
@@ -9,57 +10,69 @@ export function applyPostContentTableLayout(root: HTMLElement): void {
       return;
     }
 
-    applyTableWidthFromColGroup(element);
-    applyTableHeightFromData(element);
+    fitTableToViewport(element);
   });
 }
 
-function applyTableWidthFromColGroup(table: HTMLTableElement): void {
-  const cols = table.querySelectorAll("colgroup > col");
+/**
+ * Sanitize-time transform so React's dangerouslySetInnerHTML already has
+ * responsive table styles (post-effect DOM patches get wiped on re-render).
+ */
+export function preparePostContentTablesHtml(html: string): string {
+  if (typeof DOMParser === "undefined" || !html.trim()) {
+    return html;
+  }
+
+  const parser = new DOMParser();
+  const document = parser.parseFromString(`<div id="post-root">${html}</div>`, "text/html");
+  const root = document.getElementById("post-root");
+  if (!root) {
+    return html;
+  }
+
+  applyPostContentTableLayout(root);
+  return root.innerHTML;
+}
+
+function fitTableToViewport(table: HTMLTableElement): void {
+  table.style.width = "100%";
+  table.style.maxWidth = "100%";
+  table.style.minWidth = "0";
+  table.style.height = "auto";
+  table.style.removeProperty("--table-row-height");
+  table.removeAttribute("data-height");
+
+  const cols = [...table.querySelectorAll("colgroup > col")].filter(
+    (col): col is HTMLElement => col instanceof HTMLElement,
+  );
   if (cols.length === 0) {
     return;
   }
 
-  let totalWidth = 0;
-  let allFixed = true;
+  const pixelWidths = cols.map((col) => readColPixelWidth(col));
+  const totalWidth = pixelWidths.reduce((sum, width) => sum + width, 0);
+  const useEqualColumns = totalWidth <= 0;
 
-  cols.forEach((col) => {
-    if (!(col instanceof HTMLElement)) {
-      allFixed = false;
+  cols.forEach((col, index) => {
+    col.style.minWidth = "0";
+    if (useEqualColumns) {
+      col.style.width = `${(100 / cols.length).toFixed(4)}%`;
       return;
     }
-    const width = Number.parseInt(col.style.width, 10);
-    if (!Number.isFinite(width) || width <= 0) {
-      allFixed = false;
-      return;
-    }
-    totalWidth += width;
+    col.style.width = `${((pixelWidths[index] / totalWidth) * 100).toFixed(4)}%`;
   });
-
-  if (!allFixed || totalWidth <= 0) {
-    return;
-  }
-
-  if (!table.style.width) {
-    table.style.width = `${totalWidth}px`;
-  }
 }
 
-function applyTableHeightFromData(table: HTMLTableElement): void {
-  const dataHeight = table.getAttribute("data-height");
-  const heightPx = dataHeight
-    ? Number.parseInt(dataHeight, 10)
-    : Number.parseInt(table.style.height, 10);
-
-  const rowCount = table.rows.length;
-  if (!Number.isFinite(heightPx) || heightPx <= 0 || rowCount <= 0) {
-    return;
+function readColPixelWidth(col: HTMLElement): number {
+  const width = Number.parseInt(col.style.width, 10);
+  if (Number.isFinite(width) && width > 0) {
+    return width;
   }
 
-  table.style.height = `${heightPx}px`;
-  table.style.setProperty("--table-row-height", `${Math.floor(heightPx / rowCount)}px`);
-
-  if (!dataHeight) {
-    table.setAttribute("data-height", String(heightPx));
+  const minWidth = Number.parseInt(col.style.minWidth, 10);
+  if (Number.isFinite(minWidth) && minWidth > 0) {
+    return minWidth;
   }
+
+  return 0;
 }

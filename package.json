@@ -6,7 +6,8 @@
   "scripts": {
     "sync:hf-papers": "node scripts/github-actions/sync-huggingface-daily-papers.mjs",
     "sync:gh-trending": "node scripts/github-actions/sync-github-trending-repos.mjs",
-    "summarize:gh-trending": "node scripts/github-actions/summarize-github-trending-ai.mjs"
+    "summarize:gh-trending": "node scripts/github-actions/summarize-github-trending-ai.mjs",
+    "summarize:hf-papers": "node scripts/github-actions/summarize-huggingface-papers-ai.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.104.1"

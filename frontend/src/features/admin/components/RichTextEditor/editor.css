@@ -125,8 +125,7 @@
   text-align: justify;
 }
 
-.rich-text-editor .tableWrapper,
-.post-content .tableWrapper {
+.rich-text-editor .tableWrapper {
   margin: 1rem 0;
   max-width: 100%;
   overflow-x: auto;
@@ -136,8 +135,18 @@
   width: fit-content;
 }
 
-.rich-text-editor .tiptap table,
-.post-content table {
+/* Post view: fit viewport; wrap cell text instead of horizontal scroll */
+.post-content .tableWrapper {
+  margin: 1rem 0;
+  max-width: 100%;
+  overflow-x: visible;
+  overflow-y: visible;
+  padding: 0;
+  position: relative;
+  width: 100%;
+}
+
+.rich-text-editor .tiptap table {
   border-collapse: collapse;
   margin: 0;
   overflow: hidden;
@@ -147,21 +156,79 @@
   max-width: none;
 }
 
-.post-content > table {
-  margin: 1rem 0;
+.post-content {
   max-width: 100%;
+  min-width: 0;
+}
+
+.post-content table {
+  border-collapse: collapse;
+  box-sizing: border-box;
+  height: auto !important;
+  margin: 1rem 0;
+  max-width: 100% !important;
+  min-width: 0 !important;
+  overflow: visible;
+  table-layout: fixed;
+  width: 100% !important;
+  --table-row-height: auto;
+}
+
+.post-content col {
+  min-width: 0 !important;
+}
+
+.post-content .tableWrapper > table {
+  margin: 0;
 }
 
 .rich-text-editor .tiptap td,
-.rich-text-editor .tiptap th,
-.post-content td,
-.post-content th {
+.rich-text-editor .tiptap th {
   border: 1px solid rgb(203 213 225);
   height: var(--table-row-height, auto);
   min-width: 3rem;
   padding: 0.45rem 0.65rem;
   position: relative;
   vertical-align: top;
+}
+
+.post-content td,
+.post-content th {
+  border: 1px solid rgb(203 213 225);
+  box-sizing: border-box;
+  height: auto !important;
+  max-width: 0;
+  min-width: 0;
+  overflow-wrap: anywhere;
+  padding: 0.45rem 0.65rem;
+  position: relative;
+  vertical-align: top;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.post-content td *,
+.post-content th * {
+  max-width: 100%;
+  overflow-wrap: anywhere;
+  white-space: normal;
+  word-break: break-word;
+}
+
+.post-content td ul,
+.post-content td ol,
+.post-content th ul,
+.post-content th ol {
+  margin: 0;
+  padding-left: 1.1rem;
+}
+
+@media (max-width: 640px) {
+  .post-content td,
+  .post-content th {
+    font-size: 0.8125rem;
+    padding: 0.35rem 0.45rem;
+  }
 }
 
 .rich-text-editor .tiptap td[style*="vertical-align: middle"],
