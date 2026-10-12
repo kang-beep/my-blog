@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+Disallow: /admin
+Disallow: /admin-login
+
+Sitemap: https://kang-beep-blog.vercel.app/sitemap.xml
