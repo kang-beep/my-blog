@@ -3,7 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 const SITE_ORIGIN = "https://kang-beep-blog.vercel.app";
 const POST_STATUS_PUBLISHED = "published";
 
-const STATIC_PATHS = ["/", "/posts", "/trends", "/portfolio"];
+const STATIC_PATHS = ["/", "/posts", "/trends"];
 
 function escapeXml(value) {
   return String(value)
