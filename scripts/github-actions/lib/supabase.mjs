@@ -113,21 +113,6 @@ export async function deleteRowsBeforeDate(supabase, table, fetchedDate, extraFi
   }
 }
 
-/**
- * Delete every row for one feed period (all fetched_date values).
- * Used when sync/fetch fails so the UI surfaces unavailable instead of stale data.
- */
-export async function deleteRowsForPeriod(supabase, table, period) {
-  if (!period) {
-    throw new Error(`DELETE requires a WHERE clause: missing period for ${table}`);
-  }
-
-  const { error } = await supabase.from(table).delete().eq("period", period);
-  if (error) {
-    throw new Error(`Failed to wipe ${table} period=${period}: ${error.message}`);
-  }
-}
-
 export async function insertRows(supabase, table, rows) {
   if (rows.length === 0) {
     return;

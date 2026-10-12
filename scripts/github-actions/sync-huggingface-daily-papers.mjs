@@ -1,6 +1,5 @@
 import {
   createServiceSupabaseClient,
-  deleteRowsForPeriod,
   getUtcDateString,
   replaceRowsForDate,
 } from "./lib/supabase.mjs";
@@ -157,14 +156,9 @@ async function main() {
     try {
       await syncPeriod(supabase, period, fetchedDate);
     } catch (error) {
+      // Keep last good rows so Trends stays usable when HF API blips.
       failures.push(`${period}: ${error.message}`);
       console.error(`Failed ${period}: ${error.message}`);
-      try {
-        await deleteRowsForPeriod(supabase, TABLE_NAME, period);
-        console.error(`Wiped ${TABLE_NAME} period=${period} so UI shows unavailable`);
-      } catch (wipeError) {
-        console.error(`Wipe failed for ${period}: ${wipeError.message}`);
-      }
     }
   }
 

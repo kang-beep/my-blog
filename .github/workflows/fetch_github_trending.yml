@@ -70,9 +70,12 @@ jobs:
         run: node scripts/github-actions/sync-github-trending-repos.mjs
 
   # Runs only after sync succeeds. Fingerprint skip avoids Gemini when inputs unchanged.
+  # continue-on-error: quota / Gemini outages must not mark the whole feed sync failed.
   digest:
     name: Summarize GitHub trending (Gemini)
     needs: sync
+    if: success()
+    continue-on-error: true
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

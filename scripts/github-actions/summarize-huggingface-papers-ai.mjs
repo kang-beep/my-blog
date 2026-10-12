@@ -14,7 +14,11 @@
  */
 import { createServiceSupabaseClient } from "./lib/supabase.mjs";
 import { loadGeminiApiKey, loadGeminiOutputLanguage } from "./lib/geminiApiKey.mjs";
-import { generateJsonWithGemini, getGeminiModelName } from "./lib/geminiClient.mjs";
+import {
+  generateJsonWithGemini,
+  getGeminiModelName,
+  isGeminiQuotaError,
+} from "./lib/geminiClient.mjs";
 import {
   ensureTempDirs,
   fetchExistingTrendAiDigest,
@@ -154,13 +158,23 @@ async function main() {
       results.push(await summarizePeriod({ supabase, apiKey, model, language, period }));
     } catch (error) {
       console.error(`[${period}] FAILED:`, error.message);
-      results.push({ period, status: "error", error: error.message });
+      results.push({
+        period,
+        status: isGeminiQuotaError(error) ? "quota" : "error",
+        error: error.message,
+      });
+      if (isGeminiQuotaError(error)) {
+        console.warn(`[${period}] Gemini quota hit — keeping previous digests and stopping further calls`);
+        break;
+      }
     }
   }
 
-  const failed = results.filter((item) => item.status === "error");
+  const hardFailed = results.filter((item) => item.status === "error");
+  const quotaFailed = results.filter((item) => item.status === "quota");
   console.log("Done:", results.map((item) => `${item.period}=${item.status}`).join(", "));
-  if (failed.length === results.length) {
+  // Quota exhaustion should not fail the workflow; feed sync already succeeded.
+  if (hardFailed.length > 0 && hardFailed.length + quotaFailed.length === results.length) {
     process.exitCode = 1;
   }
 }
