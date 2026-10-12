@@ -5,19 +5,34 @@ export function getGeminiModelName() {
   return process.env.GEMINI_MODEL?.trim() || DEFAULT_MODEL;
 }
 
-export class GeminiQuotaError extends Error {
-  constructor(message) {
+export class GeminiSoftFailError extends Error {
+  constructor(message, kind = "soft") {
     super(message);
+    this.name = "GeminiSoftFailError";
+    this.kind = kind;
+  }
+}
+
+/** @deprecated use isGeminiSoftFailError */
+export class GeminiQuotaError extends GeminiSoftFailError {
+  constructor(message) {
+    super(message, "quota");
     this.name = "GeminiQuotaError";
   }
 }
 
-export function isGeminiQuotaError(error) {
-  if (error instanceof GeminiQuotaError) {
+export function isGeminiSoftFailError(error) {
+  if (error instanceof GeminiSoftFailError || error instanceof GeminiQuotaError) {
     return true;
   }
   const message = String(error?.message ?? error ?? "");
-  return /RESOURCE_EXHAUSTED|quota|rate limit|Too Many Requests|429/i.test(message);
+  return /RESOURCE_EXHAUSTED|quota|rate limit|Too Many Requests|429|503|UNAVAILABLE|currently unavailable|high demand/i.test(
+    message,
+  );
+}
+
+export function isGeminiQuotaError(error) {
+  return isGeminiSoftFailError(error);
 }
 
 /**
@@ -51,8 +66,8 @@ export async function generateJsonWithGemini({ apiKey, model, systemText, userTe
   if (!response.ok) {
     const message = payload?.error?.message || JSON.stringify(payload).slice(0, 400);
     const detail = `Gemini API failed (${response.status}): ${message}`;
-    if (response.status === 429 || isGeminiQuotaError({ message: detail })) {
-      throw new GeminiQuotaError(detail);
+    if (response.status === 429 || response.status === 503 || isGeminiSoftFailError({ message: detail })) {
+      throw new GeminiSoftFailError(detail, response.status === 429 ? "quota" : "unavailable");
     }
     throw new Error(detail);
   }

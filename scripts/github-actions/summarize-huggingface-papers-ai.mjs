@@ -17,7 +17,7 @@ import { loadGeminiApiKey, loadGeminiOutputLanguage } from "./lib/geminiApiKey.m
 import {
   generateJsonWithGemini,
   getGeminiModelName,
-  isGeminiQuotaError,
+  isGeminiSoftFailError,
 } from "./lib/geminiClient.mjs";
 import {
   ensureTempDirs,
@@ -158,23 +158,24 @@ async function main() {
       results.push(await summarizePeriod({ supabase, apiKey, model, language, period }));
     } catch (error) {
       console.error(`[${period}] FAILED:`, error.message);
+      const soft = isGeminiSoftFailError(error);
       results.push({
         period,
-        status: isGeminiQuotaError(error) ? "quota" : "error",
+        status: soft ? "soft_fail" : "error",
         error: error.message,
       });
-      if (isGeminiQuotaError(error)) {
-        console.warn(`[${period}] Gemini quota hit — keeping previous digests and stopping further calls`);
+      if (soft) {
+        console.warn(`[${period}] Gemini soft-fail — keeping previous digests and stopping further calls`);
         break;
       }
     }
   }
 
   const hardFailed = results.filter((item) => item.status === "error");
-  const quotaFailed = results.filter((item) => item.status === "quota");
+  const softFailed = results.filter((item) => item.status === "soft_fail");
   console.log("Done:", results.map((item) => `${item.period}=${item.status}`).join(", "));
-  // Quota exhaustion should not fail the workflow; feed sync already succeeded.
-  if (hardFailed.length > 0 && hardFailed.length + quotaFailed.length === results.length) {
+  // Quota/503 should not fail the workflow; feed sync already succeeded.
+  if (hardFailed.length > 0 && hardFailed.length + softFailed.length === results.length) {
     process.exitCode = 1;
   }
 }
