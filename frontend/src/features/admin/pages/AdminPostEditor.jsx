@@ -111,6 +111,7 @@ export default function AdminPostEditor() {
     setIsSubmitting(true);
     setError("");
     try {
+      // Persist must succeed before DB write — never store Notion temp image URLs.
       const persisted = await persistExternalPostImages({
         postId: payload.id,
         contentHtml: payload.content ?? "",
@@ -121,10 +122,6 @@ export default function AdminPostEditor() {
         content: persisted.contentHtml,
         image_url: persisted.imageUrl,
       };
-      const persistWarning =
-        persisted.warnings?.length > 0
-          ? ` Some images could not be copied (${persisted.warnings.length}). Re-import from Notion while links are fresh.`
-          : "";
 
       if (isEditMode) {
         let imageUrl = nextPayload.image_url ?? null;
@@ -140,7 +137,7 @@ export default function AdminPostEditor() {
           ),
         );
         await refreshTagStats();
-        setToastMessage(`Post saved.${persistWarning}`);
+        setToastMessage("Post saved.");
         return;
       }
 
@@ -157,7 +154,7 @@ export default function AdminPostEditor() {
         await refreshTagStats();
         navigate(getAdminPostEditPath(created.id), {
           replace: true,
-          state: { toastMessage: `Post published.${persistWarning}` },
+          state: { toastMessage: "Post published." },
         });
         return;
       }
@@ -169,7 +166,7 @@ export default function AdminPostEditor() {
       await refreshTagStats();
       navigate(getAdminPostEditPath(nextPayload.id), {
         replace: true,
-        state: { toastMessage: `Post published.${persistWarning}` },
+        state: { toastMessage: "Post published." },
       });
     } catch (requestError) {
       setError(requestError.message || "Could not save post.");
