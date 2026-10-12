@@ -1,6 +1,11 @@
 import "jsr:@supabase/functions-js/edge-runtime.d.ts";
 import { createClient } from "npm:@supabase/supabase-js@2";
 import {
+  ImageMagick,
+  initializeImageMagick,
+  MagickFormat,
+} from "npm:@imagemagick/magick-wasm@0.0.30";
+import {
   corsHeaders,
   jsonResponse,
   requireAuthedUser,
@@ -8,7 +13,15 @@ import {
 
 const POSTS_BUCKET = "posts-images";
 const MAX_IMAGE_BYTES = 12 * 1024 * 1024;
+/** Match frontend prepareImageForUpload max dimension. */
+const MAX_IMAGE_DIMENSION = 1920;
+const WEBP_QUALITY = 85;
 const IMG_SRC_PATTERN = /<img\b[^>]*?\bsrc\s*=\s*(["'])(.*?)\1/gi;
+
+const magickWasmBytes = await Deno.readFile(
+  new URL("magick.wasm", import.meta.resolve("npm:@imagemagick/magick-wasm@0.0.30")),
+);
+await initializeImageMagick(magickWasmBytes);
 
 /** Browser-like UA — Notion/S3 often reject custom bot UAs with 400. */
 const BROWSER_USER_AGENT =
@@ -97,12 +110,26 @@ function collectExternalImageSrcs(html: string, supabaseUrl: string): string[] {
   return [...srcs];
 }
 
-function extensionForContentType(contentType: string): string {
-  if (contentType.includes("png")) return "png";
-  if (contentType.includes("webp")) return "webp";
-  if (contentType.includes("gif")) return "gif";
-  if (contentType.includes("jpeg") || contentType.includes("jpg")) return "jpg";
-  return "bin";
+/** Convert downloaded image bytes to WebP (same policy as frontend upload). */
+function convertImageBytesToWebp(bytes: Uint8Array): Uint8Array {
+  try {
+    return ImageMagick.read(bytes, (image) => {
+      const width = image.width;
+      const height = image.height;
+      if (width > MAX_IMAGE_DIMENSION || height > MAX_IMAGE_DIMENSION) {
+        if (width >= height) {
+          image.resize(MAX_IMAGE_DIMENSION, 0);
+        } else {
+          image.resize(0, MAX_IMAGE_DIMENSION);
+        }
+      }
+      image.quality = WEBP_QUALITY;
+      return image.write(MagickFormat.WebP, (data) => data);
+    });
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "unknown";
+    throw new Error(`WebP conversion failed: ${message}`);
+  }
 }
 
 async function downloadImageBytes(
@@ -156,14 +183,14 @@ async function uploadExternalImage(
   src: string,
   folder: "content" | "root",
 ): Promise<string> {
-  const { bytes, contentType } = await downloadImageBytes(src);
-  const extension = extensionForContentType(contentType);
-  const fileName = `${crypto.randomUUID()}.${extension}`;
+  const { bytes } = await downloadImageBytes(src);
+  const webpBytes = convertImageBytesToWebp(bytes);
+  const fileName = `${crypto.randomUUID()}.webp`;
   const filePath = folder === "content" ? `${postId}/content/${fileName}` : `${postId}/${fileName}`;
 
-  const { error } = await supabase.storage.from(POSTS_BUCKET).upload(filePath, bytes, {
+  const { error } = await supabase.storage.from(POSTS_BUCKET).upload(filePath, webpBytes, {
     upsert: false,
-    contentType,
+    contentType: "image/webp",
   });
   if (error) {
     throw new Error(`Storage upload failed: ${error.message}`);
