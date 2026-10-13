@@ -50,7 +50,7 @@ jobs:
           SKIP_DELETE: ${{ inputs.skip_delete }}
         run: node scripts/github-actions/sync-huggingface-daily-papers.mjs
 
-  # Runs only after sync succeeds. Uses upvote Top 5 + fingerprint skip.
+  # Runs only after sync succeeds. Uses upvote Top N (HF_TOP_LIMIT) + fingerprint skip.
   # continue-on-error: quota / Gemini outages must not mark the whole feed sync failed.
   digest:
     name: Summarize Hugging Face papers (Gemini)

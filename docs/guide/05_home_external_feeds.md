@@ -1,26 +1,24 @@
-# 05. Home External Feeds
+# 05. External Feeds (HF · GitHub Trending)
 
-홈(`/`)은 **Mine**(내 콘텐츠)과 **Latest Trends**(외부) 두 섹션으로 구성된다. **Mine이 위**, Latest Trends가 아래.
+Hugging Face Papers / GitHub Trending은 **GitHub Actions → Supabase 캐시 → React SELECT** 흐름이다.  
+브라우저는 외부 API/RSS를 직접 호출하지 않는다.
 
-- **Mine**: 최신 글 목록 + Tag Network (확대 시 창형 모달)
-- **Latest Trends**: Hugging Face Daily Papers + GitHub Trending Repos (`External` 배지)
+UI: 홈 `HomeTodayInAi`(하이라이트) · `/trends`의 `TrendSourcePanel`(period별 **전체 목록**).
 
 ## 데이터 흐름
 
 ```
 GitHub Actions (각 하루 10회, ~2.5h 간격)
-  ├─ UTC 00:00, 02:30, 05:00, 07:30, 10:00, 12:30, 15:00, 17:30, 20:00, 22:30 — HF API → Supabase huggingface_daily_papers
-  └─ UTC 00:15, 02:45, 05:15, 07:45, 10:15, 12:45, 15:15, 17:45, 20:15, 22:45 — GitHub Trending RSS → Supabase github_trending_repos
+  ├─ HF API → Supabase huggingface_daily_papers
+  └─ GitHub Trending RSS → Supabase github_trending_repos
 
-React (브라우저)
+React
   ├─ Supabase SELECT (fetched_date = UTC 오늘)
-  ├─ 오늘 데이터 없으면 최신 fetched_date로 fallback (isStale)
-  └─ 카드 렌더링 (self-contained 컴포넌트)
+  ├─ 오늘 데이터 없으면 최신 fetched_date fallback (isStale)
+  └─ period별 DB rows 전부 표시 (클라이언트 top-N 없음)
 ```
 
-브라우저는 외부 API/RSS를 직접 호출하지 않는다. CORS 회피 및 rate limit 관리를 Actions + Supabase 캐시로 처리한다.
-
-## period 지원
+## period
 
 | | daily | weekly | monthly |
 |---|---|---|---|
@@ -29,7 +27,7 @@ React (브라우저)
 
 ## Supabase 테이블
 
-초기 SQL: [`../sql/bootstrap.sql`](../sql/bootstrap.sql) (`bootstrap.sql`에 외부 피드 테이블 포함)
+초기 SQL: [`../sql/bootstrap.sql`](../sql/bootstrap.sql)
 
 ### `huggingface_daily_papers`
 
@@ -40,10 +38,10 @@ React (브라우저)
 | ai_keywords | text[] |
 | authors | text[] |
 | upvotes | int |
-| github_repo | text, **nullable** |
+| github_repo | text, nullable |
 | published_at | timestamptz |
 | period | `daily` \| `weekly` \| `monthly` |
-| fetched_date | date (UTC 기준) |
+| fetched_date | date (UTC) |
 
 Unique: `(paper_id, period, fetched_date)`
 
@@ -55,7 +53,7 @@ Unique: `(paper_id, period, fetched_date)`
 | url | 레포 URL |
 | description | nullable |
 | period | `daily` \| `weekly` \| `monthly` |
-| fetched_date | date (UTC 기준) |
+| fetched_date | date (UTC) |
 
 Unique: `(url, period, fetched_date)`
 
@@ -65,39 +63,19 @@ RLS: anon/authenticated **SELECT only**. INSERT/DELETE는 Actions(service_role)�
 
 | 워크플로 | cron (UTC) | 스크립트 |
 |---|---|---|
-| `fetch_huggingface_papers.yml` | 10×/day: `0 0`, `30 2`, `0 5`, `30 7`, `0 10`, `30 12`, `0 15`, `30 17`, `0 20`, `30 22` | `scripts/github-actions/sync-huggingface-daily-papers.mjs` |
-| `fetch_github_trending.yml` | 10×/day: `15 0`, `45 2`, `15 5`, `45 7`, `15 10`, `45 12`, `15 15`, `45 17`, `15 20`, `45 22` | `scripts/github-actions/sync-github-trending-repos.mjs` |
+| `fetch_huggingface_papers.yml` | 10×/day | `scripts/github-actions/sync-huggingface-daily-papers.mjs` |
+| `fetch_github_trending.yml` | 10×/day | `scripts/github-actions/sync-github-trending-repos.mjs` |
 
-공통 Secrets (기존 ping과 동일):
+Secrets: `SUPABASE_URL`, `SUPABASE_SECRET_KEY` (service role — 클라이언트 노출 금지)
 
-- `SUPABASE_URL`
-- `SUPABASE_SECRET_KEY` (service role / secret key — 클라이언트 노출 금지)
+sync 성공 시 해당 period의 당일 rows를 교체한다. **API/sync 실패 시 기존 캐시를 지우지 않는다.**
 
-### 수동 실행
-
-Actions 탭 → 워크플로 선택 → **Run workflow**
-
-| 입력 | 용도 |
-|---|---|
-| `skip_delete` | `true`면 전날 데이터 삭제 건너뜀 (테스트) |
-| `period` (GitHub만) | `all` / `daily` / `weekly` / `monthly` |
-
-### 동기화 순서 (스크립트)
-
-1. 외부 API/RSS fetch
-2. 오늘(`fetched_date`) 기존 행 삭제 (재실행 idempotent)
-3. INSERT
-4. `skip_delete`가 아니면 `fetched_date < today` 삭제
-5. GitHub Trending: period별 실패 시 해당 period만 skip (나머지 계속)
-
-**주의:** 2→3 순서 때문에 fetch 실패로 INSERT 0건이어도 당일 캐시는 비워진다. 프론트는 `externalFeedQuery` fallback으로 이전 `fetched_date`를 보여줄 수 있다 (`isStale`).
+HF sync 후 upvote Top 20(`HF_TOP_LIMIT`)으로 Gemini digest (CI + Admin regenerate). 목록 표시 개수와 무관.
 
 ## 로컬 스크립트 (선택)
 
-`.env.local`에 **로컬 전용**으로 service role key를 넣지 말 것. 테스트 시 일회성 env로 실행:
-
 ```bash
-# PowerShell 예시
+# PowerShell
 $env:SUPABASE_URL="https://xxx.supabase.co"
 $env:SUPABASE_SECRET_KEY="..."
 $env:SKIP_DELETE="true"
@@ -105,58 +83,17 @@ npm run sync:hf-papers
 npm run sync:gh-trending
 ```
 
-## 프론트 구조
+## 프론트
 
 ```
 src/features/huggingface/daily-papers/
 src/features/github/trending-repos/
+src/features/trends/          # /trends, HomeTodayInAi
+src/shared/utils/externalFeedQuery.js
 ```
-
-- 커스텀 훅 / Zustand / React Query **사용 안 함**
-- `useEffect` + `useState` + Supabase JS
-- `fetched_date`는 `getUtcDateString()` (Actions와 동일 UTC 날짜)
-- `fetchRowsForTodayOrLatest` (`src/shared/utils/externalFeedQuery.js`): 오늘 행이 0건이면 해당 테이블의 최신 `fetched_date`로 재조회 (`isStale: true`)
-
-## Home 레이아웃
-
-### Mine (상단)
-
-- `.home-tag-posts-grid`: Posts + Tag Network — lg+ **`6fr : 4fr`**
-- 섹션 제목 **내 글** (`HOME_SECTION_MINE`)
-- Posts 카드 헤더 **Latest Posts**, 최대 10건 (`HOME_LATEST_POST_LIMIT`)
-- Tag Network: `TagNetworkPanel` + `TagForceGraph`
-  - 우상단 확대 → `TagNetworkFullscreenModal` (배경 딤, PC **정사각형** 창, 모바일 여백 유지)
-  - Esc / X / 배경 클릭으로 닫기
-
-### Latest Trends (하단)
-
-- `.home-cards-grid`: HF + GitHub 2열 (lg+) / 1열 (모바일)
-- 카드 헤더 `External` 배지, UI 라벨 영문
-
-### 관련 컴포넌트
-
-```
-src/features/posts/components/HomeSection.jsx
-src/features/posts/components/HomeLatestPosts.jsx
-src/features/tags/components/TagNetwork.jsx
-src/features/tags/components/TagNetworkPanel.jsx
-src/features/tags/components/TagNetworkFullscreenModal.jsx
-src/shared/ui/HomeFeedBadge.jsx
-src/shared/hooks/useProfileSidebarOpen.js
-```
-
-## 제거된 것
-
-- `api/huggingface/daily-papers.js` (Vercel Edge)
-- `vite.config.js` HuggingFace proxy
-
-## 추후 (범위 외)
-
-- Hugging Face weekly/monthly (`?date=` 누적)
 
 ## 관련 문서
 
-- DB 상세: [`03_db.md`](./03_db.md), [`../sql/schema.md`](../sql/schema.md)
+- DB: [`03_db.md`](./03_db.md), [`../sql/schema.md`](../sql/schema.md)
 - Ops: [`04_ops.md`](./04_ops.md)
 - 프론트: [`02_frontend.md`](./02_frontend.md)
-- 글 삭제·Giscus: [`06_post_delete_and_giscus.md`](./06_post_delete_and_giscus.md)

@@ -17,9 +17,10 @@
 
 | 경로 | 설명 |
 |---|---|
-| `/` | 홈 — 내 글(Posts·Tag Network) + Latest Trends |
-| `/posts` | 글 목록 |
+| `/` | 홈 — 내 글 + Today in AI 하이라이트 |
+| `/posts` | 글 목록 (+ Tag Network 사이드) |
 | `/posts/:id` | 글 상세 + Giscus 댓글 |
+| `/trends` | HF / GitHub 트렌드 + AI brief |
 | `/portfolio` | 포트폴리오 |
 
 ### 관리자 (인증)
@@ -33,13 +34,11 @@
 | `/admin/posts/new` | 글 작성 |
 | `/admin/posts/:id/edit` | 글 수정·삭제 |
 | `/admin/portfolio` | 포트폴리오 관리 |
+| `/admin/settings` | 시크릿·Notion·트렌드 digest 재생성 |
 
 ## 레이아웃
 
-- 상단 `Header` (공개/관리 네비, 영문 라벨)
-- `ProfileSidebar` (프로필 레일, 접기/펼치기) + 본문
-  - lg+: 그리드 **1.2fr : 9fr** (사이드바 열림 시), 토글은 사이드바 우상단 `btn`
-  - 모바일: 사이드바 기본 닫힘, 상·하단 바로 열기/닫기
+- `SiteSidebar` + `MobileSiteHeader` (공개/관리 네비)
 - 공개 네비에 관리 대시보드 링크 없음 (URL 직접 입력 또는 로그인 후 진입)
 
 ## 소스 구조 (요약)
@@ -53,11 +52,12 @@ frontend/
     shared/        layout, constants, supabaseClient, 공용 UI
     features/
       posts/       목록·상세·홈, PostListRow
+      trends/      /trends, HomeTodayInAi, digests
       comments/    GiscusComments, deleteGiscusDiscussion API
       auth/        로그인
       admin/       글 에디터·목록, adminPostApi (CRUD·삭제)
       categories/  categoryApi (카테고리 CRUD)
-      tags/        Tag Network, refreshTagStats
+      tags/        TagNetworkPanel, refreshTagStats
       settings/    프로필
       portfolio/
       huggingface/daily-papers/
@@ -75,17 +75,18 @@ frontend/
 | 상세 본문 | `posts.content` (마크다운) — 상세 hero 이미지 없음, 본문 내 이미지만 표시 |
 | excerpt | DB `null`이면 목록에서 본문 30자 자동 미리보기; 수동 입력 시 그대로 사용 |
 | 댓글 | `GiscusComments` — `term={postId}`, mapping `specific` |
-| 카테고리 | 미선택 시 **`기타`** 자동 (`categories.js`, `resolvePostCategory.js`) |
+| 카테고리 | 미선택 시 **`Other`** 자동 (`categories.js`, `resolvePostCategory.js`) |
 | 이미지 업로드 | JPEG/PNG 등 → **WebP 변환** 후 Storage (`prepareImageForUpload`) |
 | 좋아요 | `post_likes` + `posts.like_count` (익명, visitor_key) |
 
 글 삭제: `adminPostApi.deletePost` → Storage + Giscus Edge Function + `posts` DELETE. 상세는 [`06_post_delete_and_giscus.md`](./06_post_delete_and_giscus.md).
 
-## 홈 외부 피드
+## 외부 피드 · Trends
 
-- Hugging Face / GitHub Trending 카드: Supabase 캐시 조회 (브라우저 직접 fetch 없음)
-- 홈 섹션 **내 글** (상단) / **Latest Trends** (하단, `External` 배지)
-- 오늘(UTC) 데이터 없으면 최신 `fetched_date`로 fallback (`externalFeedQuery.js`)
+- HF / GitHub: Supabase 캐시 조회 (브라우저 직접 fetch 없음)
+- 홈: `HomeMyPosts` + `HomeTodayInAi` 하이라이트
+- `/trends`: period별 전체 목록 + AI brief
+- 오늘(UTC) 데이터 없으면 최신 `fetched_date` fallback (`externalFeedQuery.js`)
 - 상세: [`05_home_external_feeds.md`](./05_home_external_feeds.md)
 
 ## 로컬

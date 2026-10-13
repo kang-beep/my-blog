@@ -869,10 +869,6 @@
     @apply text-right text-xs tabular-nums text-slate-500;
   }
 
-  .home-cards-grid {
-    @apply grid grid-cols-1 gap-6 lg:grid-cols-2;
-  }
-
   .home-feed-badge {
     @apply inline-flex shrink-0 rounded-full px-2 py-0.5 text-xs font-medium;
   }
@@ -883,10 +879,6 @@
 
   .home-feed-card-header .home-feed-badge-external {
     @apply bg-white/10 text-neutral-200;
-  }
-
-  .home-feed-badge-mine {
-    @apply bg-indigo-50 text-indigo-700;
   }
 
   .home-feed-card {
@@ -933,14 +925,6 @@
     @apply max-h-none overflow-visible;
   }
 
-  .home-tag-posts-grid {
-    @apply grid min-h-0 grid-cols-1 lg:grid-cols-[minmax(0,6fr)_minmax(0,4fr)] lg:divide-x lg:divide-slate-100;
-  }
-
-  .home-tag-posts-panel {
-    @apply flex min-h-0 flex-col;
-  }
-
   .home-tag-posts-panel-header {
     @apply flex h-14 shrink-0 items-center justify-between gap-2 border-b border-neutral-500 bg-neutral-600 px-4 text-white sm:px-5;
   }
@@ -951,14 +935,6 @@
 
   .home-tag-posts-panel-header-action-slot {
     @apply inline-flex h-[2.375rem] shrink-0 items-center;
-  }
-
-  .home-tag-posts-panel-body {
-    @apply flex min-h-0 flex-col px-4 py-3 sm:px-5 lg:h-96 lg:overflow-hidden;
-  }
-
-  .home-tag-posts-panel-body-scroll {
-    @apply lg:overflow-y-auto;
   }
 
   .posts-split-panel-body {

@@ -1,7 +1,7 @@
 /**
  * Hugging Face papers AI digest (daily / weekly / monthly).
  *
- * Input: upvote Top 5 papers (title + summary) from huggingface_daily_papers.
+ * Input: upvote Top N papers (title + summary) from huggingface_daily_papers.
  * Fingerprint skip when inputs + language unchanged.
  *
  * Env:

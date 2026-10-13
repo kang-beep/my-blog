@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 
 export const HUGGINGFACE_PAPERS_TABLE = "huggingface_daily_papers";
 export const HF_PROMPT_VERSION = "huggingface-v2";
-export const HF_TOP_LIMIT = 5;
+export const HF_TOP_LIMIT = 20;
 
 /**
  * Latest HF papers for a period, ordered by upvotes, capped at Top N.
@@ -39,7 +39,7 @@ export async function fetchHuggingfacePapersForPeriod(supabase, period, topLimit
   return { fetchedDate, rows: data ?? [] };
 }
 
-/** Gemini input: title + full summary (Top 5 by upvotes). */
+/** Gemini input: title + full summary (upvote top N). */
 export function buildHuggingfaceDigestInput(rows) {
   return rows.map((row) => ({
     title: String(row.title ?? "").trim(),

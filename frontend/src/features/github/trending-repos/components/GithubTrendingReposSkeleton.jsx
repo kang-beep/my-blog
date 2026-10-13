@@ -1,4 +1,4 @@
-import { GITHUB_TRENDING_REPOS_TOP_LIMIT } from "@/features/github/trending-repos/constants/githubTrendingRepos";
+const SKELETON_ITEM_COUNT = 5;
 
 function GithubTrendingRepoSkeletonItem() {
   return (
@@ -16,7 +16,7 @@ function GithubTrendingRepoSkeletonItem() {
 export default function GithubTrendingReposSkeleton() {
   return (
     <ul className="divide-y divide-slate-100" aria-hidden>
-      {Array.from({ length: GITHUB_TRENDING_REPOS_TOP_LIMIT }, (_, index) => (
+      {Array.from({ length: SKELETON_ITEM_COUNT }, (_, index) => (
         <GithubTrendingRepoSkeletonItem key={`github-trending-skeleton-${index}`} />
       ))}
     </ul>

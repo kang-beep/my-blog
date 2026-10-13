@@ -28,29 +28,3 @@ export function filterPostsByTag(posts, tag) {
     (post.tags ?? []).some((postTag) => postTag?.trim().toLowerCase() === normalizedTag),
   );
 }
-
-export function groupPostsByCategory(posts, categoryOrder = []) {
-  const grouped = new Map();
-
-  posts.forEach((post) => {
-    const category = post.category?.trim() || "Uncategorized";
-    if (!grouped.has(category)) {
-      grouped.set(category, []);
-    }
-    grouped.get(category).push(post);
-  });
-
-  const orderedCategories = [
-    ...categoryOrder.filter((name) => grouped.has(name)),
-    ...[...grouped.keys()]
-      .filter((name) => !categoryOrder.includes(name))
-      .sort((a, b) => a.localeCompare(b, "ko")),
-  ];
-
-  return orderedCategories
-    .map((category) => ({
-      category,
-      posts: grouped.get(category) ?? [],
-    }))
-    .filter((section) => section.posts.length > 0);
-}

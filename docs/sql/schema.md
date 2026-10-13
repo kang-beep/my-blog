@@ -19,7 +19,7 @@ github_trending_repos / huggingface_daily_papers ──> trend_ai_digests (Gemin
 
 **Admin secrets:** Notion / Giscus PAT / Gemini API key 등. 원문은 RPC로만 읽고, 목록은 마스킹. 마이그레이션: [`migrations/20260321_admin_secrets.sql`](./migrations/20260321_admin_secrets.sql)
 
-**Trend AI digests:** [`migrations/20261010_trend_ai_digests.sql`](./migrations/20261010_trend_ai_digests.sql) · 설계 [`../ai_summary/pipeline_design.md`](../ai_summary/pipeline_design.md)
+**Trend AI digests:** [`migrations/20261010_trend_ai_digests.sql`](./migrations/20261010_trend_ai_digests.sql) · 운영 [`../guide/04_ops.md`](../guide/04_ops.md) · 피드 [`../guide/05_home_external_feeds.md`](../guide/05_home_external_feeds.md)
 
 ## admin_secrets
 

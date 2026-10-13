@@ -100,17 +100,3 @@ export function getMostRecentDate(createdAt, updatedAt) {
 
   return updatedDate > createdDate ? updatedAt : createdAt;
 }
-
-export function isSameMinute(left, right) {
-  if (!left || !right) {
-    return false;
-  }
-
-  const leftDate = new Date(left);
-  const rightDate = new Date(right);
-  if (Number.isNaN(leftDate.getTime()) || Number.isNaN(rightDate.getTime())) {
-    return false;
-  }
-
-  return leftDate.getTime() === rightDate.getTime();
-}

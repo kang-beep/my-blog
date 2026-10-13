@@ -73,7 +73,7 @@ scripts/github-actions/   GitHub Actions 동기화
 | `02_frontend.md` | 라우트, 레이아웃, Vercel |
 | `03_db.md` | DB·Storage·RLS 운영 |
 | `04_ops.md` | 배포, Actions, Edge Functions |
-| `05_home_external_feeds.md` | HF·GitHub Trending 캐시 |
+| `05_home_external_feeds.md` | HF·GitHub Trending 캐시 · `/trends` |
 | `06_post_delete_and_giscus.md` | 글 삭제, Giscus, Edge Function |
 | `../sql/bootstrap.sql` | Supabase 초기 설정 SQL |
 | `../sql/schema.md` | 스키마 상세 |

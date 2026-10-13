@@ -16,7 +16,7 @@
 | [guide/02_frontend.md](./guide/02_frontend.md) | 라우트, 레이아웃, Vercel |
 | [guide/03_db.md](./guide/03_db.md) | DB·Storage·RLS 운영 |
 | [guide/04_ops.md](./guide/04_ops.md) | 배포, Actions, Edge Functions |
-| [guide/05_home_external_feeds.md](./guide/05_home_external_feeds.md) | HF·GitHub Trending 캐시 |
+| [guide/05_home_external_feeds.md](./guide/05_home_external_feeds.md) | HF·GitHub Trending 캐시 · `/trends` |
 | [guide/06_post_delete_and_giscus.md](./guide/06_post_delete_and_giscus.md) | 글 삭제, Giscus, Edge Function |
 | [guide/07_admin_secrets_and_notion.md](./guide/07_admin_secrets_and_notion.md) | Admin 시크릿 DB, Notion import |
 
