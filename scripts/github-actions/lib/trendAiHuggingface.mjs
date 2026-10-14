@@ -2,7 +2,7 @@ import { createHash } from "node:crypto";
 
 export const HUGGINGFACE_PAPERS_TABLE = "huggingface_daily_papers";
 export const HF_PROMPT_VERSION = "huggingface-v2";
-export const HF_TOP_LIMIT = 20;
+export const HF_TOP_LIMIT = 10;
 
 /**
  * Latest HF papers for a period, ordered by upvotes, capped at Top N.

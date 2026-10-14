@@ -9,7 +9,7 @@ function buildHelpText(source, model) {
   if (source === TREND_AI_SOURCES.GITHUB || source === "github") {
     return `Generated with ${modelName}. Analyzed the full trending list for this period.`;
   }
-  return `Generated with ${modelName}. Analyzed the top papers by upvotes (up to 20).`;
+  return `Generated with ${modelName}. Analyzed the top papers by upvotes (up to 10).`;
 }
 
 function useCloseOnOutsideClick(isOpen, rootRef, setIsOpen) {
