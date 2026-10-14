@@ -70,7 +70,7 @@ Secrets: `SUPABASE_URL`, `SUPABASE_SECRET_KEY` (service role — 클라이언트
 
 sync 성공 시 해당 period의 당일 rows를 교체한다. **API/sync 실패 시 기존 캐시를 지우지 않는다.**
 
-HF sync 후 upvote Top 10(`HF_TOP_LIMIT`)으로 Gemini digest (CI + Admin regenerate). 목록 표시 개수와 무관.
+Gemini digest는 sync와 분리, **하루 2회** (`summarize_trend_ai_digests.yml`). HF는 upvote Top 10(`HF_TOP_LIMIT`). Admin regenerate도 동일 로직. 목록 표시 개수와 무관.
 
 ## 로컬 스크립트 (선택)
 

@@ -1,0 +1,59 @@
+name: Summarize Trend AI Digests
+
+# Gemini free RPD is tight (~20). Keep feed sync frequent; run digests only 2×/day.
+# Worst case if all fingerprints miss: 2 runs × (HF 3 periods + GH 3 periods) = 12 requests.
+
+on:
+  schedule:
+    # UTC 01:00 → KST 10:00, UTC 13:00 → KST 22:00
+    - cron: "0 1 * * *"
+    - cron: "0 13 * * *"
+  workflow_dispatch:
+    inputs:
+      period:
+        description: "Period to summarize"
+        type: choice
+        options:
+          - all
+          - daily
+          - weekly
+          - monthly
+        default: all
+      source:
+        description: "Which digests to run"
+        type: choice
+        options:
+          - all
+          - huggingface
+          - github
+        default: all
+
+jobs:
+  digest:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - run: npm ci
+
+      - name: Summarize Hugging Face papers (Gemini)
+        if: ${{ github.event_name == 'schedule' || inputs.source == 'all' || inputs.source == 'huggingface' }}
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          PERIOD: ${{ inputs.period || 'all' }}
+        run: npm run summarize:hf-papers
+
+      - name: Summarize GitHub trending (Gemini)
+        if: ${{ github.event_name == 'schedule' || inputs.source == 'all' || inputs.source == 'github' }}
+        env:
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
+          PERIOD: ${{ inputs.period || 'all' }}
+        run: npm run summarize:gh-trending

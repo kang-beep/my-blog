@@ -36,9 +36,6 @@ supabase functions deploy dynamic-handler --project-ref tznrmatarsyyptddnaee
 supabase functions deploy regenerate-trend-ai-digests --project-ref tznrmatarsyyptddnaee
 ```
 
-HF AI digest: sync 후 `npm run summarize:hf-papers` (upvote Top 10, daily/weekly/monthly).
-
-
 Secret (Dashboard): `my-blog-giscus-tokens` = GitHub fine-grained PAT (Discussions read/write on `kang-beep/my-blog`).
 
 ## GitHub Actions — Supabase ping
@@ -64,6 +61,19 @@ Secret (Dashboard): `my-blog-giscus-tokens` = GitHub fine-grained PAT (Discussio
 |---|---|---|
 | `fetch_huggingface_papers.yml` | 10×/day (~2.5h): `0 0`, `30 2`, `0 5`, `30 7`, `0 10`, `30 12`, `0 15`, `30 17`, `0 20`, `30 22` | `scripts/github-actions/sync-huggingface-daily-papers.mjs` |
 | `fetch_github_trending.yml` | 10×/day (+15m offset): `15 0`, `45 2`, `15 5`, `45 7`, `15 10`, `45 12`, `15 15`, `45 17`, `15 20`, `45 22` | `scripts/github-actions/sync-github-trending-repos.mjs` |
+
+## GitHub Actions — Trend AI digests (Gemini)
+
+Feed sync는 자주, Gemini digest는 **하루 2회**만 (`summarize_trend_ai_digests.yml`). 무료 RPD(~20) 대비.
+
+| 항목 | 내용 |
+|---|---|
+| cron (UTC) | `0 1 * * *`, `0 13 * * *` (KST 10:00 / 22:00) |
+| 스크립트 | `npm run summarize:hf-papers` → `npm run summarize:gh-trending` |
+| HF 입력 | upvote Top 10 (`HF_TOP_LIMIT`), period별 fingerprint 스킵 |
+| 최악 RPD | 2×(HF 3 + GH 3) = 12 (전부 재생성 시) |
+
+수동: Actions → **Summarize Trend AI Digests** → `workflow_dispatch`
 
 수동: `workflow_dispatch`
 

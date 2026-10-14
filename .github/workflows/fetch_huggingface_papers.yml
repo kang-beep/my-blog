@@ -49,28 +49,3 @@ jobs:
           PERIOD: ${{ inputs.period || 'all' }}
           SKIP_DELETE: ${{ inputs.skip_delete }}
         run: node scripts/github-actions/sync-huggingface-daily-papers.mjs
-
-  # Runs only after sync succeeds. Uses upvote Top N (HF_TOP_LIMIT) + fingerprint skip.
-  # continue-on-error: quota / Gemini outages must not mark the whole feed sync failed.
-  digest:
-    name: Summarize Hugging Face papers (Gemini)
-    needs: sync
-    if: success()
-    continue-on-error: true
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: "22"
-          cache: npm
-
-      - run: npm ci
-
-      - name: Upsert AI digests (skip Gemini on fingerprint match)
-        env:
-          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
-          SUPABASE_SECRET_KEY: ${{ secrets.SUPABASE_SECRET_KEY }}
-          PERIOD: ${{ inputs.period || 'all' }}
-        run: npm run summarize:hf-papers
