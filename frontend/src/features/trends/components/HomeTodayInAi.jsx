@@ -1,4 +1,4 @@
-// Home Today in Trend: AI headline from trend_ai_digests + real daily feed highlights
+// Home Today in Trend: AI headline + daily feed highlights (full brief on /trends)
 import { useEffect, useState } from "react";
 import { fetchGithubTrendingRepos } from "@/features/github/trending-repos/api/githubTrendingReposApi";
 import { fetchHuggingFaceDailyPapers } from "@/features/huggingface/daily-papers/api/huggingfaceDailyPapersApi";

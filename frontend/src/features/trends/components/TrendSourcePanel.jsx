@@ -19,6 +19,7 @@ import {
 import { HOME_FEED_BADGE_EXTERNAL } from "@/features/posts/constants/home";
 import TrendAiBriefHelpTip from "@/features/trends/components/TrendAiBriefHelpTip";
 import { TREND_AI_SOURCES } from "@/features/trends/constants/trendAiDigests";
+import { splitDigestSummarySentences } from "@/features/trends/utils/formatDigestSummary";
 import ExternalFeedUnavailable from "@/shared/ui/ExternalFeedUnavailable";
 import GithubMarkIcon from "@/shared/ui/GithubMarkIcon";
 import HomeFeedBadge from "@/shared/ui/HomeFeedBadge";
@@ -53,6 +54,8 @@ export default function TrendSourcePanel({
   const externalUrl = isGithub ? GITHUB_TRENDING_PAGE_URL : HUGGINGFACE_DAILY_PAPERS_PAGE_URL;
   const externalLabel = isGithub ? "Trending" : "Papers";
   const emptyFeedLabel = isGithub ? "Top repos · RSS order" : "Top papers · by upvotes";
+  const feedListLabel = isGithub ? "Trending repos" : "Top papers";
+  const feedListHint = isGithub ? "Ordered as on GitHub Trending" : "Sorted by upvotes";
 
   const [selectedPeriod, setSelectedPeriod] = useState("daily");
   const [items, setItems] = useState([]);
@@ -171,23 +174,51 @@ export default function TrendSourcePanel({
           <p className="trend-brief-card-summary">No AI brief yet for this period.</p>
         ) : null}
         {!isDigestLoading && digest ? (
-          <div className="space-y-2">
-            <h4 className="trend-brief-card-headline">{digest.headline}</h4>
-            <p className="trend-brief-card-summary">{digest.summary}</p>
-            {(digest.keywords ?? []).length > 0 ? (
-              <ul className="trend-brief-keywords">
-                {digest.keywords.map((keyword) => (
-                  <li key={keyword}>
-                    <span className="trend-brief-keyword">{keyword}</span>
-                  </li>
+          <div className="trend-brief-body">
+            <section className="trend-brief-section" aria-labelledby={`${source}-headline-label`}>
+              <p id={`${source}-headline-label`} className="trend-brief-section-label">
+                Headline
+              </p>
+              <h4 className="trend-brief-card-headline">{digest.headline}</h4>
+            </section>
+            <div className="trend-brief-divider" aria-hidden />
+            <section className="trend-brief-section" aria-labelledby={`${source}-brief-label`}>
+              <p id={`${source}-brief-label`} className="trend-brief-section-label">
+                Brief
+              </p>
+              <div className="trend-brief-card-summary">
+                {splitDigestSummarySentences(digest.summary).map((sentence, index) => (
+                  <p key={`digest-brief-${index}`}>{sentence}</p>
                 ))}
-              </ul>
+              </div>
+            </section>
+            {(digest.keywords ?? []).length > 0 ? (
+              <>
+                <div className="trend-brief-divider" aria-hidden />
+                <section className="trend-brief-section" aria-labelledby={`${source}-keywords-label`}>
+                  <p id={`${source}-keywords-label`} className="trend-brief-section-label">
+                    Keywords
+                  </p>
+                  <ul className="trend-brief-keywords">
+                    {digest.keywords.map((keyword) => (
+                      <li key={keyword}>
+                        <span className="trend-brief-keyword">{keyword}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </section>
+              </>
             ) : null}
           </div>
         ) : null}
       </div>
 
       <div className="home-feed-card-body" aria-busy={isFeedLoading} aria-live="polite">
+        <div className="trend-feed-list-header">
+          <p className="trend-brief-section-label">{feedListLabel}</p>
+          <p className="trend-feed-list-hint">{feedListHint}</p>
+        </div>
+
         {isFeedLoading ? (
           <>
             <p className="sr-only">Loading feed.</p>

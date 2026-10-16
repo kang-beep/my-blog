@@ -384,40 +384,8 @@
     @apply grid grid-cols-1 gap-4 lg:grid-cols-2;
   }
 
-  .home-ai-brief {
-    @apply border-l-2 pl-3;
-  }
-
-  .home-ai-brief-github {
-    @apply border-indigo-500;
-  }
-
-  .home-ai-brief-huggingface {
-    @apply border-amber-400;
-  }
-
-  .home-ai-brief-label-row {
-    @apply mb-1 flex items-center justify-between gap-2;
-  }
-
-  .home-ai-brief-label {
-    @apply m-0 text-[11px] font-semibold uppercase tracking-wide;
-  }
-
-  .home-ai-brief-github .home-ai-brief-label {
-    @apply text-indigo-600;
-  }
-
-  .home-ai-brief-huggingface .home-ai-brief-label {
-    @apply text-amber-600;
-  }
-
-  .home-ai-card-headline {
-    @apply m-0 line-clamp-2 text-base font-semibold leading-snug text-slate-800;
-  }
-
   .home-ai-highlight-list {
-    @apply m-0 mt-3 flex list-none flex-col divide-y divide-slate-100 p-0;
+    @apply m-0 flex list-none flex-col divide-y divide-slate-100 p-0;
   }
 
   .home-ai-highlight-row {
@@ -450,6 +418,22 @@
 
   .home-ai-highlight-empty {
     @apply m-0 py-1.5 text-xs text-slate-500;
+  }
+
+  .home-ai-more-link {
+    @apply mt-1 flex flex-col items-center gap-1.5 border-t border-slate-100 px-2 py-3 text-slate-400 no-underline transition-colors hover:bg-slate-50 hover:text-slate-700;
+  }
+
+  .home-ai-more-dots {
+    @apply flex flex-col items-center gap-1;
+  }
+
+  .home-ai-more-dots > span {
+    @apply block size-1 rounded-full bg-current;
+  }
+
+  .home-ai-more-label {
+    @apply text-xs font-medium tracking-wide;
   }
 
   .trends-page {
@@ -505,15 +489,39 @@
   }
 
   .trend-source-ai-block {
-    @apply space-y-2 border-b border-slate-100 bg-slate-50 px-4 py-4 sm:px-6;
+    @apply space-y-3 border-b border-slate-200 bg-slate-50 px-4 py-4 sm:px-6;
   }
 
   .trend-source-ai-label-row {
-    @apply flex items-center justify-between gap-2;
+    @apply flex items-center justify-between gap-2 border-b border-slate-200 pb-2.5;
   }
 
   .trend-source-ai-label {
     @apply m-0 text-xs font-medium uppercase tracking-[0.08em] text-slate-500;
+  }
+
+  .trend-brief-body {
+    @apply space-y-3;
+  }
+
+  .trend-brief-section {
+    @apply space-y-3;
+  }
+
+  .trend-brief-section-label {
+    @apply m-0 text-[11px] font-semibold uppercase tracking-[0.08em] text-slate-400;
+  }
+
+  .trend-brief-divider {
+    @apply border-t border-slate-200;
+  }
+
+  .trend-feed-list-header {
+    @apply mb-3 flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 border-b border-slate-100 pb-2.5;
+  }
+
+  .trend-feed-list-hint {
+    @apply m-0 text-xs text-slate-400;
   }
 
   .trend-ai-help {
@@ -544,15 +552,19 @@
   }
 
   .trend-brief-card-summary {
-    @apply m-0 text-sm leading-relaxed text-slate-600;
+    @apply m-0 space-y-3 text-sm leading-relaxed text-slate-600;
+  }
+
+  .trend-brief-card-summary p {
+    @apply m-0;
   }
 
   .trend-brief-keywords {
-    @apply m-0 mt-1 flex list-none flex-wrap gap-2 p-0;
+    @apply m-0 flex list-none flex-wrap gap-2 p-0;
   }
 
   .trend-brief-keyword {
-    @apply inline-flex shrink-0 items-center justify-center rounded-full bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-200;
+    @apply inline-flex shrink-0 items-center justify-center rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs font-medium text-slate-600 transition-colors hover:bg-slate-100;
   }
 
   .trends-browse-grid {
